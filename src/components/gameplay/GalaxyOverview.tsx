@@ -148,6 +148,14 @@ export const GalaxyOverview = () => {
           />
           {mappedSystems.map((system) => (
             <g key={system.id}>
+              {system.hostilePower && system.hostilePower > 0 ? (
+                <circle
+                  cx={system.screenX}
+                  cy={system.screenY}
+                  r={visibilityRadius[system.visibility] + 4}
+                  className="galaxy-overview__hostile"
+                />
+              ) : null}
               <circle
                 cx={system.screenX}
                 cy={system.screenY}
@@ -199,6 +207,7 @@ export const GalaxyOverview = () => {
               <th>Nome</th>
               <th>Tipo</th>
               <th>Stato</th>
+              <th>Minaccia</th>
               <th>Mondo</th>
               <th>Colonizzazione</th>
             </tr>
@@ -225,9 +234,10 @@ export const GalaxyOverview = () => {
               return (
                 <tr key={system.id}>
                   <td>{system.name}</td>
-                  <td>{system.starClass}</td>
-                  <td>{visibilityLabel[system.visibility]}</td>
-                  <td>{habitable ? habitable.kind : '—'}</td>
+                <td>{system.starClass}</td>
+                <td>{visibilityLabel[system.visibility]}</td>
+                <td>{system.hostilePower ?? 0}</td>
+                <td>{habitable ? habitable.kind : '—'}</td>
                   <td>
                     {habitable ? (
                       <button

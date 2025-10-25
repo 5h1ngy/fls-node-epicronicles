@@ -283,6 +283,13 @@ body {
   stroke-width: 1;
 }
 
+.galaxy-overview__hostile {
+  fill: none;
+  stroke: rgba(255, 87, 87, 0.8);
+  stroke-width: 2;
+  stroke-dasharray: 4 2;
+}
+
 .galaxy-overview__ships {
   margin-top: 1rem;
 }
@@ -456,4 +463,99 @@ body {
 .colonization-progress__bar {
   height: 100%;
   background: linear-gradient(90deg, #7fe38f, #4dffdf);
+}
+
+.shipyard-panel,
+.fleet-panel,
+.combat-log {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  background: rgba(4, 10, 25, 0.9);
+}
+
+.shipyard-panel__designs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.shipyard-panel__card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.shipyard-panel__queue ul,
+.fleet-panel ul,
+.combat-log ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.shipyard-panel__queue li,
+.fleet-panel li,
+.combat-log li {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.progress-bar {
+  margin-top: 0.4rem;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7ba2ff, #4de2ff);
+}
+
+.panel-message {
+  margin: 0.4rem 0;
+  color: #7fe38f;
+  font-size: 0.85rem;
+}
+
+.fleet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.fleet-panel__order {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.fleet-panel__order select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.4rem;
+  color: inherit;
+}
+
+.fleet-ships {
+  margin: 0.4rem 0;
+  font-size: 0.85rem;
+}
+
+.combat-log__header {
+  display: flex;
+  justify-content: space-between;
 }

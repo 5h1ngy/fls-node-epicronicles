@@ -92,6 +92,8 @@ const createStarSystem = (
     },
     visibility,
     habitableWorld: createHabitableWorld(random, name),
+    hostilePower:
+      index === 0 || random() > 0.35 ? 0 : Math.round(6 + random() * 10),
   };
 };
 

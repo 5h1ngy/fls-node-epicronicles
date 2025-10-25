@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { gameConfig, type GameConfig } from '../config/gameConfig';
 import { advanceClock, setClockRunning, setClockSpeed } from '../domain/clock';
 import { createSession } from '../domain/session';
-import type { GameSession, GameView } from '../domain/types';
+import type { GameSession, GameView, ShipClassId } from '../domain/types';
 import { advanceSimulation } from '../domain/simulation';
 import { createColonizationTask } from '../domain/colonization';
 import { canAffordCost, spendResources } from '../domain/economy';
+import { createShipyardTask } from '../domain/shipyard';
+import { calculateTravelTicks } from '../domain/fleets';
 
 export interface StartSessionArgs {
   seed?: string;
@@ -25,6 +27,27 @@ export type StartColonizationResult =
   | { success: true }
   | { success: false; reason: ColonizationError };
 
+export type BuildShipError =
+  | 'NO_SESSION'
+  | 'INVALID_DESIGN'
+  | 'QUEUE_FULL'
+  | 'INSUFFICIENT_RESOURCES';
+
+export type QueueShipBuildResult =
+  | { success: true }
+  | { success: false; reason: BuildShipError };
+
+export type FleetOrderError =
+  | 'NO_SESSION'
+  | 'FLEET_NOT_FOUND'
+  | 'SYSTEM_NOT_FOUND'
+  | 'ALREADY_IN_SYSTEM'
+  | 'NO_SHIPS';
+
+export type FleetMoveResult =
+  | { success: true }
+  | { success: false; reason: FleetOrderError };
+
 interface GameStoreState {
   view: GameView;
   config: GameConfig;
@@ -35,6 +58,8 @@ interface GameStoreState {
   setSpeedMultiplier: (speed: number) => void;
   advanceClockBy: (elapsedMs: number, now: number) => void;
   startColonization: (systemId: string) => StartColonizationResult;
+  queueShipBuild: (designId: ShipClassId) => QueueShipBuildResult;
+  orderFleetMove: (fleetId: string, systemId: string) => FleetMoveResult;
 }
 
 const tickDurationMs = (cfg: GameConfig) =>
@@ -159,6 +184,90 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         ...session,
         economy: updatedEconomy,
         colonizationTasks: [...session.colonizationTasks, task],
+      },
+    });
+
+    return { success: true };
+  },
+  queueShipBuild: (designId) => {
+    const state = get();
+    const session = state.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+
+    const design = state.config.military.shipDesigns.find(
+      (entry) => entry.id === designId,
+    );
+    if (!design) {
+      return { success: false, reason: 'INVALID_DESIGN' };
+    }
+
+    if (
+      session.shipyardQueue.length >= state.config.military.shipyard.queueSize
+    ) {
+      return { success: false, reason: 'QUEUE_FULL' };
+    }
+
+    if (!canAffordCost(session.economy, design.buildCost)) {
+      return { success: false, reason: 'INSUFFICIENT_RESOURCES' };
+    }
+
+    const updatedEconomy = spendResources(session.economy, design.buildCost);
+    const task = createShipyardTask(design.id, design.buildTime);
+
+    set({
+      session: {
+        ...session,
+        economy: updatedEconomy,
+        shipyardQueue: [...session.shipyardQueue, task],
+      },
+    });
+
+    return { success: true };
+  },
+  orderFleetMove: (fleetId, systemId) => {
+    const state = get();
+    const session = state.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    const fleet = session.fleets.find((entry) => entry.id === fleetId);
+    if (!fleet) {
+      return { success: false, reason: 'FLEET_NOT_FOUND' };
+    }
+    const system = session.galaxy.systems.find(
+      (candidate) => candidate.id === systemId,
+    );
+    if (!system) {
+      return { success: false, reason: 'SYSTEM_NOT_FOUND' };
+    }
+    if (fleet.systemId === systemId && fleet.targetSystemId === null) {
+      return { success: false, reason: 'ALREADY_IN_SYSTEM' };
+    }
+    if (fleet.ships.length === 0) {
+      return { success: false, reason: 'NO_SHIPS' };
+    }
+
+    const travelTicks = calculateTravelTicks(
+      fleet.systemId,
+      systemId,
+      session.galaxy,
+      state.config,
+    );
+
+    set({
+      session: {
+        ...session,
+        fleets: session.fleets.map((entry) =>
+          entry.id === fleetId
+            ? {
+                ...entry,
+                targetSystemId: systemId,
+                ticksToArrival: travelTicks,
+              }
+            : entry,
+        ),
       },
     });
 

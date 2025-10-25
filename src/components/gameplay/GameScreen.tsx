@@ -6,6 +6,9 @@ import { GalaxyOverview } from './GalaxyOverview';
 import { ResourceBar } from './ResourceBar';
 import { PlanetList } from './PlanetList';
 import { ColonizationPanel } from './ColonizationPanel';
+import { ShipyardPanel } from './ShipyardPanel';
+import { FleetPanel } from './FleetPanel';
+import { CombatLogPanel } from './CombatLogPanel';
 
 const speedOptions = [0.5, 1, 2, 4];
 
@@ -121,6 +124,9 @@ export const GameScreen = () => {
       <GalaxyOverview />
       <PlanetList />
       <ColonizationPanel />
+      <ShipyardPanel />
+      <FleetPanel />
+      <CombatLogPanel />
       <DebugConsole />
     </div>
   );

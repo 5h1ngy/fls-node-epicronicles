@@ -58,6 +58,7 @@ export interface StarSystem {
   starClass: StarClass;
   visibility: SystemVisibility;
   habitableWorld?: HabitableWorldTemplate;
+  hostilePower?: number;
 }
 
 export interface ScienceShip {

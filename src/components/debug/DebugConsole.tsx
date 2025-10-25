@@ -51,6 +51,18 @@ export const DebugConsole = () => {
                 ticksRemaining: task.ticksRemaining,
                 totalTicks: task.totalTicks,
               })),
+              shipyardQueue: session.shipyardQueue.map((task) => ({
+                id: task.id,
+                designId: task.designId,
+                ticksRemaining: task.ticksRemaining,
+              })),
+              fleets: session.fleets.map((fleet) => ({
+                id: fleet.id,
+                systemId: fleet.systemId,
+                targetSystemId: fleet.targetSystemId,
+                ticksToArrival: fleet.ticksToArrival,
+                ships: fleet.ships.length,
+              })),
             },
             null,
             2,

@@ -3,6 +3,8 @@ import type { GameConfig } from '../config/gameConfig';
 import { advanceExploration } from './exploration';
 import { advanceEconomy } from './economy';
 import { advanceColonization } from './colonization';
+import { advanceShipyard } from './shipyard';
+import { advanceFleets } from './fleets';
 
 export const advanceSimulation = (
   session: GameSession,
@@ -16,12 +18,29 @@ export const advanceSimulation = (
   let updatedSession = session;
 
   for (let iteration = 0; iteration < ticks; iteration += 1) {
+    const fallbackSystemId =
+      updatedSession.fleets[0]?.systemId ??
+      updatedSession.galaxy.systems[0]?.id ??
+      'unknown';
     const colonization = advanceColonization(
       updatedSession.colonizationTasks,
       updatedSession.economy,
     );
+    const shipyard = advanceShipyard({
+      tasks: updatedSession.shipyardQueue,
+      fleets: updatedSession.fleets,
+      military: config.military,
+      fallbackSystemId,
+    });
+    const fleetsAdvance = advanceFleets({
+      fleets: shipyard.fleets,
+      galaxy: updatedSession.galaxy,
+      config,
+      fallbackSystemId,
+      tick: updatedSession.clock.tick + iteration + 1,
+    });
     const { galaxy, scienceShips } = advanceExploration(
-      updatedSession.galaxy,
+      fleetsAdvance.galaxy,
       updatedSession.scienceShips,
       config.exploration,
     );
@@ -32,6 +51,12 @@ export const advanceSimulation = (
       galaxy,
       scienceShips,
       colonizationTasks: colonization.tasks,
+      shipyardQueue: shipyard.tasks,
+      fleets: fleetsAdvance.fleets,
+      combatReports: [
+        ...updatedSession.combatReports,
+        ...fleetsAdvance.reports,
+      ].slice(-8),
       economy,
     };
   }
