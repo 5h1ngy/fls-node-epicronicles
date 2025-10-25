@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
-import { useGameStore } from '../../store/gameStore';
+import { useMemo, useState } from 'react';
+import { useGameStore, type ColonizationError } from '../../store/gameStore';
 import type {
   ScienceShip,
   StarClass,
   SystemVisibility,
 } from '../../domain/types';
+import { resourceLabels } from '../../domain/resourceMetadata';
 
 const VIEWPORT_SIZE = 320;
 
@@ -38,11 +39,41 @@ const shipStatusLabel: Record<ScienceShip['status'], string> = {
   surveying: 'Analisi',
 };
 
+const colonizationErrors: Record<ColonizationError, string> = {
+  NO_SESSION: 'Nessuna sessione attiva.',
+  SYSTEM_NOT_FOUND: 'Sistema non trovato.',
+  SYSTEM_NOT_SURVEYED: 'Sonda prima il sistema.',
+  NO_HABITABLE_WORLD: 'Nessun mondo abitabile disponibile.',
+  ALREADY_COLONIZED: 'Sistema già colonizzato.',
+  TASK_IN_PROGRESS: 'Colonizzazione già in corso.',
+  INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
+};
+
+const formatCost = (cost: Record<string, number | undefined>) =>
+  Object.entries(cost)
+    .filter(([, amount]) => amount && amount > 0)
+    .map(
+      ([type, amount]) => `${resourceLabels[type as keyof typeof resourceLabels]} ${amount}`,
+    )
+    .join(' · ');
+
 export const GalaxyOverview = () => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
   const scienceShips = useGameStore(
     (state) => state.session?.scienceShips ?? [],
   );
+  const planets = useGameStore((state) => state.session?.economy.planets ?? []);
+  const resources = useGameStore(
+    (state) => state.session?.economy.resources ?? null,
+  );
+  const colonizationTasks = useGameStore(
+    (state) => state.session?.colonizationTasks ?? [],
+  );
+  const colonizationConfig = useGameStore(
+    (state) => state.config.colonization,
+  );
+  const startColonization = useGameStore((state) => state.startColonization);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const mappedSystems = useMemo(() => {
     if (systems.length === 0) {
@@ -72,6 +103,37 @@ export const GalaxyOverview = () => {
     mappedSystems.forEach((system) => map.set(system.id, system));
     return map;
   }, [mappedSystems]);
+
+  const colonizedSystems = useMemo(
+    () => new Set(planets.map((planet) => planet.systemId)),
+    [planets],
+  );
+  const pendingSystems = useMemo(
+    () => new Set(colonizationTasks.map((task) => task.systemId)),
+    [colonizationTasks],
+  );
+
+  const canAffordCost = () => {
+    if (!resources) {
+      return false;
+    }
+    return Object.entries(colonizationConfig.cost).every(([type, amount]) => {
+      if (!amount || amount <= 0) {
+        return true;
+      }
+      const ledger = resources[type as keyof typeof resources];
+      return (ledger?.amount ?? 0) >= amount;
+    });
+  };
+
+  const handleColonize = (systemId: string, systemName: string) => {
+    const result = startColonization(systemId);
+    if (result.success) {
+      setActionMessage(`Colonizzazione avviata nel sistema ${systemName}.`);
+    } else {
+      setActionMessage(colonizationErrors[result.reason]);
+    }
+  };
 
   return (
     <section className="galaxy-overview">
@@ -121,22 +183,71 @@ export const GalaxyOverview = () => {
         </svg>
       </div>
       <div className="galaxy-overview__list">
+        <header className="galaxy-overview__header">
+          <h3>Sistemi stellari</h3>
+          <p className="galaxy-overview__hint">
+            Costo colonizzazione: {formatCost(colonizationConfig.cost)}
+          </p>
+          {actionMessage ? (
+            <p className="colonization-message">{actionMessage}</p>
+          ) : null}
+        </header>
         <table>
           <thead>
             <tr>
               <th>Nome</th>
               <th>Tipo</th>
               <th>Stato</th>
+              <th>Mondo</th>
+              <th>Colonizzazione</th>
             </tr>
           </thead>
           <tbody>
-            {systems.map((system) => (
-              <tr key={system.id}>
-                <td>{system.name}</td>
-                <td>{system.starClass}</td>
-                <td>{visibilityLabel[system.visibility]}</td>
-              </tr>
-            ))}
+            {systems.map((system) => {
+              const habitable = system.habitableWorld;
+              const colonized = colonizedSystems.has(system.id);
+              const pending = pendingSystems.has(system.id);
+              const affordability = canAffordCost();
+              let disabledReason: string | null = null;
+              if (!habitable) {
+                disabledReason = 'Nessun mondo abitabile';
+              } else if (system.visibility !== 'surveyed') {
+                disabledReason = 'Esplora e sonda il sistema';
+              } else if (colonized) {
+                disabledReason = 'Già colonizzato';
+              } else if (pending) {
+                disabledReason = 'In corso';
+              } else if (!affordability) {
+                disabledReason = 'Risorse insufficienti';
+              }
+
+              return (
+                <tr key={system.id}>
+                  <td>{system.name}</td>
+                  <td>{system.starClass}</td>
+                  <td>{visibilityLabel[system.visibility]}</td>
+                  <td>{habitable ? habitable.kind : '—'}</td>
+                  <td>
+                    {habitable ? (
+                      <button
+                        className="panel__action panel__action--compact"
+                        disabled={Boolean(disabledReason)}
+                        title={disabledReason ?? 'Avvia colonizzazione'}
+                        onClick={() => handleColonize(system.id, system.name)}
+                      >
+                        {colonized
+                          ? 'Colonia attiva'
+                          : pending
+                            ? 'In corso'
+                            : 'Colonizza'}
+                      </button>
+                    ) : (
+                      <span className="text-muted">N/A</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <div className="galaxy-overview__ships">

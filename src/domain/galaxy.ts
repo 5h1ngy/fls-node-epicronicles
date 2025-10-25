@@ -1,5 +1,8 @@
 import type {
   GalaxyState,
+  HabitableWorldTemplate,
+  PlanetKind,
+  ResourceType,
   StarClass,
   StarSystem,
   SystemVisibility,
@@ -12,6 +15,25 @@ export interface GalaxyGenerationParams {
 }
 
 const starClasses: StarClass[] = ['mainSequence', 'giant', 'dwarf'];
+const planetKinds: PlanetKind[] = ['terrestrial', 'desert', 'tundra'];
+
+const baseProductionByKind: Record<
+  PlanetKind,
+  { yields: Partial<Record<ResourceType, number>>; upkeep: Partial<Record<ResourceType, number>> }
+> = {
+  terrestrial: {
+    yields: { food: 4, energy: 2, minerals: 2 },
+    upkeep: { food: 2 },
+  },
+  desert: {
+    yields: { minerals: 4, energy: 3 },
+    upkeep: { food: 3 },
+  },
+  tundra: {
+    yields: { minerals: 3, research: 2 },
+    upkeep: { food: 4 },
+  },
+};
 
 const stringToSeed = (value: string) =>
   value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -23,6 +45,28 @@ const createRandom = (seed: string) => {
     let x = Math.imul(t ^ (t >>> 15), 1 | t);
     x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
     return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const createHabitableWorld = (
+  random: () => number,
+  systemName: string,
+): HabitableWorldTemplate | undefined => {
+  if (random() > 0.45) {
+    return undefined;
+  }
+
+  const kind =
+    planetKinds[Math.floor(random() * planetKinds.length)] ?? 'terrestrial';
+  const base = baseProductionByKind[kind];
+  const size = 12 + Math.round(random() * 8);
+
+  return {
+    name: `${systemName} Prime`,
+    kind,
+    size,
+    baseProduction: { ...base.yields },
+    upkeep: { ...base.upkeep },
   };
 };
 
@@ -47,6 +91,7 @@ const createStarSystem = (
       y: Math.sin(angle) * radius,
     },
     visibility,
+    habitableWorld: createHabitableWorld(random, name),
   };
 };
 

@@ -2,6 +2,7 @@ import type {
   EconomyState,
   Planet,
   PlanetKind,
+  ResourceCost,
   ResourceLedger,
   ResourceType,
 } from './types';
@@ -61,6 +62,43 @@ export const createInitialEconomy = (
   resources: createLedger(config.startingResources),
   planets: [createHomeworld(homeSystemId, config.homeworld)],
 });
+
+export const canAffordCost = (
+  state: EconomyState,
+  cost: ResourceCost,
+): boolean =>
+  Object.entries(cost).every(([type, amount]) => {
+    if (!amount) {
+      return true;
+    }
+    const ledger = state.resources[type as ResourceType];
+    return ledger?.amount >= amount;
+  });
+
+export const spendResources = (
+  state: EconomyState,
+  cost: ResourceCost,
+): EconomyState => {
+  const resources = { ...state.resources };
+  Object.entries(cost).forEach(([type, amount]) => {
+    if (!amount) {
+      return;
+    }
+    const resourceType = type as ResourceType;
+    const ledger = resources[resourceType];
+    if (!ledger) {
+      return;
+    }
+    resources[resourceType] = {
+      ...ledger,
+      amount: Math.max(0, ledger.amount - amount),
+    };
+  });
+  return {
+    ...state,
+    resources,
+  };
+};
 
 export interface AdvanceEconomyResult {
   economy: EconomyState;

@@ -1,5 +1,11 @@
 import type { GalaxyGenerationParams } from '../domain/galaxy';
 import type { EconomyConfig } from '../domain/economy';
+import type { ResourceCost } from '../domain/types';
+
+export interface ColonizationConfig {
+  cost: ResourceCost;
+  durationTicks: number;
+}
 
 export interface GameConfig {
   ticksPerSecond: number;
@@ -12,6 +18,7 @@ export interface GameConfig {
     surveyTicks: number;
   };
   economy: EconomyConfig;
+  colonization: ColonizationConfig;
 }
 
 export const gameConfig: GameConfig = {
@@ -50,5 +57,13 @@ export const gameConfig: GameConfig = {
         food: 4,
       },
     },
+  },
+  colonization: {
+    cost: {
+      energy: 50,
+      minerals: 80,
+      food: 30,
+    },
+    durationTicks: 6,
   },
 };

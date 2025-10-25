@@ -84,6 +84,11 @@ body {
   cursor: not-allowed;
 }
 
+.panel__action--compact {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+}
+
 .game-screen {
   width: min(960px, 95vw);
   display: flex;
@@ -232,6 +237,25 @@ body {
   max-height: 360px;
 }
 
+.galaxy-overview__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.galaxy-overview__hint {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.colonization-message {
+  font-size: 0.85rem;
+  margin: 0;
+  color: #7fe38f;
+}
+
 .galaxy-overview__list table {
   width: 100%;
   border-collapse: collapse;
@@ -317,6 +341,11 @@ body {
   color: rgba(255, 255, 255, 0.85);
 }
 
+.text-muted {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
 .planet-list {
   margin-top: 1.5rem;
 }
@@ -378,4 +407,53 @@ body {
 
 .planet-list__yield .is-negative {
   color: #ff9b8a;
+}
+
+.colonization-panel {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  background: rgba(4, 10, 25, 0.9);
+}
+
+.colonization-panel ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.colonization-panel li {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.colonization-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.colonization-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.colonization-progress {
+  margin-top: 0.6rem;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.colonization-progress__bar {
+  height: 100%;
+  background: linear-gradient(90deg, #7fe38f, #4dffdf);
 }

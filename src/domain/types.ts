@@ -15,6 +15,7 @@ export type SystemVisibility = 'unknown' | 'revealed' | 'surveyed';
 export type ScienceShipStatus = 'idle' | 'traveling' | 'surveying';
 
 export type ResourceType = 'energy' | 'minerals' | 'food' | 'research';
+export type ResourceCost = Partial<Record<ResourceType, number>>;
 
 export interface ResourceLedger {
   amount: number;
@@ -29,12 +30,21 @@ export interface Vector2 {
   y: number;
 }
 
+export interface HabitableWorldTemplate {
+  name: string;
+  kind: PlanetKind;
+  size: number;
+  baseProduction: ResourceCost;
+  upkeep: ResourceCost;
+}
+
 export interface StarSystem {
   id: string;
   name: string;
   position: Vector2;
   starClass: StarClass;
   visibility: SystemVisibility;
+  habitableWorld?: HabitableWorldTemplate;
 }
 
 export interface ScienceShip {
@@ -63,6 +73,17 @@ export interface EconomyState {
   planets: Planet[];
 }
 
+export type ColonizationStatus = 'preparing' | 'colonizing';
+
+export interface ColonizationTask {
+  id: string;
+  systemId: string;
+  planetTemplate: HabitableWorldTemplate;
+  ticksRemaining: number;
+  status: ColonizationStatus;
+  totalTicks: number;
+}
+
 export interface GalaxyState {
   seed: string;
   systems: StarSystem[];
@@ -76,4 +97,5 @@ export interface GameSession {
   clock: SimulationClock;
   scienceShips: ScienceShip[];
   economy: EconomyState;
+  colonizationTasks: ColonizationTask[];
 }

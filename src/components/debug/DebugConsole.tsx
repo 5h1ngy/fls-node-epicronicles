@@ -45,6 +45,12 @@ export const DebugConsole = () => {
                 targetSystemId: ship.targetSystemId,
                 ticksRemaining: ship.ticksRemaining,
               })),
+              colonizationTasks: session.colonizationTasks.map((task) => ({
+                id: task.id,
+                systemId: task.systemId,
+                ticksRemaining: task.ticksRemaining,
+                totalTicks: task.totalTicks,
+              })),
             },
             null,
             2,

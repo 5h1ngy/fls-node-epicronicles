@@ -35,5 +35,6 @@ export const createSession = ({
     clock: createClock(),
     scienceShips: createInitialScienceShips(galaxy),
     economy: createInitialEconomy(homeSystemId, economyConfig),
+    colonizationTasks: [],
   };
 };
