@@ -33,7 +33,7 @@ export const createInitialFleet = (
 
   return {
     id: `FLEET-${crypto.randomUUID()}`,
-    name: '1ª Flotta',
+    name: '1 Flotta',
     systemId: homeSystemId,
     targetSystemId: null,
     ticksToArrival: 0,
