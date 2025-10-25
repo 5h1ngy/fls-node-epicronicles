@@ -10,6 +10,10 @@ export interface SimulationClock {
 
 export type StarClass = 'mainSequence' | 'giant' | 'dwarf';
 
+export type SystemVisibility = 'unknown' | 'revealed' | 'surveyed';
+
+export type ScienceShipStatus = 'idle' | 'traveling' | 'surveying';
+
 export interface Vector2 {
   x: number;
   y: number;
@@ -20,7 +24,17 @@ export interface StarSystem {
   name: string;
   position: Vector2;
   starClass: StarClass;
-  discovered: boolean;
+  visibility: SystemVisibility;
+}
+
+export interface ScienceShip {
+  id: string;
+  name: string;
+  currentSystemId: string;
+  targetSystemId: string | null;
+  status: ScienceShipStatus;
+  ticksRemaining: number;
+  autoExplore: boolean;
 }
 
 export interface GalaxyState {
@@ -34,4 +48,5 @@ export interface GameSession {
   createdAt: number;
   galaxy: GalaxyState;
   clock: SimulationClock;
+  scienceShips: ScienceShip[];
 }

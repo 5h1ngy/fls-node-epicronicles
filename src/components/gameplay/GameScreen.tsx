@@ -27,7 +27,13 @@ export const GameScreen = () => {
     );
   }
 
-  const { clock, galaxy } = session;
+  const { clock, galaxy, scienceShips } = session;
+  const revealedCount = galaxy.systems.filter(
+    (system) => system.visibility !== 'unknown',
+  ).length;
+  const surveyedCount = galaxy.systems.filter(
+    (system) => system.visibility === 'surveyed',
+  ).length;
 
   useEffect(() => {
     if (!sessionId) {
@@ -87,8 +93,24 @@ export const GameScreen = () => {
             <dd>{clock.isRunning ? 'Running' : 'Paused'}</dd>
           </div>
           <div>
-            <dt>Sistemi</dt>
+            <dt>Sistemi totali</dt>
             <dd>{galaxy.systems.length}</dd>
+          </div>
+          <div>
+            <dt>Rivelati</dt>
+            <dd>
+              {revealedCount}/{galaxy.systems.length}
+            </dd>
+          </div>
+          <div>
+            <dt>Sondati</dt>
+            <dd>
+              {surveyedCount}/{galaxy.systems.length}
+            </dd>
+          </div>
+          <div>
+            <dt>Navi scientifiche</dt>
+            <dd>{scienceShips.length}</dd>
           </div>
         </dl>
       </section>

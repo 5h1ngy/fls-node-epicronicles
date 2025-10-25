@@ -1,6 +1,7 @@
 import { createTestGalaxy } from './galaxy';
 import type { GalaxyGenerationParams } from './galaxy';
 import type { GameSession, SimulationClock } from './types';
+import { createInitialScienceShips } from './exploration';
 
 export interface SessionParams {
   seed: string;
@@ -20,10 +21,14 @@ export const createSession = ({
   seed,
   label,
   galaxyOverrides,
-}: SessionParams): GameSession => ({
-  id: crypto.randomUUID(),
-  label: label ?? `Session ${new Date().toLocaleTimeString()}`,
-  createdAt: Date.now(),
-  galaxy: createTestGalaxy({ seed, ...galaxyOverrides }),
-  clock: createClock(),
-});
+}: SessionParams): GameSession => {
+  const galaxy = createTestGalaxy({ seed, ...galaxyOverrides });
+  return {
+    id: crypto.randomUUID(),
+    label: label ?? `Session ${new Date().toLocaleTimeString()}`,
+    createdAt: Date.now(),
+    galaxy,
+    clock: createClock(),
+    scienceShips: createInitialScienceShips(galaxy),
+  };
+};

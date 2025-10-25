@@ -3,6 +3,7 @@ import { gameConfig, type GameConfig } from '../config/gameConfig';
 import { advanceClock, setClockRunning, setClockSpeed } from '../domain/clock';
 import { createSession } from '../domain/session';
 import type { GameSession, GameView } from '../domain/types';
+import { advanceSimulation } from '../domain/simulation';
 
 export interface StartSessionArgs {
   seed?: string;
@@ -83,10 +84,16 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         now,
       });
 
+      const ticksAdvanced = updatedClock.tick - state.session.clock.tick;
+      const simulatedSession =
+        ticksAdvanced > 0
+          ? advanceSimulation(state.session, ticksAdvanced, cfg)
+          : state.session;
+
       return {
         ...state,
         session: {
-          ...state.session,
+          ...simulatedSession,
           clock: updatedClock,
         },
       };

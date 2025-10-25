@@ -9,13 +9,20 @@ export const DebugConsole = () => {
     return null;
   }
 
+  const revealed = session.galaxy.systems.filter(
+    (system) => system.visibility !== 'unknown',
+  ).length;
+  const surveyed = session.galaxy.systems.filter(
+    (system) => system.visibility === 'surveyed',
+  ).length;
+
   return (
     <div className={`debug-console ${isOpen ? 'is-open' : ''}`}>
       <button
         className="panel__action"
         onClick={() => setIsOpen((value) => !value)}
       >
-        {isOpen ? 'Hide debug' : 'Show debug'}
+        {isOpen ? 'Nascondi debug' : 'Mostra debug'}
       </button>
       {isOpen ? (
         <pre>
@@ -26,7 +33,18 @@ export const DebugConsole = () => {
               speed: session.clock.speedMultiplier,
               running: session.clock.isRunning,
               elapsedMs: session.clock.elapsedMs,
-              systems: session.galaxy.systems.length,
+              systems: {
+                total: session.galaxy.systems.length,
+                revealed,
+                surveyed,
+              },
+              ships: session.scienceShips.map((ship) => ({
+                id: ship.id,
+                status: ship.status,
+                currentSystemId: ship.currentSystemId,
+                targetSystemId: ship.targetSystemId,
+                ticksRemaining: ship.ticksRemaining,
+              })),
             },
             null,
             2,

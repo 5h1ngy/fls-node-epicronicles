@@ -212,3 +212,67 @@ body {
   padding: 0.4rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+.galaxy-overview__ship {
+  fill: #fff;
+  stroke: #0ff;
+  stroke-width: 1;
+}
+
+.galaxy-overview__ships {
+  margin-top: 1rem;
+}
+
+.galaxy-overview__ships ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.galaxy-overview__ships li {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.ship-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ship-name {
+  font-weight: 600;
+}
+
+.ship-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ship-status--idle {
+  color: #8dd1ff;
+  border-color: rgba(141, 209, 255, 0.4);
+}
+
+.ship-status--traveling {
+  color: #ffd280;
+  border-color: rgba(255, 210, 128, 0.5);
+}
+
+.ship-status--surveying {
+  color: #d7a6ff;
+  border-color: rgba(215, 166, 255, 0.5);
+}
+
+.ship-target {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+}

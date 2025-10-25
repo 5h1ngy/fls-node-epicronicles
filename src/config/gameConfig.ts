@@ -6,6 +6,10 @@ export interface GameConfig {
   debug: {
     autoStart: boolean;
   };
+  exploration: {
+    travelTicks: number;
+    surveyTicks: number;
+  };
 }
 
 export const gameConfig: GameConfig = {
@@ -17,5 +21,9 @@ export const gameConfig: GameConfig = {
   },
   debug: {
     autoStart: false,
+  },
+  exploration: {
+    travelTicks: 3,
+    surveyTicks: 2,
   },
 };

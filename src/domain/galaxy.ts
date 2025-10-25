@@ -1,4 +1,9 @@
-import type { GalaxyState, StarClass, StarSystem } from './types';
+import type {
+  GalaxyState,
+  StarClass,
+  StarSystem,
+  SystemVisibility,
+} from './types';
 
 export interface GalaxyGenerationParams {
   seed: string;
@@ -31,6 +36,8 @@ const createStarSystem = (
   const starClass = starClasses[Math.floor(random() * starClasses.length)];
   const name = `SYS-${(index + 1).toString().padStart(3, '0')}`;
 
+  const visibility: SystemVisibility = index === 0 ? 'surveyed' : 'unknown';
+
   return {
     id: `${name}-${Math.round(random() * 10000)}`,
     name,
@@ -39,7 +46,7 @@ const createStarSystem = (
       x: Math.cos(angle) * radius,
       y: Math.sin(angle) * radius,
     },
-    discovered: index === 0,
+    visibility,
   };
 };
 

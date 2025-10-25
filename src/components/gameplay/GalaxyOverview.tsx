@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import { useGameStore } from '../../store/gameStore';
-import type { StarClass } from '../../domain/types';
+import type {
+  ScienceShip,
+  StarClass,
+  SystemVisibility,
+} from '../../domain/types';
 
 const VIEWPORT_SIZE = 320;
 
@@ -10,8 +14,35 @@ const systemClassColor: Record<StarClass, string> = {
   dwarf: '#d8b4ff',
 };
 
+const visibilityOpacity: Record<SystemVisibility, number> = {
+  unknown: 0.25,
+  revealed: 0.65,
+  surveyed: 1,
+};
+
+const visibilityRadius: Record<SystemVisibility, number> = {
+  unknown: 4,
+  revealed: 5,
+  surveyed: 6,
+};
+
+const visibilityLabel: Record<SystemVisibility, string> = {
+  unknown: 'Inesplorato',
+  revealed: 'Rivelato',
+  surveyed: 'Sondato',
+};
+
+const shipStatusLabel: Record<ScienceShip['status'], string> = {
+  idle: 'In attesa',
+  traveling: 'In viaggio',
+  surveying: 'Analisi',
+};
+
 export const GalaxyOverview = () => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
+  const scienceShips = useGameStore(
+    (state) => state.session?.scienceShips ?? [],
+  );
 
   const mappedSystems = useMemo(() => {
     if (systems.length === 0) {
@@ -36,6 +67,12 @@ export const GalaxyOverview = () => {
     }));
   }, [systems]);
 
+  const systemById = useMemo(() => {
+    const map = new Map<string, (typeof mappedSystems)[number]>();
+    mappedSystems.forEach((system) => map.set(system.id, system));
+    return map;
+  }, [mappedSystems]);
+
   return (
     <section className="galaxy-overview">
       <div className="galaxy-overview__map" aria-label="Mappa galattica">
@@ -51,9 +88,9 @@ export const GalaxyOverview = () => {
               <circle
                 cx={system.screenX}
                 cy={system.screenY}
-                r={system.discovered ? 6 : 4}
+                r={visibilityRadius[system.visibility]}
                 fill={systemClassColor[system.starClass]}
-                opacity={system.discovered ? 1 : 0.4}
+                opacity={visibilityOpacity[system.visibility]}
               />
               <text
                 x={system.screenX + 8}
@@ -64,6 +101,23 @@ export const GalaxyOverview = () => {
               </text>
             </g>
           ))}
+          {scienceShips.map((ship) => {
+            const currentSystem = systemById.get(ship.currentSystemId);
+            if (!currentSystem) {
+              return null;
+            }
+
+            return (
+              <g key={ship.id}>
+                <circle
+                  cx={currentSystem.screenX}
+                  cy={currentSystem.screenY}
+                  r={3}
+                  className="galaxy-overview__ship"
+                />
+              </g>
+            );
+          })}
         </svg>
       </div>
       <div className="galaxy-overview__list">
@@ -72,7 +126,7 @@ export const GalaxyOverview = () => {
             <tr>
               <th>Nome</th>
               <th>Tipo</th>
-              <th>Scoperta</th>
+              <th>Stato</th>
             </tr>
           </thead>
           <tbody>
@@ -80,11 +134,44 @@ export const GalaxyOverview = () => {
               <tr key={system.id}>
                 <td>{system.name}</td>
                 <td>{system.starClass}</td>
-                <td>{system.discovered ? 'Sì' : 'No'}</td>
+                <td>{visibilityLabel[system.visibility]}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        <div className="galaxy-overview__ships">
+          <h3>Navi scientifiche</h3>
+          <ul>
+            {scienceShips.map((ship) => {
+              const currentSystem = systems.find(
+                (system) => system.id === ship.currentSystemId,
+              );
+              const target = ship.targetSystemId
+                ? systems.find((system) => system.id === ship.targetSystemId)
+                : null;
+              return (
+                <li key={ship.id}>
+                  <div className="ship-row">
+                    <span className="ship-name">{ship.name}</span>
+                    <span className={`ship-status ship-status--${ship.status}`}>
+                      {shipStatusLabel[ship.status]}
+                    </span>
+                  </div>
+                  <p>
+                    Sistema attuale: {currentSystem ? currentSystem.name : '???'}
+                  </p>
+                  {target ? (
+                    <p className="ship-target">
+                      Obiettivo: {target.name} ({ship.ticksRemaining} tick)
+                    </p>
+                  ) : (
+                    <p className="ship-target">Nessun obiettivo attivo</p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </section>
   );
