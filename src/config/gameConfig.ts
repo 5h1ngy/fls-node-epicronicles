@@ -1,10 +1,21 @@
 import type { GalaxyGenerationParams } from '../domain/galaxy';
 import type { EconomyConfig } from '../domain/economy';
-import type { ResourceCost } from '../domain/types';
+import type { ResourceCost, ShipDesign, ShipClassId } from '../domain/types';
 
 export interface ColonizationConfig {
   cost: ResourceCost;
   durationTicks: number;
+}
+
+export interface MilitaryConfig {
+  shipyard: {
+    queueSize: number;
+    homeSystemDesignId: ShipClassId;
+  };
+  fleet: {
+    baseTravelTicks: number;
+  };
+  shipDesigns: ShipDesign[];
 }
 
 export interface GameConfig {
@@ -19,6 +30,7 @@ export interface GameConfig {
   };
   economy: EconomyConfig;
   colonization: ColonizationConfig;
+  military: MilitaryConfig;
 }
 
 export const gameConfig: GameConfig = {
@@ -65,5 +77,29 @@ export const gameConfig: GameConfig = {
       food: 30,
     },
     durationTicks: 6,
+  },
+  military: {
+    shipyard: {
+      queueSize: 4,
+      homeSystemDesignId: 'corvette',
+    },
+    fleet: {
+      baseTravelTicks: 3,
+    },
+    shipDesigns: [
+      {
+        id: 'corvette',
+        name: 'Classe Aurora',
+        buildCost: {
+          minerals: 120,
+          energy: 40,
+        },
+        buildTime: 5,
+        attack: 6,
+        defense: 2,
+        hullPoints: 20,
+        speed: 1,
+      },
+    ],
   },
 };

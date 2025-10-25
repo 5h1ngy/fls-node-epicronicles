@@ -55,6 +55,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         galaxyRadius: cfg.defaultGalaxy.galaxyRadius,
       },
       economyConfig: cfg.economy,
+      militaryConfig: cfg.military,
     });
     set({ session, view: 'simulation' });
   },

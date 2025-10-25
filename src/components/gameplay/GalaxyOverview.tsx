@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useGameStore, type ColonizationError } from '../../store/gameStore';
 import type {
+  ResourceCost,
   ScienceShip,
   StarClass,
   SystemVisibility,
@@ -44,18 +45,18 @@ const colonizationErrors: Record<ColonizationError, string> = {
   SYSTEM_NOT_FOUND: 'Sistema non trovato.',
   SYSTEM_NOT_SURVEYED: 'Sonda prima il sistema.',
   NO_HABITABLE_WORLD: 'Nessun mondo abitabile disponibile.',
-  ALREADY_COLONIZED: 'Sistema già colonizzato.',
-  TASK_IN_PROGRESS: 'Colonizzazione già in corso.',
+  ALREADY_COLONIZED: 'Sistema gia colonizzato.',
+  TASK_IN_PROGRESS: 'Colonizzazione gia in corso.',
   INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
 };
 
-const formatCost = (cost: Record<string, number | undefined>) =>
+const formatCost = (cost: ResourceCost) =>
   Object.entries(cost)
-    .filter(([, amount]) => amount && amount > 0)
+    .filter(([, amount]) => typeof amount === 'number' && amount > 0)
     .map(
       ([type, amount]) => `${resourceLabels[type as keyof typeof resourceLabels]} ${amount}`,
     )
-    .join(' · ');
+    .join(' | ');
 
 export const GalaxyOverview = () => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
@@ -287,3 +288,5 @@ export const GalaxyOverview = () => {
     </section>
   );
 };
+
+

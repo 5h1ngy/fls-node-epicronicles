@@ -25,6 +25,19 @@ export interface ResourceLedger {
 
 export type PlanetKind = 'terrestrial' | 'desert' | 'tundra';
 
+export type ShipClassId = 'corvette';
+
+export interface ShipDesign {
+  id: ShipClassId;
+  name: string;
+  buildCost: ResourceCost;
+  buildTime: number;
+  attack: number;
+  defense: number;
+  hullPoints: number;
+  speed: number;
+}
+
 export interface Vector2 {
   x: number;
   y: number;
@@ -73,6 +86,28 @@ export interface EconomyState {
   planets: Planet[];
 }
 
+export interface FleetShip {
+  id: string;
+  designId: ShipClassId;
+  hullPoints: number;
+}
+
+export interface Fleet {
+  id: string;
+  name: string;
+  systemId: string;
+  targetSystemId: string | null;
+  ticksToArrival: number;
+  ships: FleetShip[];
+}
+
+export interface ShipyardTask {
+  id: string;
+  designId: ShipClassId;
+  ticksRemaining: number;
+  totalTicks: number;
+}
+
 export type ColonizationStatus = 'preparing' | 'colonizing';
 
 export interface ColonizationTask {
@@ -82,6 +117,23 @@ export interface ColonizationTask {
   ticksRemaining: number;
   status: ColonizationStatus;
   totalTicks: number;
+}
+
+export interface CombatLoss {
+  fleetId: string;
+  shipsLost: number;
+}
+
+export type CombatResultType = 'playerVictory' | 'playerDefeat' | 'mutualDestruction';
+
+export interface CombatReport {
+  id: string;
+  systemId: string;
+  tick: number;
+  playerPower: number;
+  hostilePower: number;
+  result: CombatResultType;
+  losses: CombatLoss[];
 }
 
 export interface GalaxyState {
@@ -98,4 +150,7 @@ export interface GameSession {
   scienceShips: ScienceShip[];
   economy: EconomyState;
   colonizationTasks: ColonizationTask[];
+  fleets: Fleet[];
+  shipyardQueue: ShipyardTask[];
+  combatReports: CombatReport[];
 }

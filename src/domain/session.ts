@@ -3,12 +3,15 @@ import type { GalaxyGenerationParams } from './galaxy';
 import type { GameSession, SimulationClock } from './types';
 import { createInitialScienceShips } from './exploration';
 import { createInitialEconomy, type EconomyConfig } from './economy';
+import type { MilitaryConfig } from '../config/gameConfig';
+import { createInitialFleet } from './ships';
 
 export interface SessionParams {
   seed: string;
   label?: string;
   galaxyOverrides?: Partial<GalaxyGenerationParams>;
   economyConfig: EconomyConfig;
+  militaryConfig: MilitaryConfig;
 }
 
 const createClock = (): SimulationClock => ({
@@ -24,6 +27,7 @@ export const createSession = ({
   label,
   galaxyOverrides,
   economyConfig,
+  militaryConfig,
 }: SessionParams): GameSession => {
   const galaxy = createTestGalaxy({ seed, ...galaxyOverrides });
   const homeSystemId = galaxy.systems[0]?.id ?? 'unknown';
@@ -36,5 +40,8 @@ export const createSession = ({
     scienceShips: createInitialScienceShips(galaxy),
     economy: createInitialEconomy(homeSystemId, economyConfig),
     colonizationTasks: [],
+    fleets: [createInitialFleet(homeSystemId, militaryConfig)],
+    shipyardQueue: [],
+    combatReports: [],
   };
 };
