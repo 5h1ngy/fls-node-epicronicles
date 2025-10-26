@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../../store/gameStore';
-import { DebugConsole } from '../debug/DebugConsole';
 import { useGameLoop } from '../../utils/useGameLoop';
 import { GalaxyMap } from './GalaxyMap';
 import { PlanetList } from './PlanetList';
@@ -65,9 +64,6 @@ export const GameScreen = () => {
         </DraggablePanel>
         <DraggablePanel title="Battaglie" initialX={viewportWidth - 360} initialY={600}>
           <CombatLogPanel />
-        </DraggablePanel>
-        <DraggablePanel title="Debug" initialX={20} initialY={600}>
-          <DebugConsole />
         </DraggablePanel>
       </div>
     </div>

@@ -149,6 +149,17 @@ body {
   font-size: 0.75rem;
 }
 
+.hud-top-bar__elapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 90px;
+}
+
+.hud-top-bar__elapsed strong {
+  font-family: 'Roboto Mono', monospace;
+}
+
 .hud-bottom-bar {
   position: absolute;
   bottom: 0;
@@ -156,17 +167,25 @@ body {
   right: 0;
   padding: 0.6rem 1rem;
   display: flex;
-  gap: 1.2rem;
+  gap: 0.8rem;
   flex-wrap: wrap;
   background: linear-gradient(0deg, rgba(2, 5, 15, 0.9), rgba(2, 5, 15, 0.5));
   z-index: 2;
   font-size: 0.75rem;
+  align-items: flex-start;
 }
 
-.hud-bottom-bar div {
+.hud-bottom-bar > div {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+}
+
+.hud-bottom-bar__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .resource-bar {
@@ -206,6 +225,24 @@ body {
 
 .resource-bar__delta.is-negative {
   color: #ff9b8a;
+}
+
+.debug-console--inline {
+  position: relative;
+}
+
+.debug-console__overlay {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 0;
+  max-height: 200px;
+  width: 280px;
+  background: rgba(5, 8, 18, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+  overflow: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 .floating-panels {

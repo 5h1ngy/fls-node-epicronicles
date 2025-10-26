@@ -1,4 +1,5 @@
 import { useGameStore } from '../../store/gameStore';
+import { DebugConsole } from '../debug/DebugConsole';
 
 export const HudBottomBar = () => {
   const session = useGameStore((state) => state.session);
@@ -21,10 +22,6 @@ export const HudBottomBar = () => {
       <div>
         <dt>Tick</dt>
         <dd>{clock.tick}</dd>
-      </div>
-      <div>
-        <dt>Elapsed</dt>
-        <dd>{clock.elapsedMs.toFixed(0)} ms</dd>
       </div>
       <div>
         <dt>Status</dt>
@@ -50,8 +47,9 @@ export const HudBottomBar = () => {
         <dt>Navi scientifiche</dt>
         <dd>{scienceShips.length}</dd>
       </div>
-      <div>
-        <button className="panel__action" onClick={returnToMenu}>
+      <div className="hud-bottom-bar__actions">
+        <DebugConsole variant="inline" />
+        <button className="panel__action panel__action--compact" onClick={returnToMenu}>
           Quit to menu
         </button>
       </div>

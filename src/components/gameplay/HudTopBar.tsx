@@ -22,10 +22,6 @@ export const HudTopBar = () => {
         <ResourceBar />
       </div>
       <div className="hud-top-bar__right">
-        <div className="hud-top-bar__session-info">
-          <strong>{label}</strong>
-          <span>Seed: {galaxy.seed}</span>
-        </div>
         <div className="hud-top-bar__controls">
           <div className="hud-top-bar__elapsed">
             <span>Elapsed</span>
@@ -53,6 +49,10 @@ export const HudTopBar = () => {
               ))}
             </div>
           </div>
+        </div>
+        <div className="hud-top-bar__session-info">
+          <strong>{label}</strong>
+          <span>Seed: {galaxy.seed}</span>
         </div>
       </div>
     </div>
