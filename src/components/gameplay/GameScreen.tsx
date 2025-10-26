@@ -7,6 +7,7 @@ import { ColonyPanel } from './ColonyPanel';
 import { ShipyardPanel } from './ShipyardPanel';
 import { FleetAndCombatPanel } from './FleetAndCombatPanel';
 import { SciencePanel } from './SciencePanel';
+import { SystemPanel } from './SystemPanel';
 import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
@@ -118,6 +119,19 @@ export const GameScreen = () => {
             }}
           />
         </DraggablePanel>
+        {focusSystemId ? (
+          <DraggablePanel
+            title="Dettagli sistema"
+            initialX={Math.max(12, viewportWidth - 340)}
+            initialY={100}
+            onClose={clearFocusTargets}
+          >
+            <SystemPanel
+              systemId={focusSystemId}
+              onFocusPlanet={(planetId) => setFocusPlanetId(planetId)}
+            />
+          </DraggablePanel>
+        ) : null}
         <DraggablePanel
           title="Flotte & Battaglie"
           initialX={Math.max(12, viewportWidth - 320)}
