@@ -126,9 +126,14 @@ interface GalaxyMapProps {
     systemId: string,
     anchor: { x: number; y: number },
   ) => void;
+  onClearFocus?: () => void;
 }
 
-export const GalaxyMap = ({ focusSystemId, onSystemSelect }: GalaxyMapProps) => {
+export const GalaxyMap = ({
+  focusSystemId,
+  onSystemSelect,
+  onClearFocus,
+}: GalaxyMapProps) => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
   const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -260,6 +265,7 @@ export const GalaxyMap = ({ focusSystemId, onSystemSelect }: GalaxyMapProps) => 
         return Boolean(obj?.userData.systemId);
       });
       if (!hit) {
+        onClearFocus?.();
         return;
       }
       let targetNode: THREE.Object3D | null = hit.object;

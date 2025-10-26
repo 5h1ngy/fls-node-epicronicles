@@ -25,6 +25,22 @@ export const GameScreen = () => {
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
 
+  const clearFocusTargets = () => {
+    setFocusSystemId(null);
+    setShipyardSystemId(null);
+    setSelectedPlanetId(null);
+  };
+
+  const closeShipyardPanel = () => {
+    setShipyardSystemId(null);
+    setFocusSystemId(null);
+  };
+
+  const closePlanetPanel = () => {
+    setSelectedPlanetId(null);
+    setFocusSystemId(null);
+  };
+
   if (!session) {
     return (
       <div className="panel">
@@ -69,6 +85,7 @@ export const GameScreen = () => {
             setSelectedPlanetId(null);
             setFocusSystemId(systemId);
           }}
+          onClearFocus={clearFocusTargets}
         />
       </div>
       <HudBottomBar
@@ -93,21 +110,27 @@ export const GameScreen = () => {
           <FleetAndCombatPanel />
         </DraggablePanel>
         {debugOpen ? (
-          <DraggablePanel
-            title="Debug"
-            initialX={viewportWidth - 420}
-            initialY={viewportHeight - 380}
-            onClose={() => setDebugOpen(false)}
-          >
-            <DebugConsole />
-          </DraggablePanel>
+          <div className="debug-modal">
+            <div className="debug-modal__header">
+              <h3>Console debug</h3>
+              <button
+                className="panel__action panel__action--compact"
+                onClick={() => setDebugOpen(false)}
+              >
+                Chiudi
+              </button>
+            </div>
+            <div className="debug-modal__content">
+              <DebugConsole />
+            </div>
+          </div>
         ) : null}
         {shipyardSystem ? (
           <DraggablePanel
             title={`Cantieri - ${shipyardSystem.name}`}
             initialX={viewportWidth / 2 - 180}
             initialY={viewportHeight / 2 - 200}
-            onClose={() => setShipyardSystemId(null)}
+            onClose={closeShipyardPanel}
           >
             <ShipyardPanel system={shipyardSystem} />
           </DraggablePanel>
@@ -117,7 +140,7 @@ export const GameScreen = () => {
             title={`${selectedPlanet.name} (${selectedPlanet.id})`}
             initialX={viewportWidth / 2 - 180}
             initialY={viewportHeight / 2 - 140}
-            onClose={() => setSelectedPlanetId(null)}
+            onClose={closePlanetPanel}
           >
             <div className="planet-detail">
               <p>Sistema: {selectedPlanetSystem.name}</p>
