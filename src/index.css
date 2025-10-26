@@ -63,6 +63,20 @@ body {
   font-size: 0.8rem;
 }
 
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(6, 8, 16, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 140, 200, 0.6);
+  border-radius: 999px;
+}
+
 .game-layout {
   position: relative;
   width: 100vw;

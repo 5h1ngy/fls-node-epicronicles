@@ -2,11 +2,9 @@ import { useEffect } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { useGameLoop } from '../../utils/useGameLoop';
 import { GalaxyMap } from './GalaxyMap';
-import { PlanetList } from './PlanetList';
-import { ColonizationPanel } from './ColonizationPanel';
+import { ColonyPanel } from './ColonyPanel';
 import { ShipyardPanel } from './ShipyardPanel';
-import { FleetPanel } from './FleetPanel';
-import { CombatLogPanel } from './CombatLogPanel';
+import { FleetAndCombatPanel } from './FleetAndCombatPanel';
 import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
@@ -50,20 +48,14 @@ export const GameScreen = () => {
       </div>
       <HudBottomBar />
       <div className="floating-panels">
-        <DraggablePanel title="Pianeti" initialX={20} initialY={120}>
-          <PlanetList />
+        <DraggablePanel title="Colonie" initialX={20} initialY={140}>
+          <ColonyPanel />
         </DraggablePanel>
-        <DraggablePanel title="Colonizzazione" initialX={20} initialY={360}>
-          <ColonizationPanel />
-        </DraggablePanel>
-        <DraggablePanel title="Cantieri" initialX={viewportWidth - 360} initialY={120}>
+        <DraggablePanel title="Cantieri" initialX={viewportWidth - 340} initialY={140}>
           <ShipyardPanel />
         </DraggablePanel>
-        <DraggablePanel title="Flotte" initialX={viewportWidth - 360} initialY={360}>
-          <FleetPanel />
-        </DraggablePanel>
-        <DraggablePanel title="Battaglie" initialX={viewportWidth - 360} initialY={600}>
-          <CombatLogPanel />
+        <DraggablePanel title="Flotte & Battaglie" initialX={viewportWidth - 340} initialY={420}>
+          <FleetAndCombatPanel />
         </DraggablePanel>
       </div>
     </div>
