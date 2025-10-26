@@ -122,6 +122,7 @@ const toMapPosition = (system: StarSystem) => ({
 
 interface GalaxyMapProps {
   focusSystemId?: string | null;
+  focusPlanetId?: string | null;
   onSystemSelect?: (
     systemId: string,
     anchor: { x: number; y: number },
@@ -131,6 +132,7 @@ interface GalaxyMapProps {
 
 export const GalaxyMap = ({
   focusSystemId,
+  focusPlanetId,
   onSystemSelect,
   onClearFocus,
 }: GalaxyMapProps) => {
@@ -364,7 +366,7 @@ export const GalaxyMap = ({
   }, []);
 
   useEffect(() => {
-    if (!focusSystemId) {
+    if (!focusSystemId || focusPlanetId) {
       return;
     }
     const target = systems.find((system) => system.id === focusSystemId);
@@ -382,7 +384,26 @@ export const GalaxyMap = ({
       offsetTargetRef.current = new THREE.Vector3(-pos.x, -pos.y, 0);
     }
     zoomTargetRef.current = 90;
-  }, [focusSystemId, systems]);
+  }, [focusSystemId, focusPlanetId, systems]);
+
+  useEffect(() => {
+    if (!focusPlanetId) {
+      return;
+    }
+    const planet = planetLookupRef.current.get(focusPlanetId);
+    if (!planet) {
+      return;
+    }
+    const worldPos = new THREE.Vector3();
+    planet.getWorldPosition(worldPos);
+    const group = systemGroupRef.current;
+    if (group) {
+      offsetTargetRef.current = group.position.clone().sub(worldPos);
+    } else {
+      offsetTargetRef.current = new THREE.Vector3(-worldPos.x, -worldPos.y, 0);
+    }
+    zoomTargetRef.current = 70;
+  }, [focusPlanetId, systems]);
 
   useEffect(() => {
     const group = systemGroupRef.current;

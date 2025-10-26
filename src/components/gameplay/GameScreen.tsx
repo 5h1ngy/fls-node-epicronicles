@@ -24,21 +24,25 @@ export const GameScreen = () => {
   const [focusSystemId, setFocusSystemId] = useState<string | null>(null);
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
+  const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
 
   const clearFocusTargets = () => {
     setFocusSystemId(null);
     setShipyardSystemId(null);
     setSelectedPlanetId(null);
+    setFocusPlanetId(null);
   };
 
   const closeShipyardPanel = () => {
     setShipyardSystemId(null);
     setFocusSystemId(null);
+    setFocusPlanetId(null);
   };
 
   const closePlanetPanel = () => {
     setSelectedPlanetId(null);
     setFocusSystemId(null);
+    setFocusPlanetId(null);
   };
 
   if (!session) {
@@ -80,10 +84,12 @@ export const GameScreen = () => {
       <div className="game-map-layer">
         <GalaxyMap
           focusSystemId={focusSystemId}
+          focusPlanetId={focusPlanetId}
           onSystemSelect={(systemId, _anchor) => {
             setShipyardSystemId(systemId);
             setSelectedPlanetId(null);
             setFocusSystemId(systemId);
+            setFocusPlanetId(null);
           }}
           onClearFocus={clearFocusTargets}
         />
@@ -99,6 +105,7 @@ export const GameScreen = () => {
               setFocusSystemId(systemId);
               setSelectedPlanetId(planetId);
               setShipyardSystemId(null);
+              setFocusPlanetId(planetId);
             }}
           />
         </DraggablePanel>
