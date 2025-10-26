@@ -46,21 +46,49 @@ const createOrbitGroup = (
   planets: OrbitingPlanet[],
   seed: number,
   baseSpeed: number,
+  systemId: string,
+  angleStore: Map<string, number>,
+  planetLookup: Map<string, THREE.Object3D>,
 ) => {
   const group = new THREE.Group();
   group.name = 'orbits';
-  const speedBase = baseSpeed + (seed % 7) * 0.0004;
+  group.userData.systemId = systemId;
+  group.visible = false;
+  const base = baseSpeed + (seed % 7) * 0.0004;
 
   planets.forEach((planet) => {
+    const initialAngle =
+      angleStore.get(planet.id) ?? Math.random() * Math.PI * 2;
+    angleStore.set(planet.id, initialAngle);
+    const meshMaterial = new THREE.MeshStandardMaterial({ color: planet.color });
     const planetMesh = new THREE.Mesh(
       new THREE.SphereGeometry(planet.size, 16, 16),
-      new THREE.MeshStandardMaterial({ color: planet.color }),
+      meshMaterial,
     );
-    planetMesh.position.set(planet.orbitRadius, 0, 0);
+    const orbitSpeed = base * planet.orbitSpeed;
+    planetMesh.userData = {
+      ...planetMesh.userData,
+      kind: 'planet',
+      systemId,
+      planetId: planet.id,
+      orbitRadius: planet.orbitRadius,
+      orbitSpeed,
+      orbitAngle: initialAngle,
+    };
+    planetMesh.position.set(
+      Math.cos(initialAngle) * planet.orbitRadius,
+      0,
+      Math.sin(initialAngle) * planet.orbitRadius,
+    );
+    planetLookup.set(planet.id, planetMesh);
     group.add(planetMesh);
 
     const orbitRing = new THREE.Mesh(
-      new THREE.RingGeometry(planet.orbitRadius - 0.1, planet.orbitRadius + 0.1, 32),
+      new THREE.RingGeometry(
+        planet.orbitRadius - 0.1,
+        planet.orbitRadius + 0.1,
+        32,
+      ),
       new THREE.MeshBasicMaterial({
         color: '#345',
         side: THREE.DoubleSide,
@@ -69,11 +97,14 @@ const createOrbitGroup = (
       }),
     );
     orbitRing.rotation.x = Math.PI / 2;
+    orbitRing.userData = {
+      ...orbitRing.userData,
+      kind: 'ring',
+      systemId,
+    };
     group.add(orbitRing);
   });
 
-  group.userData.speed = speedBase;
-  group.visible = false;
   return group;
 };
 
@@ -90,21 +121,24 @@ const toMapPosition = (system: StarSystem) => ({
 });
 
 interface GalaxyMapProps {
-  onSystemSelect?: (systemId: string) => void;
+  focusSystemId?: string | null;
+  onSystemSelect?: (
+    systemId: string,
+    anchor: { x: number; y: number },
+  ) => void;
 }
 
-export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
+export const GalaxyMap = ({ focusSystemId, onSystemSelect }: GalaxyMapProps) => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
-  const scienceShips = useGameStore(
-    (state) => state.session?.scienceShips ?? [],
-  );
   const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const systemGroupRef = useRef<THREE.Group | null>(null);
   const animationRef = useRef<number | null>(null);
   const offsetTargetRef = useRef(new THREE.Vector3(0, 0, 0));
   const zoomTargetRef = useRef(170);
-  const orbitPhaseRef = useRef(new Map<string, number>());
+  const planetAngleRef = useRef(new Map<string, number>());
+  const planetLookupRef = useRef(new Map<string, THREE.Object3D>());
+  const clockRef = useRef<THREE.Clock | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -126,6 +160,7 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
+    clockRef.current = new THREE.Clock();
 
     const ambient = new THREE.AmbientLight(0xffffff, 0.35);
     const keyLight = new THREE.PointLight(0xffffff, 1.2);
@@ -160,11 +195,11 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
 
     const handleMouseDown = (event: MouseEvent) => {
       if (event.button === 0) {
-        dragMode = 'pan';
+        dragMode = 'rotate';
         isDragging = true;
         lastPointer = { x: event.clientX, y: event.clientY };
       } else if (event.button === 2) {
-        dragMode = 'rotate';
+        dragMode = 'pan';
         isDragging = true;
         lastPointer = { x: event.clientX, y: event.clientY };
       }
@@ -189,8 +224,8 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
 
     const handleMouseUp = (event: MouseEvent) => {
       if (
-        (event.button === 0 && dragMode === 'pan') ||
-        (event.button === 2 && dragMode === 'rotate')
+        (event.button === 0 && dragMode === 'rotate') ||
+        (event.button === 2 && dragMode === 'pan')
       ) {
         isDragging = false;
         dragMode = null;
@@ -243,12 +278,20 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
         0,
       );
       zoomTargetRef.current = 90;
-      onSystemSelect?.(targetNode.userData.systemId as string);
+      const projected = worldPos.clone().project(camera);
+      const anchorX = ((projected.x + 1) / 2) * renderer.domElement.clientWidth;
+      const anchorY = ((-projected.y + 1) / 2) * renderer.domElement.clientHeight;
+      onSystemSelect?.(targetNode.userData.systemId as string, {
+        x: anchorX,
+        y: anchorY,
+      });
     };
 
     renderer.domElement.addEventListener('click', handleClick);
 
     const renderLoop = () => {
+      const delta = clockRef.current?.getDelta() ?? 0;
+      const deltaFactor = delta > 0 ? Math.min(4, delta * 60) : 1;
       systemGroup.rotation.y = rotation.x;
       systemGroup.rotation.x = rotation.y;
       systemGroup.position.lerp(offsetTargetRef.current, 0.08);
@@ -271,8 +314,27 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
         const orbitGroup = node.getObjectByName('orbits') as THREE.Group;
         if (orbitGroup) {
           orbitGroup.visible = showOrbits;
-          orbitGroup.rotation.y += orbitGroup.userData.speed;
-          orbitPhaseRef.current.set(node.name, orbitGroup.rotation.y);
+          orbitGroup.children.forEach((child) => {
+            const orbitData = child.userData;
+            if (
+              orbitData?.kind === 'planet' &&
+              typeof orbitData.orbitRadius === 'number'
+            ) {
+              const orbitSpeed = orbitData.orbitSpeed ?? 0;
+              const nextAngle =
+                (orbitData.orbitAngle ?? 0) + orbitSpeed * deltaFactor;
+              orbitData.orbitAngle = nextAngle;
+              planetAngleRef.current.set(
+                orbitData.planetId as string,
+                nextAngle,
+              );
+              child.position.set(
+                Math.cos(nextAngle) * orbitData.orbitRadius,
+                0,
+                Math.sin(nextAngle) * orbitData.orbitRadius,
+              );
+            }
+          });
         }
       });
 
@@ -299,6 +361,19 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
   }, []);
 
   useEffect(() => {
+    if (!focusSystemId) {
+      return;
+    }
+    const target = systems.find((system) => system.id === focusSystemId);
+    if (!target) {
+      return;
+    }
+    const pos = toMapPosition(target);
+    offsetTargetRef.current = new THREE.Vector3(-pos.x, -pos.y, 0);
+    zoomTargetRef.current = 90;
+  }, [focusSystemId, systems]);
+
+  useEffect(() => {
     const group = systemGroupRef.current;
     if (!group) {
       return;
@@ -306,29 +381,39 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
 
     group.children.forEach((child) => {
       const orbit = child.getObjectByName('orbits') as THREE.Group | null;
-      if (orbit) {
-        orbitPhaseRef.current.set(child.name, orbit.rotation.y);
+      if (!orbit) {
+        return;
       }
+      orbit.children.forEach((entry) => {
+        const planetId = entry.userData?.planetId as string | undefined;
+        if (
+          planetId &&
+          typeof entry.userData?.orbitAngle === 'number'
+        ) {
+          planetAngleRef.current.set(planetId, entry.userData.orbitAngle);
+        }
+      });
     });
     group.clear();
-    const positions = new Map<string, THREE.Vector3>();
-
-    const starGeometryMap = {
-      surveyed: new THREE.SphereGeometry(2.1, 20, 20),
-      other: new THREE.SphereGeometry(1.4, 16, 16),
-    };
+    planetLookupRef.current.clear();
 
     systems.forEach((system) => {
       const node = new THREE.Group();
       node.name = system.id;
       node.userData.systemId = system.id;
-      node.userData.systemId = system.id;
       const pos = toMapPosition(system);
       node.position.set(pos.x, pos.y, pos.z);
-      positions.set(system.id, node.position);
 
-      const geometry =
-        system.visibility === 'surveyed' ? starGeometryMap.surveyed : starGeometryMap.other;
+      const starSizes: Record<string, number> = {
+        mainSequence: 2.1,
+        dwarf: 1.2,
+        giant: 3.1,
+      };
+      const geometry = new THREE.SphereGeometry(
+        starSizes[system.starClass] ?? 1.8,
+        20,
+        20,
+      );
 
       const starMesh = new THREE.Mesh(
         geometry,
@@ -351,36 +436,17 @@ export const GalaxyMap = ({ onSystemSelect }: GalaxyMapProps) => {
           system.orbitingPlanets,
           system.id.charCodeAt(0),
           orbitBaseSpeed,
+          system.id,
+          planetAngleRef.current,
+          planetLookupRef.current,
         );
-        const phase =
-          orbitPhaseRef.current.get(system.id) ?? Math.random() * Math.PI * 2;
-        orbitGroup.rotation.y = phase;
-        orbitPhaseRef.current.set(system.id, phase);
-        orbitGroup.userData.systemId = system.id;
-        orbitGroup.traverse((child) => {
-          child.userData = child.userData ?? {};
-          child.userData.systemId = system.id;
-        });
         node.add(orbitGroup);
       }
 
       group.add(node);
     });
 
-    const shipGroup = new THREE.Group();
-    shipGroup.name = 'ships';
-    const shipGeometry = new THREE.SphereGeometry(0.8, 16, 16);
-    scienceShips.forEach((ship) => {
-      const position = positions.get(ship.currentSystemId);
-      if (!position) {
-        return;
-      }
-      const shipMesh = new THREE.Mesh(shipGeometry, materialCache.ship);
-      shipMesh.position.set(position.x, position.y, position.z + 4);
-      shipGroup.add(shipMesh);
-    });
-    group.add(shipGroup);
-  }, [systems, scienceShips]);
+  }, [systems, orbitBaseSpeed]);
 
   return <div className="galaxy-map" ref={containerRef} />;
 };

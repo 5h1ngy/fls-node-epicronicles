@@ -85,6 +85,7 @@ const createOrbitingPlanets = (
     orbitRadius: 8 + index * 5 + random() * 3,
     size: 0.6 + random() * 0.8,
     color: orbitPalette[Math.floor(random() * orbitPalette.length)],
+    orbitSpeed: 0.7 + random() * 0.9,
   }));
 };
 

@@ -61,6 +61,7 @@ export interface OrbitingPlanet {
   orbitRadius: number;
   size: number;
   color: string;
+  orbitSpeed: number;
 }
 
 export interface StarSystem {
