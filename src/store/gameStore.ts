@@ -2,7 +2,13 @@ import { create } from 'zustand';
 import { gameConfig, type GameConfig } from '../config/gameConfig';
 import { advanceClock, setClockRunning, setClockSpeed } from '../domain/clock';
 import { createSession } from '../domain/session';
-import type { GameSession, GameView, ShipClassId } from '../domain/types';
+import type {
+  GameSession,
+  GameView,
+  ScienceShipStatus,
+  ShipClassId,
+  SystemVisibility,
+} from '../domain/types';
 import { advanceSimulation } from '../domain/simulation';
 import { createColonizationTask } from '../domain/colonization';
 import { canAffordCost, spendResources } from '../domain/economy';
@@ -48,6 +54,15 @@ export type FleetMoveResult =
   | { success: true }
   | { success: false; reason: FleetOrderError };
 
+export type ScienceShipOrderError =
+  | 'NO_SESSION'
+  | 'SHIP_NOT_FOUND'
+  | 'SYSTEM_NOT_FOUND';
+
+export type ScienceShipOrderResult =
+  | { success: true }
+  | { success: false; reason: ScienceShipOrderError };
+
 interface GameStoreState {
   view: GameView;
   config: GameConfig;
@@ -60,6 +75,11 @@ interface GameStoreState {
   startColonization: (systemId: string) => StartColonizationResult;
   queueShipBuild: (designId: ShipClassId) => QueueShipBuildResult;
   orderFleetMove: (fleetId: string, systemId: string) => FleetMoveResult;
+  orderScienceShip: (
+    shipId: string,
+    systemId: string,
+  ) => ScienceShipOrderResult;
+  setScienceAutoExplore: (shipId: string, auto: boolean) => void;
 }
 
 const tickDurationMs = (cfg: GameConfig) =>
@@ -272,5 +292,88 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     });
 
     return { success: true };
+  },
+  orderScienceShip: (shipId, systemId) => {
+    const state = get();
+    const session = state.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    const shipIndex = session.scienceShips.findIndex(
+      (ship) => ship.id === shipId,
+    );
+    if (shipIndex < 0) {
+      return { success: false, reason: 'SHIP_NOT_FOUND' };
+    }
+    const targetSystem = session.galaxy.systems.find(
+      (system) => system.id === systemId,
+    );
+    if (!targetSystem) {
+      return { success: false, reason: 'SYSTEM_NOT_FOUND' };
+    }
+
+    const travelTicks = Math.max(1, state.config.exploration.travelTicks);
+    const updatedShips = session.scienceShips.map((ship) =>
+      ship.id === shipId
+        ? {
+            ...ship,
+            autoExplore: false,
+            status: 'traveling' as ScienceShipStatus,
+            targetSystemId: systemId,
+            ticksRemaining: travelTicks,
+          }
+        : ship,
+    );
+
+    const visibilityRank: Record<'unknown' | 'revealed' | 'surveyed', number> = {
+      unknown: 0,
+      revealed: 1,
+      surveyed: 2,
+    };
+    const updatedSystems = session.galaxy.systems.map((system) => {
+      if (system.id !== systemId) {
+        return system;
+      }
+      if (visibilityRank[system.visibility] >= visibilityRank.revealed) {
+        return system;
+      }
+      return {
+        ...system,
+        visibility: 'revealed' as SystemVisibility,
+      };
+    });
+
+    set({
+      session: {
+        ...session,
+        scienceShips: updatedShips,
+        galaxy:
+          updatedSystems === session.galaxy.systems
+            ? session.galaxy
+            : { ...session.galaxy, systems: updatedSystems },
+      },
+    });
+
+    return { success: true };
+  },
+  setScienceAutoExplore: (shipId, auto) => {
+    const session = get().session;
+    if (!session) {
+      return;
+    }
+    const updatedShips = session.scienceShips.map((ship) =>
+      ship.id === shipId
+        ? {
+            ...ship,
+            autoExplore: auto,
+          }
+        : ship,
+    );
+    set({
+      session: {
+        ...session,
+        scienceShips: updatedShips,
+      },
+    });
   },
 }));

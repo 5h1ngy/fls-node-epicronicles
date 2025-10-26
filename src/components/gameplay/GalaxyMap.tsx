@@ -126,6 +126,15 @@ const materialCache = {
   ship: new THREE.MeshBasicMaterial({ color: 0xffffff }),
 };
 
+const scienceMaterials: Record<
+  'idle' | 'traveling' | 'surveying',
+  THREE.Material
+> = {
+  idle: new THREE.MeshBasicMaterial({ color: 0x7fe38f }),
+  traveling: new THREE.MeshBasicMaterial({ color: 0xffc857 }),
+  surveying: new THREE.MeshBasicMaterial({ color: 0x4de2ff }),
+};
+
 const toMapPosition = (system: StarSystem) => ({
   x: system.mapPosition?.x ?? system.position.x,
   y: system.mapPosition?.y ?? system.position.y,
@@ -149,6 +158,9 @@ export const GalaxyMap = ({
   onClearFocus,
 }: GalaxyMapProps) => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
+  const scienceShips = useGameStore(
+    (state) => state.session?.scienceShips ?? [],
+  );
   const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const systemGroupRef = useRef<THREE.Group | null>(null);
@@ -445,6 +457,8 @@ export const GalaxyMap = ({
     group.clear();
     planetLookupRef.current.clear();
 
+    const positions = new Map<string, THREE.Vector3>();
+
     systems.forEach((system) => {
       const node = new THREE.Group();
       node.name = system.id;
@@ -503,9 +517,26 @@ export const GalaxyMap = ({
       }
 
       group.add(node);
+      positions.set(system.id, node.position.clone());
     });
 
-  }, [systems, orbitBaseSpeed]);
+    const scienceGroup = new THREE.Group();
+    scienceGroup.name = 'scienceShips';
+    const shipGeometry = new THREE.SphereGeometry(0.6, 12, 12);
+    scienceShips.forEach((ship) => {
+      const position = positions.get(ship.currentSystemId);
+      if (!position) {
+        return;
+      }
+      const material =
+        scienceMaterials[ship.status] ?? scienceMaterials.idle;
+      const marker = new THREE.Mesh(shipGeometry, material);
+      marker.position.set(position.x, position.y, position.z + 4);
+      scienceGroup.add(marker);
+    });
+    group.add(scienceGroup);
+
+  }, [systems, orbitBaseSpeed, scienceShips]);
 
   return <div className="galaxy-map" ref={containerRef} />;
 };

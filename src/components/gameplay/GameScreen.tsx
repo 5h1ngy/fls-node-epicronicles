@@ -6,6 +6,7 @@ import { GalaxyMap } from './GalaxyMap';
 import { ColonyPanel } from './ColonyPanel';
 import { ShipyardPanel } from './ShipyardPanel';
 import { FleetAndCombatPanel } from './FleetAndCombatPanel';
+import { SciencePanel } from './SciencePanel';
 import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
@@ -106,6 +107,14 @@ export const GameScreen = () => {
               setSelectedPlanetId(planetId);
               setShipyardSystemId(null);
               setFocusPlanetId(planetId);
+            }}
+          />
+        </DraggablePanel>
+        <DraggablePanel title="Navi scientifiche" initialX={12} initialY={360}>
+          <SciencePanel
+            onFocusSystem={(systemId) => {
+              setFocusSystemId(systemId);
+              setFocusPlanetId(null);
             }}
           />
         </DraggablePanel>
