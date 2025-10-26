@@ -31,6 +31,9 @@ export interface GameConfig {
   economy: EconomyConfig;
   colonization: ColonizationConfig;
   military: MilitaryConfig;
+  map: {
+    orbitSpeed: number;
+  };
 }
 
 export const gameConfig: GameConfig = {
@@ -101,5 +104,8 @@ export const gameConfig: GameConfig = {
         speed: 1,
       },
     ],
+  },
+  map: {
+    orbitSpeed: 0.0025,
   },
 };

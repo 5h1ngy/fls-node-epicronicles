@@ -320,6 +320,25 @@ body {
   padding: 0.1rem 0.3rem;
 }
 
+.shipyard-popover {
+  position: absolute;
+  transform: translate(-50%, -110%);
+  background: rgba(5, 9, 18, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.75rem;
+  min-width: 320px;
+  pointer-events: auto;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+}
+
+.shipyard-popover__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
 .text-muted {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.8rem;

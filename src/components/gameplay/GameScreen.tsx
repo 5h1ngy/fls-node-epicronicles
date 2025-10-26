@@ -19,6 +19,11 @@ export const GameScreen = () => {
     (state) => state.setSimulationRunning,
   );
   const [debugOpen, setDebugOpen] = useState(false);
+  const [shipyardAnchor, setShipyardAnchor] = useState<{
+    systemId: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
   if (!session) {
     return (
@@ -48,7 +53,11 @@ export const GameScreen = () => {
     <div className="game-layout">
       <HudTopBar />
       <div className="game-map-layer">
-        <GalaxyMap />
+        <GalaxyMap
+          onSystemFocus={({ systemId, screenX, screenY }) =>
+            setShipyardAnchor({ systemId, x: screenX, y: screenY })
+          }
+        />
       </div>
       <HudBottomBar
         onToggleDebug={() => setDebugOpen((value) => !value)}
@@ -57,9 +66,6 @@ export const GameScreen = () => {
       <div className="floating-panels">
         <DraggablePanel title="Colonie" initialX={20} initialY={140}>
           <ColonyPanel />
-        </DraggablePanel>
-        <DraggablePanel title="Cantieri" initialX={viewportWidth - 340} initialY={140}>
-          <ShipyardPanel />
         </DraggablePanel>
         <DraggablePanel title="Flotte & Battaglie" initialX={viewportWidth - 340} initialY={420}>
           <FleetAndCombatPanel />
@@ -73,6 +79,26 @@ export const GameScreen = () => {
           >
             <DebugConsole />
           </DraggablePanel>
+        ) : null}
+        {shipyardAnchor ? (
+          <div
+            className="shipyard-popover"
+            style={{
+              left: shipyardAnchor.x,
+              top: shipyardAnchor.y,
+            }}
+          >
+            <div className="shipyard-popover__header">
+              <strong>Cantieri ({shipyardAnchor.systemId})</strong>
+              <button
+                className="draggable-panel__close"
+                onClick={() => setShipyardAnchor(null)}
+              >
+                ×
+              </button>
+            </div>
+            <ShipyardPanel />
+          </div>
         ) : null}
       </div>
     </div>

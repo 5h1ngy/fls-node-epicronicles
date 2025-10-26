@@ -42,10 +42,14 @@ const createLabelSprite = (text: string) => {
   return sprite;
 };
 
-const createOrbitGroup = (planets: OrbitingPlanet[], seed: number) => {
+const createOrbitGroup = (
+  planets: OrbitingPlanet[],
+  seed: number,
+  baseSpeed: number,
+) => {
   const group = new THREE.Group();
   group.name = 'orbits';
-  const speedBase = 0.002 + (seed % 5) * 0.0004;
+  const speedBase = baseSpeed + (seed % 7) * 0.0004;
 
   planets.forEach((planet) => {
     const planetMesh = new THREE.Mesh(
@@ -85,11 +89,16 @@ const toMapPosition = (system: StarSystem) => ({
   z: system.mapPosition?.z ?? 0,
 });
 
-export const GalaxyMap = () => {
+interface GalaxyMapProps {
+  onSystemFocus?: (payload: { systemId: string; screenX: number; screenY: number }) => void;
+}
+
+export const GalaxyMap = ({ onSystemFocus }: GalaxyMapProps) => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
   const scienceShips = useGameStore(
     (state) => state.session?.scienceShips ?? [],
   );
+  const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const systemGroupRef = useRef<THREE.Group | null>(null);
   const animationRef = useRef<number | null>(null);
@@ -150,11 +159,11 @@ export const GalaxyMap = () => {
 
     const handleMouseDown = (event: MouseEvent) => {
       if (event.button === 0) {
-        dragMode = 'rotate';
+        dragMode = 'pan';
         isDragging = true;
         lastPointer = { x: event.clientX, y: event.clientY };
       } else if (event.button === 2) {
-        dragMode = 'pan';
+        dragMode = 'rotate';
         isDragging = true;
         lastPointer = { x: event.clientX, y: event.clientY };
       }
@@ -179,8 +188,8 @@ export const GalaxyMap = () => {
 
     const handleMouseUp = (event: MouseEvent) => {
       if (
-        (event.button === 0 && dragMode === 'rotate') ||
-        (event.button === 2 && dragMode === 'pan')
+        (event.button === 0 && dragMode === 'pan') ||
+        (event.button === 2 && dragMode === 'rotate')
       ) {
         isDragging = false;
         dragMode = null;
@@ -233,6 +242,16 @@ export const GalaxyMap = () => {
         0,
       );
       zoomTargetRef.current = 90;
+      if (onSystemFocus) {
+        const projected = worldPos.clone().project(camera);
+        const anchorX = ((projected.x + 1) / 2) * renderer.domElement.clientWidth;
+        const anchorY = ((-projected.y + 1) / 2) * renderer.domElement.clientHeight;
+        onSystemFocus({
+          systemId: targetNode.userData.systemId as string,
+          screenX: anchorX,
+          screenY: anchorY,
+        });
+      }
     };
 
     renderer.domElement.addEventListener('click', handleClick);
@@ -260,9 +279,7 @@ export const GalaxyMap = () => {
         const orbitGroup = node.getObjectByName('orbits') as THREE.Group;
         if (orbitGroup) {
           orbitGroup.visible = showOrbits;
-          if (showOrbits) {
-            orbitGroup.rotation.y += orbitGroup.userData.speed;
-          }
+          orbitGroup.rotation.y += orbitGroup.userData.speed;
         }
       });
 
@@ -334,6 +351,7 @@ export const GalaxyMap = () => {
         const orbitGroup = createOrbitGroup(
           system.orbitingPlanets,
           system.id.charCodeAt(0),
+          orbitBaseSpeed,
         );
         orbitGroup.userData.systemId = system.id;
         orbitGroup.traverse((child) => {
