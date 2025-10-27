@@ -77,8 +77,8 @@ const createOrbitGroup = (
     };
     planetMesh.position.set(
       Math.cos(initialAngle) * planet.orbitRadius,
-      0,
       Math.sin(initialAngle) * planet.orbitRadius,
+      0,
     );
     planetLookup.set(planet.id, planetMesh);
     group.add(planetMesh);
@@ -96,7 +96,6 @@ const createOrbitGroup = (
         opacity: 0.3,
       }),
     );
-    orbitRing.rotation.x = Math.PI / 2;
     orbitRing.userData = {
       ...orbitRing.userData,
       kind: 'ring',
@@ -368,8 +367,8 @@ export const GalaxyMap = ({
               );
               child.position.set(
                 Math.cos(nextAngle) * orbitData.orbitRadius,
-                0,
                 Math.sin(nextAngle) * orbitData.orbitRadius,
+                0,
               );
             }
           });
