@@ -109,6 +109,10 @@ export const GameScreen = () => {
               setShipyardSystemId(null);
               setFocusPlanetId(planetId);
             }}
+            onFocusSystem={(systemId) => {
+              setFocusSystemId(systemId);
+              setFocusPlanetId(null);
+            }}
           />
         </DraggablePanel>
         <DraggablePanel title="Navi scientifiche" initialX={12} initialY={360}>

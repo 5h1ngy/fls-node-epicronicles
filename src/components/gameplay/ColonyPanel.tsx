@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useGameStore, type ColonizationError } from '../../store/gameStore';
-import { RESOURCE_TYPES } from '../../domain/economy';
 import { resourceLabels } from '../../domain/resourceMetadata';
 
 const colonizationErrors: Record<ColonizationError, string> = {
@@ -13,7 +12,15 @@ const colonizationErrors: Record<ColonizationError, string> = {
   INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
 };
 
-export const ColonyPanel = () => {
+interface ColonyPanelProps {
+  onSelectPlanet: (planetId: string, systemId: string) => void;
+  onFocusSystem: (systemId: string) => void;
+}
+
+export const ColonyPanel = ({
+  onSelectPlanet,
+  onFocusSystem,
+}: ColonyPanelProps) => {
   const session = useGameStore((state) => state.session);
   const systems = session?.galaxy.systems ?? [];
   const planets = session?.economy.planets ?? [];
@@ -60,47 +67,26 @@ export const ColonyPanel = () => {
     <section className="colony-panel">
       <div className="panel-section">
         <div className="panel-section__header">
-          <h3>Pianeti colonizzati</h3>
+          <h3>Colonie attive</h3>
         </div>
-        <ul>
-          {planets.map((planet) => {
-            const systemName =
-              systems.find((system) => system.id === planet.systemId)?.name ??
-              '???';
-            return (
+        {planets.length === 0 ? (
+          <p className="text-muted">Nessuna colonia attiva.</p>
+        ) : (
+          <ul className="colony-list">
+            {planets.map((planet) => (
               <li key={planet.id}>
-                <header>
-                  <div>
-                    <strong>{planet.name}</strong>
-                    <span className="planet-list__system">{systemName}</span>
-                  </div>
-                  <span className="planet-list__meta">
-                    Popolazione: {planet.population}
-                  </span>
-                </header>
-                <div className="planet-list__yields">
-                  {RESOURCE_TYPES.map((type) => {
-                    const production = planet.baseProduction[type] ?? 0;
-                    const upkeep = planet.upkeep[type] ?? 0;
-                    if (production === 0 && upkeep === 0) {
-                      return null;
-                    }
-                    const net = production - upkeep;
-                    return (
-                      <div key={type} className="planet-list__yield">
-                        <span>{resourceLabels[type]}</span>
-                        <span className={net >= 0 ? 'is-positive' : 'is-negative'}>
-                          {net >= 0 ? '+' : '-'}
-                          {Math.abs(net)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
+                <button
+                  type="button"
+                  className="colony-chip"
+                  onClick={() => onSelectPlanet(planet.id, planet.systemId)}
+                >
+                  <span>{planet.name}</span>
+                  <small>{planet.id}</small>
+                </button>
               </li>
-            );
-          })}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="panel-section">
         <div className="panel-section__header">
@@ -146,7 +132,18 @@ export const ColonyPanel = () => {
                           : null;
                 return (
                   <tr key={system.id}>
-                    <td>{system.name}</td>
+                    <td>
+                      <div className="colony-table__system">
+                        <span>{system.name}</span>
+                        <button
+                          type="button"
+                          className="colony-table__link"
+                          onClick={() => onFocusSystem(system.id)}
+                        >
+                          Vai
+                        </button>
+                      </div>
+                    </td>
                     <td>{habitable ? habitable.kind : '—'}</td>
                     <td>
                       {colonized ? 'Colonia attiva' : pending ? 'In corso' : '-'}
@@ -167,41 +164,6 @@ export const ColonyPanel = () => {
             </tbody>
           </table>
         </div>
-        {colonizationTasks.length > 0 ? (
-          <>
-            <h4>Colonizzazioni in corso</h4>
-            <ul>
-              {colonizationTasks.map((task) => {
-                const systemName =
-                  systems.find((system) => system.id === task.systemId)?.name ??
-                  '???';
-                const progress =
-                  1 - task.ticksRemaining / Math.max(1, task.totalTicks);
-                return (
-                  <li key={task.id}>
-                    <div className="colonization-row">
-                      <div>
-                        <strong>
-                          {task.planetTemplate.name} ({systemName})
-                        </strong>
-                        <span className="text-muted">
-                          {task.ticksRemaining} tick rimanenti
-                        </span>
-                      </div>
-                      <span className="colonization-status">{task.status}</span>
-                    </div>
-                    <div className="colonization-progress">
-                      <div
-                        className="colonization-progress__bar"
-                        style={{ width: `${Math.round(progress * 100)}%` }}
-                      />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
-        ) : null}
       </div>
     </section>
   );
