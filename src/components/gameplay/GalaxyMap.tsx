@@ -224,10 +224,8 @@ export const GalaxyMap = ({
     systemGroupRef.current = systemGroup;
     scene.add(systemGroup);
 
-    let isDragging = false;
-    let dragMode: 'rotate' | 'pan' | null = null;
+    let isPanning = false;
     let lastPointer = { x: 0, y: 0 };
-    let rotation = { x: 0, y: 0 };
 
     const handleResize = () => {
       renderer.setSize(container.clientWidth, container.clientHeight);
@@ -246,41 +244,27 @@ export const GalaxyMap = ({
     };
 
     const handleMouseDown = (event: MouseEvent) => {
-      if (event.button === 0) {
-        dragMode = 'rotate';
-        isDragging = true;
-        lastPointer = { x: event.clientX, y: event.clientY };
-      } else if (event.button === 2) {
-        dragMode = 'pan';
-        isDragging = true;
+      if (event.button === 2) {
+        isPanning = true;
         lastPointer = { x: event.clientX, y: event.clientY };
       }
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isDragging || !dragMode) {
+      if (!isPanning) {
         return;
       }
       const deltaX = event.clientX - lastPointer.x;
       const deltaY = event.clientY - lastPointer.y;
       lastPointer = { x: event.clientX, y: event.clientY };
-      if (dragMode === 'rotate') {
-        rotation.x += deltaX * 0.004;
-        rotation.y = clamp(rotation.y + deltaY * 0.004, -Math.PI / 2.5, Math.PI / 2.5);
-      } else if (dragMode === 'pan') {
-        const panScale = (camera.position.z / 400) * 0.8;
-        offsetTargetRef.current.x += deltaX * -panScale;
-        offsetTargetRef.current.y += deltaY * panScale;
-      }
+      const panScale = (camera.position.z / 400) * 0.8;
+      offsetTargetRef.current.x += deltaX * -panScale;
+      offsetTargetRef.current.y += deltaY * panScale;
     };
 
     const handleMouseUp = (event: MouseEvent) => {
-      if (
-        (event.button === 0 && dragMode === 'rotate') ||
-        (event.button === 2 && dragMode === 'pan')
-      ) {
-        isDragging = false;
-        dragMode = null;
+      if (event.button === 2) {
+        isPanning = false;
       }
     };
 
@@ -346,8 +330,8 @@ export const GalaxyMap = ({
     const renderLoop = () => {
       const delta = clockRef.current?.getDelta() ?? 0;
       const deltaFactor = delta > 0 ? Math.min(4, delta * 60) : 1;
-      systemGroup.rotation.y = rotation.x;
-      systemGroup.rotation.x = rotation.y;
+      systemGroup.rotation.y = 0;
+      systemGroup.rotation.x = 0;
       systemGroup.position.lerp(offsetTargetRef.current, 0.08);
       camera.position.z += (zoomTargetRef.current - camera.position.z) * 0.08;
 
