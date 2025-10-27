@@ -8,6 +8,7 @@ import { ShipyardPanel } from './ShipyardPanel';
 import { FleetAndCombatPanel } from './FleetAndCombatPanel';
 import { SciencePanel } from './SciencePanel';
 import { SystemPanel } from './SystemPanel';
+import { GalaxyOverview } from './GalaxyOverview';
 import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
@@ -101,7 +102,7 @@ export const GameScreen = () => {
         debugOpen={debugOpen}
       />
       <div className="floating-panels">
-        <DraggablePanel title="Colonie" initialX={12} initialY={100}>
+        <DraggablePanel title="Colonie" initialX={12} initialY={80}>
           <ColonyPanel
             onSelectPlanet={(planetId, systemId) => {
               setFocusSystemId(systemId);
@@ -115,7 +116,15 @@ export const GameScreen = () => {
             }}
           />
         </DraggablePanel>
-        <DraggablePanel title="Navi scientifiche" initialX={12} initialY={360}>
+        <DraggablePanel title="Panoramica galassia" initialX={12} initialY={300}>
+          <GalaxyOverview
+            onFocusSystem={(systemId) => {
+              setFocusSystemId(systemId);
+              setFocusPlanetId(null);
+            }}
+          />
+        </DraggablePanel>
+        <DraggablePanel title="Navi scientifiche" initialX={12} initialY={560}>
           <SciencePanel
             onFocusSystem={(systemId) => {
               setFocusSystemId(systemId);

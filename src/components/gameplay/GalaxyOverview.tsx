@@ -28,7 +28,11 @@ const shipStatusLabel: Record<ScienceShip['status'], string> = {
   surveying: 'Analisi',
 };
 
-export const GalaxyOverview = () => {
+interface GalaxyOverviewProps {
+  onFocusSystem?: (systemId: string) => void;
+}
+
+export const GalaxyOverview = ({ onFocusSystem }: GalaxyOverviewProps) => {
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
   const scienceShips = useGameStore(
     (state) => state.session?.scienceShips ?? [],
@@ -116,6 +120,17 @@ export const GalaxyOverview = () => {
               >
                 {system.name}
               </text>
+              {onFocusSystem ? (
+                <circle
+                  cx={system.screenX}
+                  cy={system.screenY}
+                  r={visibilityRadius[system.visibility] + 2}
+                  className="galaxy-overview__focus"
+                  onClick={() =>
+                    system.visibility !== 'unknown' ? onFocusSystem(system.id) : null
+                  }
+                />
+              ) : null}
             </g>
           ))}
           {scienceShips.map((ship) => {
