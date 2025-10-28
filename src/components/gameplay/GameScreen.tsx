@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { DebugConsole } from '../debug/DebugConsole';
 import { useGameLoop } from '../../utils/useGameLoop';
@@ -28,6 +28,7 @@ export const GameScreen = () => {
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
+  const focusedSessionRef = useRef<string | null>(null);
 
   const clearFocusTargets = () => {
     setFocusSystemId(null);
@@ -66,6 +67,25 @@ export const GameScreen = () => {
 
     setSimulationRunning(true, Date.now());
   }, [sessionId, setSimulationRunning]);
+
+  useEffect(() => {
+    if (!session) {
+      focusedSessionRef.current = null;
+      return;
+    }
+    if (focusedSessionRef.current === session.id) {
+      return;
+    }
+    const homeSystemId =
+      session.economy.planets[0]?.systemId ??
+      session.galaxy.systems[0]?.id ??
+      null;
+    if (homeSystemId) {
+      setFocusSystemId(homeSystemId);
+      setFocusPlanetId(null);
+    }
+    focusedSessionRef.current = session.id;
+  }, [session, setFocusPlanetId, setFocusSystemId]);
 
   const viewportWidth =
     typeof window !== 'undefined' ? window.innerWidth : 1200;
