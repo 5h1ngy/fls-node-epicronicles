@@ -415,7 +415,8 @@ export const GalaxyMap = ({
     }
     if (target.visibility !== 'surveyed') {
       minZoomRef.current = 140;
-      return;
+    } else {
+      minZoomRef.current = 50;
     }
     const pos = toMapPosition(target);
     const group = systemGroupRef.current;
