@@ -413,6 +413,10 @@ export const GalaxyMap = ({
       onClearFocus?.();
       return;
     }
+    if (target.visibility !== 'surveyed') {
+      minZoomRef.current = 140;
+      return;
+    }
     const pos = toMapPosition(target);
     const group = systemGroupRef.current;
     if (group) {
