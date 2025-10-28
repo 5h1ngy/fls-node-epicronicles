@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { gameConfig, type GameConfig } from '../config/gameConfig';
 import { advanceClock, setClockRunning, setClockSpeed } from '../domain/clock';
 import { createSession } from '../domain/session';
@@ -86,8 +87,10 @@ interface GameStoreState {
 const tickDurationMs = (cfg: GameConfig) =>
   Math.max(16, Math.round(1000 / cfg.ticksPerSecond));
 
-export const useGameStore = create<GameStoreState>((set, get) => ({
-  view: 'mainMenu',
+export const useGameStore = create<GameStoreState>()(
+  devtools(
+    (set, get) => ({
+      view: 'mainMenu',
   config: gameConfig,
   session: null,
   startNewSession: (args) => {
@@ -380,4 +383,17 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       },
     });
   },
-}));
+    }),
+    { name: 'GameStore' },
+  ),
+);
+
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  import('simple-zustand-devtools')
+    .then(({ mountStoreDevtool }) => {
+      mountStoreDevtool('GameStore', useGameStore);
+    })
+    .catch(() => {
+      /* ignore */
+    });
+}
