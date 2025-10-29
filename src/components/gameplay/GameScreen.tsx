@@ -14,7 +14,7 @@ import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
 import { resourceLabels } from '../../domain/resourceMetadata';
-import type { StarSystem } from '../../domain/types';
+import type { StarSystem, PopulationJobId } from '../../domain/types';
 
 export const GameScreen = () => {
   useGameLoop();
@@ -30,6 +30,7 @@ export const GameScreen = () => {
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
   const [districtMessage, setDistrictMessage] = useState<string | null>(null);
+  const [populationMessage, setPopulationMessage] = useState<string | null>(null);
   const focusedSessionRef = useRef<string | null>(null);
 
   const clearFocusTargets = () => {
@@ -105,11 +106,20 @@ export const GameScreen = () => {
   const districtDefinitions = useGameStore(
     (state) => state.config.economy.districts,
   );
+  const populationJobs = useGameStore(
+    (state) => state.config.economy.populationJobs,
+  );
   const districtQueue = useGameStore(
     (state) => state.session?.districtConstructionQueue ?? [],
   );
   const queueDistrictConstruction = useGameStore(
     (state) => state.queueDistrictConstruction,
+  );
+  const promotePopulationJob = useGameStore(
+    (state) => state.promotePopulation,
+  );
+  const demotePopulationJob = useGameStore(
+    (state) => state.demotePopulation,
   );
   const planetDistrictQueue = selectedPlanet
     ? districtQueue.filter((task) => task.planetId === selectedPlanet.id)
@@ -119,6 +129,13 @@ export const GameScreen = () => {
     PLANET_NOT_FOUND: 'Pianeta non trovato.',
     INVALID_DISTRICT: 'Distretto non valido.',
     INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
+  };
+  const populationErrorMessages: Record<string, string> = {
+    NO_SESSION: 'Nessuna sessione attiva.',
+    PLANET_NOT_FOUND: 'Pianeta non trovato.',
+    INVALID_JOB: 'Ruolo non valido.',
+    NO_WORKERS: 'Nessun lavoratore disponibile.',
+    NO_POPULATION: 'Nessun pop assegnato al ruolo.',
   };
 
   const formatCost = (cost: Record<string, number | undefined>) => {
@@ -145,6 +162,30 @@ export const GameScreen = () => {
       result.success
         ? 'Costruzione distretto avviata.'
         : districtErrorMessages[result.reason],
+    );
+  };
+
+  const handlePromotePopulation = (jobId: PopulationJobId) => {
+    if (!selectedPlanet) {
+      return;
+    }
+    const result = promotePopulationJob(selectedPlanet.id, jobId);
+    setPopulationMessage(
+      result.success
+        ? 'Pop assegnato al nuovo ruolo.'
+        : populationErrorMessages[result.reason],
+    );
+  };
+
+  const handleDemotePopulation = (jobId: PopulationJobId) => {
+    if (!selectedPlanet) {
+      return;
+    }
+    const result = demotePopulationJob(selectedPlanet.id, jobId);
+    setPopulationMessage(
+      result.success
+        ? 'Pop riportato tra i lavoratori.'
+        : populationErrorMessages[result.reason],
     );
   };
 
@@ -298,6 +339,51 @@ export const GameScreen = () => {
                     </div>
                   ),
                 )}
+              </div>
+              <div className="planet-population">
+                <h4>Ruoli popolazione</h4>
+                {populationMessage ? (
+                  <p className="panel-message">{populationMessage}</p>
+                ) : null}
+                <ul>
+                  {populationJobs.map((job) => {
+                    const assigned =
+                      selectedPlanet.population[
+                        job.id as keyof typeof selectedPlanet.population
+                      ] ?? 0;
+                    return (
+                      <li key={job.id}>
+                        <div className="population-job__meta">
+                          <div>
+                            <strong>{job.label}</strong>
+                            <span className="text-muted">
+                              {job.description}
+                            </span>
+                          </div>
+                          <span>Pop assegnati: {assigned}</span>
+                          <span>Produzione: {formatCost(job.production)}</span>
+                          <span>Upkeep: {formatCost(job.upkeep)}</span>
+                        </div>
+                        <div className="population-job__actions">
+                          <button
+                            className="panel__action panel__action--compact"
+                            onClick={() => handlePromotePopulation(job.id)}
+                          >
+                            Promuovi
+                          </button>
+                          {job.id !== 'workers' ? (
+                            <button
+                              className="panel__action panel__action--compact"
+                              onClick={() => handleDemotePopulation(job.id)}
+                            >
+                              Declassa
+                            </button>
+                          ) : null}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
               {districtMessage ? (
                 <p className="panel-message">{districtMessage}</p>

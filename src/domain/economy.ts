@@ -6,6 +6,8 @@ import type {
   ResourceLedger,
   ResourceType,
   DistrictDefinition,
+  PopulationJobDefinition,
+  PopulationJobId,
 } from './types';
 
 export const RESOURCE_TYPES: ResourceType[] = [
@@ -29,6 +31,7 @@ export interface EconomyConfig {
   startingResources: Partial<Record<ResourceType, number>>;
   homeworld: HomeworldConfig;
   districts: DistrictDefinition[];
+  populationJobs: PopulationJobDefinition[];
 }
 
 const createLedger = (
@@ -54,6 +57,7 @@ const createHomeworld = (
   kind: config.kind,
   size: config.size,
   population: {
+    total: config.population,
     workers: config.population,
     specialists: 0,
     researchers: 0,
@@ -130,7 +134,10 @@ export const advanceEconomy = (
   );
 
   const districtLookup = new Map(
-    config.districts.map((district) => [district.id, district]),
+    config.districts.map((definition) => [definition.id, definition]),
+  );
+  const jobLookup = new Map<PopulationJobId, PopulationJobDefinition>(
+    config.populationJobs.map((job) => [job.id, job]),
   );
 
   state.planets.forEach((planet) => {
@@ -148,6 +155,18 @@ export const advanceEconomy = (
       RESOURCE_TYPES.forEach((type) => {
         const income = definition.production[type] ?? 0;
         const upkeep = definition.upkeep[type] ?? 0;
+        totals.income[type] += income * count;
+        totals.upkeep[type] += upkeep * count;
+      });
+    });
+    jobLookup.forEach((job) => {
+      const count = planet.population[job.id] ?? 0;
+      if (count <= 0) {
+        return;
+      }
+      RESOURCE_TYPES.forEach((type) => {
+        const income = job.production[type] ?? 0;
+        const upkeep = job.upkeep[type] ?? 0;
         totals.income[type] += income * count;
         totals.upkeep[type] += upkeep * count;
       });
