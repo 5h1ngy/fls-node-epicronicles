@@ -26,6 +26,7 @@ export const advanceSimulation = (
     const colonization = advanceColonization(
       updatedSession.colonizationTasks,
       updatedSession.economy,
+      config.colonization,
     );
     const districtConstruction = advanceDistrictConstruction({
       tasks: updatedSession.districtConstructionQueue,

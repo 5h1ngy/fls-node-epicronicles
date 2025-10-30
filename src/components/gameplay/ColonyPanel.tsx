@@ -1,6 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useGameStore, type ColonizationError } from '../../store/gameStore';
 import { resourceLabels } from '../../domain/resourceMetadata';
+import type {
+  ColonizationStatus,
+  ColonizationTask,
+} from '../../domain/types';
 
 const colonizationErrors: Record<ColonizationError, string> = {
   NO_SESSION: 'Nessuna sessione.',
@@ -10,6 +14,12 @@ const colonizationErrors: Record<ColonizationError, string> = {
   ALREADY_COLONIZED: 'Sistema gia colonizzato.',
   TASK_IN_PROGRESS: 'Colonizzazione gia attiva.',
   INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
+};
+
+const statusLabels: Record<ColonizationStatus, string> = {
+  preparing: 'Allestimento',
+  traveling: 'In viaggio',
+  colonizing: 'Insediamento',
 };
 
 interface ColonyPanelProps {
@@ -36,10 +46,17 @@ export const ColonyPanel = ({
     () => new Set(planets.map((planet) => planet.systemId)),
     [planets],
   );
-  const pendingSystems = useMemo(
-    () => new Set(colonizationTasks.map((task) => task.systemId)),
-    [colonizationTasks],
+  const systemLookup = useMemo(
+    () => new Map(systems.map((system) => [system.id, system])),
+    [systems],
   );
+  const tasksBySystem = useMemo(() => {
+    const map = new Map<string, ColonizationTask>();
+    colonizationTasks.forEach((task) => {
+      map.set(task.systemId, task);
+    });
+    return map;
+  }, [colonizationTasks]);
 
   const canAffordColonization = () => {
     if (!resources) {
@@ -61,6 +78,23 @@ export const ColonyPanel = ({
     } else {
       setMessage(colonizationErrors[result.reason]);
     }
+  };
+
+  const missionProgressPercent = (task: ColonizationTask) => {
+    if (task.missionTotalTicks <= 0) {
+      return 0;
+    }
+    return Math.round(
+      Math.min(1, task.missionElapsedTicks / task.missionTotalTicks) * 100,
+    );
+  };
+
+  const stageProgressLabel = (task: ColonizationTask) => {
+    if (task.totalTicks <= 0) {
+      return '0/0 tick';
+    }
+    const completed = Math.max(0, task.totalTicks - task.ticksRemaining);
+    return `${completed}/${task.totalTicks} tick`;
   };
 
   return (
@@ -85,6 +119,43 @@ export const ColonyPanel = ({
                 </button>
               </li>
             ))}
+          </ul>
+        )}
+      </div>
+      <div className="panel-section">
+        <div className="panel-section__header">
+          <h3>Missioni in corso</h3>
+        </div>
+        {colonizationTasks.length === 0 ? (
+          <p className="text-muted">Nessuna missione attiva.</p>
+        ) : (
+          <ul>
+            {colonizationTasks.map((task) => {
+              const system = systemLookup.get(task.systemId);
+              const missionProgress = missionProgressPercent(task);
+              return (
+                <li key={task.id}>
+                  <div className="colonization-row">
+                    <div>
+                      <strong>{system?.name ?? task.systemId}</strong>
+                      <span className="colonization-mission__status">
+                        {statusLabels[task.status]} ·{' '}
+                        {stageProgressLabel(task)}
+                      </span>
+                    </div>
+                    <span className="colonization-mission__ticks">
+                      {missionProgress}% missione
+                    </span>
+                  </div>
+                  <div className="colonization-progress">
+                    <div
+                      className="colonization-progress__bar"
+                      style={{ width: `${missionProgress}%` }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
@@ -117,7 +188,7 @@ export const ColonyPanel = ({
               {systems.map((system) => {
                 const habitable = system.habitableWorld;
                 const colonized = colonizedSystems.has(system.id);
-                const pending = pendingSystems.has(system.id);
+                const task = tasksBySystem.get(system.id);
                 const afford = canAffordColonization();
                 const disabledReason = !habitable
                   ? 'Nessun mondo'
@@ -125,8 +196,8 @@ export const ColonyPanel = ({
                     ? 'Serve sondaggio'
                     : colonized
                       ? 'Colonia attiva'
-                      : pending
-                        ? 'In corso'
+                      : task
+                        ? `Missione in corso (${statusLabels[task.status]})`
                         : !afford
                           ? 'Risorse insufficienti'
                           : null;
@@ -146,7 +217,11 @@ export const ColonyPanel = ({
                     </td>
                     <td>{habitable ? habitable.kind : '—'}</td>
                     <td>
-                      {colonized ? 'Colonia attiva' : pending ? 'In corso' : '-'}
+                      {colonized
+                        ? 'Colonia attiva'
+                        : task
+                          ? statusLabels[task.status]
+                          : '-'}
                     </td>
                     <td>
                       <button

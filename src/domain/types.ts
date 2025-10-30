@@ -23,6 +23,23 @@ export interface ResourceLedger {
   upkeep: number;
 }
 
+export type PopulationJobId = 'workers' | 'specialists' | 'researchers';
+
+export interface PopulationJobDefinition {
+  id: PopulationJobId;
+  label: string;
+  description: string;
+  production: Partial<Record<ResourceType, number>>;
+  upkeep: Partial<Record<ResourceType, number>>;
+}
+
+export interface PopulationStats {
+  total: number;
+  workers: number;
+  specialists: number;
+  researchers: number;
+}
+
 export interface DistrictDefinition {
   id: string;
   label: string;
@@ -102,11 +119,7 @@ export interface Planet {
   systemId: string;
   kind: PlanetKind;
   size: number;
-  population: {
-    workers: number;
-    specialists: number;
-    researchers: number;
-  };
+  population: PopulationStats;
   baseProduction: Partial<Record<ResourceType, number>>;
   upkeep: Partial<Record<ResourceType, number>>;
   districts: Record<string, number>;
@@ -146,7 +159,7 @@ export interface ShipyardTask {
   totalTicks: number;
 }
 
-export type ColonizationStatus = 'preparing' | 'colonizing';
+export type ColonizationStatus = 'preparing' | 'traveling' | 'colonizing';
 
 export interface ColonizationTask {
   id: string;
@@ -155,6 +168,8 @@ export interface ColonizationTask {
   ticksRemaining: number;
   status: ColonizationStatus;
   totalTicks: number;
+  missionElapsedTicks: number;
+  missionTotalTicks: number;
 }
 
 export interface CombatLoss {

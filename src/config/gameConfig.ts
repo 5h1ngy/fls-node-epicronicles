@@ -8,6 +8,8 @@ import type {
 
 export interface ColonizationConfig {
   cost: ResourceCost;
+  preparationTicks: number;
+  travelTicks: number;
   durationTicks: number;
 }
 
@@ -120,6 +122,29 @@ export const gameConfig: GameConfig = {
         upkeep: { energy: 2 },
       },
     ],
+    populationJobs: [
+      {
+        id: 'workers',
+        label: 'Lavoratori',
+        description: 'Pop dedicati a miniere, fattorie e infrastrutture.',
+        production: { minerals: 1.5, food: 1.5 },
+        upkeep: { food: 0.5 },
+      },
+      {
+        id: 'specialists',
+        label: 'Specialisti',
+        description: 'Tecnici e amministratori per distretti avanzati.',
+        production: { energy: 2 },
+        upkeep: { food: 0.5, energy: 0.2 },
+      },
+      {
+        id: 'researchers',
+        label: 'Ricercatori',
+        description: 'Scienziati che aumentano la produzione di ricerca.',
+        production: { research: 2.5 },
+        upkeep: { food: 0.5, energy: 0.5 },
+      },
+    ],
   },
   colonization: {
     cost: {
@@ -127,6 +152,8 @@ export const gameConfig: GameConfig = {
       minerals: 80,
       food: 30,
     },
+    preparationTicks: 2,
+    travelTicks: 3,
     durationTicks: 6,
   },
   military: {

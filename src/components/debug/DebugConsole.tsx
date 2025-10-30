@@ -41,8 +41,11 @@ export const DebugConsole = ({ variant = 'panel' }: DebugConsoleProps) => {
     colonizationTasks: session.colonizationTasks.map((task) => ({
       id: task.id,
       systemId: task.systemId,
+      status: task.status,
       ticksRemaining: task.ticksRemaining,
       totalTicks: task.totalTicks,
+      missionElapsedTicks: task.missionElapsedTicks,
+      missionTotalTicks: task.missionTotalTicks,
     })),
     shipyardQueue: session.shipyardQueue.map((task) => ({
       id: task.id,
