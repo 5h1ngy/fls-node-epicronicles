@@ -14,6 +14,10 @@ import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
 import { resourceLabels } from '../../domain/resourceMetadata';
+import {
+  RESOURCE_TYPES,
+  computePlanetProduction,
+} from '../../domain/economy';
 import type { StarSystem, PopulationJobId } from '../../domain/types';
 
 export const GameScreen = () => {
@@ -103,12 +107,9 @@ export const GameScreen = () => {
   const selectedPlanetSystem = selectedPlanet
     ? systems.find((system) => system.id === selectedPlanet.systemId) ?? null
     : null;
-  const districtDefinitions = useGameStore(
-    (state) => state.config.economy.districts,
-  );
-  const populationJobs = useGameStore(
-    (state) => state.config.economy.populationJobs,
-  );
+  const economyConfig = useGameStore((state) => state.config.economy);
+  const districtDefinitions = economyConfig.districts;
+  const populationJobs = economyConfig.populationJobs;
   const districtQueue = useGameStore(
     (state) => state.session?.districtConstructionQueue ?? [],
   );
@@ -153,6 +154,18 @@ export const GameScreen = () => {
       .join(' | ');
   };
 
+  const formatSigned = (value: number) => {
+    if (Math.abs(value) < 0.001) {
+      return '+0';
+    }
+    const magnitude = Math.abs(value);
+    const isInteger = Math.abs(Math.round(magnitude) - magnitude) < 0.01;
+    const formatted = isInteger
+      ? Math.round(magnitude).toString()
+      : magnitude.toFixed(1);
+    return `${value >= 0 ? '+' : '-'}${formatted}`;
+  };
+
   const handleQueueDistrict = (districtId: string) => {
     if (!selectedPlanet) {
       return;
@@ -164,6 +177,11 @@ export const GameScreen = () => {
         : districtErrorMessages[result.reason],
     );
   };
+
+  const planetProductionSummary =
+    selectedPlanet && economyConfig
+      ? computePlanetProduction(selectedPlanet, economyConfig)
+      : null;
 
   const handlePromotePopulation = (jobId: PopulationJobId) => {
     if (!selectedPlanet) {
@@ -328,18 +346,43 @@ export const GameScreen = () => {
                 {selectedPlanet.population.researchers} ricercatori
               </p>
               <p>Tipo stella: {selectedPlanetSystem.starClass}</p>
-              <div className="planet-list__yields">
-                {Object.entries(selectedPlanet.baseProduction).map(
-                  ([type, amount]) => (
-                    <div key={type} className="planet-list__yield">
-                      <span>
-                        {resourceLabels[type as keyof typeof resourceLabels]}
-                      </span>
-                      <span className="is-positive">+{amount}</span>
-                    </div>
-                  ),
-                )}
-              </div>
+              {planetProductionSummary ? (
+                <div className="planet-production">
+                  <h4>Produzione netta</h4>
+                  <div className="planet-production__grid">
+                    {RESOURCE_TYPES.map((type) => {
+                      const summary = planetProductionSummary[type];
+                      if (!summary) {
+                        return null;
+                      }
+                      const label =
+                        resourceLabels[type as keyof typeof resourceLabels];
+                      return (
+                        <div key={type} className="planet-production__card">
+                          <div className="planet-production__header">
+                            <span>{label}</span>
+                            <span
+                              className={
+                                summary.net >= 0 ? 'is-positive' : 'is-negative'
+                              }
+                            >
+                              {formatSigned(summary.net)}
+                            </span>
+                          </div>
+                          <ul className="planet-production__breakdown">
+                            <li>Base {formatSigned(summary.base)}</li>
+                            <li>Distretti {formatSigned(summary.districts)}</li>
+                            <li>
+                              Popolazione {formatSigned(summary.population)}
+                            </li>
+                            <li>Upkeep {formatSigned(-summary.upkeep)}</li>
+                          </ul>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
               <div className="planet-population">
                 <h4>Ruoli popolazione</h4>
                 {populationMessage ? (

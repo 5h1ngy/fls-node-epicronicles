@@ -737,6 +737,45 @@ body {
   margin-top: 0.75rem;
 }
 
+.planet-production {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.planet-production__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.5rem;
+}
+
+.planet-production__card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.planet-production__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.planet-production__breakdown {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .planet-population ul {
   list-style: none;
   margin: 0.5rem 0 0;

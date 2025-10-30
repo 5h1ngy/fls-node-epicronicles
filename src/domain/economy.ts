@@ -112,6 +112,72 @@ export const spendResources = (
   };
 };
 
+export interface ResourceContribution {
+  base: number;
+  districts: number;
+  population: number;
+  upkeep: number;
+  net: number;
+}
+
+export type PlanetProductionSummary = Record<ResourceType, ResourceContribution>;
+
+export const computePlanetProduction = (
+  planet: Planet,
+  config: EconomyConfig,
+): PlanetProductionSummary => {
+  const summary = RESOURCE_TYPES.reduce((acc, type) => {
+    acc[type] = {
+      base: planet.baseProduction[type] ?? 0,
+      districts: 0,
+      population: 0,
+      upkeep: planet.upkeep[type] ?? 0,
+      net: 0,
+    };
+    return acc;
+  }, {} as PlanetProductionSummary);
+
+  const districtLookup = new Map(
+    config.districts.map((definition) => [definition.id, definition]),
+  );
+  const jobLookup = new Map<PopulationJobId, PopulationJobDefinition>(
+    config.populationJobs.map((job) => [job.id, job]),
+  );
+
+  Object.entries(planet.districts ?? {}).forEach(([districtId, count]) => {
+    const definition = districtLookup.get(districtId);
+    if (!definition || (count ?? 0) <= 0) {
+      return;
+    }
+    RESOURCE_TYPES.forEach((type) => {
+      const production = definition.production[type] ?? 0;
+      const upkeep = definition.upkeep[type] ?? 0;
+      summary[type].districts += production * count;
+      summary[type].upkeep += upkeep * count;
+    });
+  });
+
+  jobLookup.forEach((job, jobId) => {
+    const assigned = planet.population[jobId] ?? 0;
+    if (assigned <= 0) {
+      return;
+    }
+    RESOURCE_TYPES.forEach((type) => {
+      const production = job.production[type] ?? 0;
+      const upkeep = job.upkeep[type] ?? 0;
+      summary[type].population += production * assigned;
+      summary[type].upkeep += upkeep * assigned;
+    });
+  });
+
+  RESOURCE_TYPES.forEach((type) => {
+    const entry = summary[type];
+    entry.net = entry.base + entry.districts + entry.population - entry.upkeep;
+  });
+
+  return summary;
+};
+
 export interface AdvanceEconomyResult {
   economy: EconomyState;
   netProduction: Record<ResourceType, number>;
