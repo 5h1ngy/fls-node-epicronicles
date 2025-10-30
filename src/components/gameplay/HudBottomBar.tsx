@@ -13,13 +13,14 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
     return null;
   }
 
-  const { clock, galaxy, scienceShips } = session;
+  const { clock, galaxy, scienceShips, notifications } = session;
   const revealedCount = galaxy.systems.filter(
     (system) => system.visibility !== 'unknown',
   ).length;
   const surveyedCount = galaxy.systems.filter(
     (system) => system.visibility === 'surveyed',
   ).length;
+  const visibleNotifications = notifications.slice(-2).reverse();
 
   return (
     <div className="hud-bottom-bar">
@@ -51,6 +52,19 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
         <dt>Navi scientifiche</dt>
         <dd>{scienceShips.length}</dd>
       </div>
+      {visibleNotifications.length > 0 ? (
+        <div className="hud-bottom-bar__notifications">
+          {visibleNotifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={`hud-notification hud-notification--${notification.kind}`}
+            >
+              <strong>Tick {notification.tick}</strong>
+              <span>{notification.message}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
       <div className="hud-bottom-bar__actions">
         <button
           className="panel__action panel__action--inline panel__action--compact"

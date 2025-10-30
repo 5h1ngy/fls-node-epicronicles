@@ -40,16 +40,19 @@ export const advanceDistrictConstruction = ({
 }): {
   tasks: DistrictConstructionTask[];
   economy: EconomyState;
+  completed: DistrictConstructionTask[];
 } => {
   if (tasks.length === 0) {
-    return { tasks, economy };
+    return { tasks, economy, completed: [] };
   }
   const updatedTasks: DistrictConstructionTask[] = [];
   let updatedEconomy = economy;
+  const completedTasks: DistrictConstructionTask[] = [];
 
   tasks.forEach((task) => {
     const remaining = Math.max(0, task.ticksRemaining - 1);
     if (remaining === 0) {
+      completedTasks.push(task);
       updatedEconomy = {
         ...updatedEconomy,
         planets: updatedEconomy.planets.map((planet) =>
@@ -69,5 +72,6 @@ export const advanceDistrictConstruction = ({
   return {
     tasks: updatedTasks,
     economy: updatedEconomy,
+    completed: completedTasks,
   };
 };

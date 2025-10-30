@@ -39,10 +39,11 @@ export const createSession = ({
     clock: createClock(),
     scienceShips: createInitialScienceShips(galaxy),
     economy: createInitialEconomy(homeSystemId, economyConfig),
-    colonizationTasks: [],
-    fleets: [createInitialFleet(homeSystemId, militaryConfig)],
-    shipyardQueue: [],
-    districtConstructionQueue: [],
-    combatReports: [],
-  };
+  colonizationTasks: [],
+  fleets: [createInitialFleet(homeSystemId, militaryConfig)],
+  shipyardQueue: [],
+  districtConstructionQueue: [],
+  combatReports: [],
+  notifications: [],
+};
 };

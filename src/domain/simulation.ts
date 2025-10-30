@@ -1,4 +1,4 @@
-import type { GameSession } from './types';
+import type { GameSession, GameNotification } from './types';
 import type { GameConfig } from '../config/gameConfig';
 import { advanceExploration } from './exploration';
 import { advanceEconomy } from './economy';
@@ -19,6 +19,7 @@ export const advanceSimulation = (
   let updatedSession = session;
 
   for (let iteration = 0; iteration < ticks; iteration += 1) {
+    const iterationNotifications: GameNotification[] = [];
     const fallbackSystemId =
       updatedSession.fleets[0]?.systemId ??
       updatedSession.galaxy.systems[0]?.id ??
@@ -32,6 +33,22 @@ export const advanceSimulation = (
       tasks: updatedSession.districtConstructionQueue,
       economy: colonization.economy,
     });
+    if (districtConstruction.completed.length > 0) {
+      districtConstruction.completed.forEach((task) => {
+        const planet = districtConstruction.economy.planets.find(
+          (entry) => entry.id === task.planetId,
+        );
+        const district = config.economy.districts.find(
+          (definition) => definition.id === task.districtId,
+        );
+        iterationNotifications.push({
+          id: `notif-${crypto.randomUUID()}`,
+          tick: updatedSession.clock.tick + iteration + 1,
+          kind: 'districtComplete',
+          message: `Distretto ${district?.label ?? task.districtId} completato su ${planet?.name ?? task.planetId}`,
+        });
+      });
+    }
     const shipyard = advanceShipyard({
       tasks: updatedSession.shipyardQueue,
       fleets: updatedSession.fleets,
@@ -67,6 +84,10 @@ export const advanceSimulation = (
         ...updatedSession.combatReports,
         ...fleetsAdvance.reports,
       ].slice(-8),
+      notifications: [
+        ...updatedSession.notifications,
+        ...iterationNotifications,
+      ].slice(-6),
       economy,
     };
   }

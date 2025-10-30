@@ -232,6 +232,35 @@ body {
   gap: 0.1rem;
 }
 
+.hud-bottom-bar__notifications {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.hud-notification {
+  min-width: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.35rem 0.45rem;
+  background: rgba(15, 25, 45, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+}
+
+.hud-notification strong {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+}
+
+.hud-notification span {
+  font-size: 0.75rem;
+  color: #f4f4f4;
+}
+
 .hud-bottom-bar__actions {
   margin-left: auto;
   display: flex;

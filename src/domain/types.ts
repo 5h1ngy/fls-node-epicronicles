@@ -50,6 +50,15 @@ export interface DistrictDefinition {
   upkeep: Partial<Record<ResourceType, number>>;
 }
 
+export type NotificationKind = 'districtComplete';
+
+export interface GameNotification {
+  id: string;
+  tick: number;
+  kind: NotificationKind;
+  message: string;
+}
+
 export type PlanetKind = 'terrestrial' | 'desert' | 'tundra';
 
 export type ShipClassId = 'corvette';
@@ -207,4 +216,5 @@ export interface GameSession {
   shipyardQueue: ShipyardTask[];
   districtConstructionQueue: DistrictConstructionTask[];
   combatReports: CombatReport[];
+  notifications: GameNotification[];
 }
