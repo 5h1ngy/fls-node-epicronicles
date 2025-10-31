@@ -17,12 +17,15 @@ import type {
   GameSession,
   GameNotification,
   GameView,
+  EconomyState,
   ScienceShipStatus,
   ShipClassId,
   SystemVisibility,
   PopulationJobId,
   Planet,
   NotificationKind,
+  ResourceType,
+  ResourceCost,
 } from '../domain/types';
 import { advanceSimulation } from '../domain/simulation';
 import { createColonizationTask } from '../domain/colonization';
@@ -90,6 +93,15 @@ export type DistrictBuildError =
 export type QueueDistrictBuildResult =
   | { success: true }
   | { success: false; reason: DistrictBuildError };
+
+export type DistrictQueueManageError =
+  | 'NO_SESSION'
+  | 'TASK_NOT_FOUND'
+  | 'PLANET_NOT_FOUND';
+
+export type DistrictQueueManageResult =
+  | { success: true }
+  | { success: false; reason: DistrictQueueManageError };
 
 export type PopulationAdjustError =
   | 'NO_SESSION'
@@ -397,6 +409,67 @@ export const queueDistrictConstruction =
     return { success: true };
   };
 
+export const cancelDistrictTask =
+  (taskId: string): AppThunk<DistrictQueueManageResult> =>
+  (dispatch, getState) => {
+    const state = getState().game;
+    const session = state.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    const queue = session.districtConstructionQueue;
+    const task = queue.find((entry) => entry.id === taskId);
+    if (!task) {
+      return { success: false, reason: 'TASK_NOT_FOUND' };
+    }
+    const planet = session.economy.planets.find(
+      (entry) => entry.id === task.planetId,
+    );
+    if (!planet) {
+      return { success: false, reason: 'PLANET_NOT_FOUND' };
+    }
+    const definition = state.config.economy.districts.find(
+      (entry) => entry.id === task.districtId,
+    );
+    const refundedEconomy = definition
+      ? refundResourceCost(session.economy, definition.cost)
+      : session.economy;
+
+    dispatch(
+      setSession({
+        ...session,
+        economy: refundedEconomy,
+        districtConstructionQueue: queue.filter(
+          (entry) => entry.id !== taskId,
+        ),
+      }),
+    );
+    return { success: true };
+  };
+
+export const prioritizeDistrictTask =
+  (taskId: string): AppThunk<DistrictQueueManageResult> =>
+  (dispatch, getState) => {
+    const session = getState().game.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    const queue = [...session.districtConstructionQueue];
+    const index = queue.findIndex((entry) => entry.id === taskId);
+    if (index < 0) {
+      return { success: false, reason: 'TASK_NOT_FOUND' };
+    }
+    const [task] = queue.splice(index, 1);
+    queue.unshift(task);
+    dispatch(
+      setSession({
+        ...session,
+        districtConstructionQueue: queue,
+      }),
+    );
+    return { success: true };
+  };
+
 const detachColonyShip = (
   fleets: GameSession['fleets'],
   designId: ShipClassId,
@@ -439,6 +512,29 @@ const appendNotification = (
   return {
     ...session,
     notifications: [...session.notifications, entry].slice(-6),
+  };
+};
+
+const refundResourceCost = (
+  economy: EconomyState,
+  cost: ResourceCost,
+): EconomyState => {
+  const resources = { ...economy.resources };
+  Object.entries(cost).forEach(([type, amount]) => {
+    if (!amount) {
+      return;
+    }
+    const resourceType = type as ResourceType;
+    const ledger = resources[resourceType];
+    resources[resourceType] = {
+      amount: (ledger?.amount ?? 0) + amount,
+      income: ledger?.income ?? 0,
+      upkeep: ledger?.upkeep ?? 0,
+    };
+  });
+  return {
+    ...economy,
+    resources,
   };
 };
 
@@ -709,6 +805,12 @@ interface HookState extends GameSliceState {
     planetId: string,
     districtId: string,
   ) => QueueDistrictBuildResult;
+  cancelDistrictTask: (
+    taskId: string,
+  ) => DistrictQueueManageResult;
+  prioritizeDistrictTask: (
+    taskId: string,
+  ) => DistrictQueueManageResult;
 }
 
 export const useGameStore = <T>(
@@ -743,6 +845,10 @@ export const useGameStore = <T>(
         dispatch(promotePopulation(planetId, jobId)),
       demotePopulation: (planetId: string, jobId: PopulationJobId) =>
         dispatch(demotePopulation(planetId, jobId)),
+      cancelDistrictTask: (taskId: string) =>
+        dispatch(cancelDistrictTask(taskId)),
+      prioritizeDistrictTask: (taskId: string) =>
+        dispatch(prioritizeDistrictTask(taskId)),
     }),
     [dispatch],
   );

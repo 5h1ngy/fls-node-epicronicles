@@ -318,6 +318,13 @@ body {
   gap: 0.4rem;
 }
 
+.resource-bar__trend {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
 .resource-bar__value {
   font-size: 0.95rem;
   font-weight: 600;
@@ -565,6 +572,43 @@ body {
 .colonization-progress__bar {
   height: 100%;
   background: linear-gradient(90deg, #7fe38f, #4dffdf);
+}
+
+.district-queue-panel ul {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.district-queue__item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.district-queue__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.district-queue__meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.district-queue__actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .shipyard-panel__designs {

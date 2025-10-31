@@ -24,14 +24,19 @@ export const ResourceBar = () => {
               <span className="resource-bar__value">
                 {entry.amount.toFixed(0)}
               </span>
-              <span
-                className={`resource-bar__delta ${
-                  isPositive ? 'is-positive' : 'is-negative'
-                }`}
-              >
-                {isPositive ? '+' : '-'}
-                {Math.abs(net).toFixed(1)}
-              </span>
+              <div className="resource-bar__trend">
+                <span
+                  className={`resource-bar__delta ${
+                    isPositive ? 'is-positive' : 'is-negative'
+                  }`}
+                >
+                  {isPositive ? '+' : '-'}
+                  {Math.abs(net).toFixed(1)}
+                </span>
+                <small className="text-muted">
+                  {isPositive ? 'surplus' : 'deficit'}/tick
+                </small>
+              </div>
             </div>
           </div>
         );

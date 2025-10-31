@@ -10,6 +10,7 @@ import { SciencePanel } from './SciencePanel';
 import { SystemPanel } from './SystemPanel';
 import { GalaxyOverview } from './GalaxyOverview';
 import { EconomyPanel } from './EconomyPanel';
+import { DistrictQueuePanel } from './DistrictQueuePanel';
 import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
 import { DraggablePanel } from '../ui/DraggablePanel';
@@ -305,6 +306,15 @@ export const GameScreen = () => {
           initialHeight={260}
         >
           <EconomyPanel />
+        </DraggablePanel>
+        <DraggablePanel
+          title="Coda distretti"
+          initialX={Math.max(12, viewportWidth - 360)}
+          initialY={520}
+          initialWidth={320}
+          initialHeight={260}
+        >
+          <DistrictQueuePanel />
         </DraggablePanel>
         <DraggablePanel
           title="Navi scientifiche"
