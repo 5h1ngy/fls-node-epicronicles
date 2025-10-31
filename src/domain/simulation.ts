@@ -34,6 +34,16 @@ export const advanceSimulation = (
       tasks: updatedSession.districtConstructionQueue,
       economy: colonization.economy,
     });
+    if (colonization.completed.length > 0) {
+      colonization.completed.forEach((entry) => {
+        iterationNotifications.push({
+          id: `notif-${crypto.randomUUID()}`,
+          tick: updatedSession.clock.tick + iteration + 1,
+          kind: 'colonizationCompleted',
+          message: `Colonia fondata in ${entry.planetName} (${entry.systemId}).`,
+        });
+      });
+    }
     if (districtConstruction.completed.length > 0) {
       districtConstruction.completed.forEach((task) => {
         const planet = districtConstruction.economy.planets.find(

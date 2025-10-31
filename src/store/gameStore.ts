@@ -300,13 +300,20 @@ export const startColonization =
       state.config.colonization,
       colonyShip.shipId,
     );
+    const sessionWithTask = {
+      ...session,
+      economy: updatedEconomy,
+      fleets: colonyShip.fleets,
+      colonizationTasks: [...session.colonizationTasks, task],
+    };
     dispatch(
-      setSession({
-        ...session,
-        economy: updatedEconomy,
-        fleets: colonyShip.fleets,
-        colonizationTasks: [...session.colonizationTasks, task],
-      }),
+      setSession(
+        appendNotification(
+          sessionWithTask,
+          `Missione di colonizzazione avviata verso ${system.name}.`,
+          'colonizationStarted',
+        ),
+      ),
     );
 
     return { success: true };

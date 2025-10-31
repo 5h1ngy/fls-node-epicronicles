@@ -95,6 +95,10 @@ const createPlanetFromTask = (task: ColonizationTask): Planet => ({
 export interface AdvanceColonizationResult {
   tasks: ColonizationTask[];
   economy: EconomyState;
+  completed: Array<{
+    systemId: string;
+    planetName: string;
+  }>;
 }
 
 export const advanceColonization = (
@@ -103,12 +107,13 @@ export const advanceColonization = (
   config: ColonizationConfig,
 ): AdvanceColonizationResult => {
   if (tasks.length === 0) {
-    return { tasks, economy };
+    return { tasks, economy, completed: [] };
   }
 
   let updatedEconomy = economy;
   const updatedTasks: ColonizationTask[] = [];
   const completedPlanets: Planet[] = [];
+  const completedEntries: Array<{ systemId: string; planetName: string }> = [];
   const durations = getStageDurations(config);
 
   const handleStageCompletion = (
@@ -117,7 +122,12 @@ export const advanceColonization = (
   ) => {
     const nextStatus = getNextStatus(task.status, durations);
     if (!nextStatus) {
-      completedPlanets.push(createPlanetFromTask(task));
+      const planet = createPlanetFromTask(task);
+      completedPlanets.push(planet);
+      completedEntries.push({
+        systemId: task.systemId,
+        planetName: planet.name,
+      });
       return;
     }
     const nextDuration = durations[nextStatus];
@@ -146,6 +156,10 @@ export const advanceColonization = (
     }
     if (task.status === 'colonizing') {
       completedPlanets.push(createPlanetFromTask(task));
+      completedEntries.push({
+        systemId: task.systemId,
+        planetName: task.planetTemplate.name,
+      });
       return;
     }
     handleStageCompletion(task, missionElapsed);
@@ -161,5 +175,6 @@ export const advanceColonization = (
   return {
     tasks: updatedTasks,
     economy: updatedEconomy,
+    completed: completedEntries,
   };
 };

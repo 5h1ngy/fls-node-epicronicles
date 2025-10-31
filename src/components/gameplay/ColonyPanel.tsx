@@ -22,6 +22,11 @@ const statusLabels: Record<ColonizationStatus, string> = {
   traveling: 'In viaggio',
   colonizing: 'Insediamento',
 };
+const statusBadgeClass: Record<ColonizationStatus, string> = {
+  preparing: 'is-preparing',
+  traveling: 'is-traveling',
+  colonizing: 'is-colonizing',
+};
 
 interface ColonyPanelProps {
   onSelectPlanet: (planetId: string, systemId: string) => void;
@@ -141,26 +146,30 @@ export const ColonyPanel = ({
         <div className="panel-section__header">
           <h3>Missioni in corso</h3>
         </div>
-        {colonizationTasks.length === 0 ? (
-          <p className="text-muted">Nessuna missione attiva.</p>
-        ) : (
-          <ul>
-            {colonizationTasks.map((task) => {
-              const system = systemLookup.get(task.systemId);
-              const missionProgress = missionProgressPercent(task);
-              return (
-                <li key={task.id}>
-                  <div className="colonization-row">
-                    <div>
-                      <strong>{system?.name ?? task.systemId}</strong>
-                      <span className="colonization-mission__status">
-                        {statusLabels[task.status]} ·{' '}
-                        {stageProgressLabel(task)}
-                      </span>
-                    </div>
-                    <span className="colonization-mission__ticks">
-                      {missionProgress}% missione
-                    </span>
+              {colonizationTasks.length === 0 ? (
+                <p className="text-muted">Nessuna missione attiva.</p>
+              ) : (
+                <ul>
+                  {colonizationTasks.map((task) => {
+                    const system = systemLookup.get(task.systemId);
+                    const missionProgress = missionProgressPercent(task);
+                    return (
+                      <li key={task.id}>
+                        <div className="colonization-row">
+                          <div>
+                            <strong>{system?.name ?? task.systemId}</strong>
+                            <span className="colonization-mission__status">
+                              <span
+                                className={`colonization-status ${statusBadgeClass[task.status]}`}
+                              >
+                                {statusLabels[task.status]}
+                              </span>
+                              {stageProgressLabel(task)}
+                            </span>
+                          </div>
+                          <span className="colonization-mission__ticks">
+                            {missionProgress}% missione
+                          </span>
                   </div>
                   <div className="colonization-progress">
                     <div

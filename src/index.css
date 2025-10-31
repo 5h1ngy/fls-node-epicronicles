@@ -548,6 +548,33 @@ body {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.65);
   margin-top: 0.2rem;
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.colonization-status {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.colonization-status.is-preparing {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.colonization-status.is-traveling {
+  border-color: rgba(255, 200, 87, 0.8);
+  color: #ffc857;
+}
+
+.colonization-status.is-colonizing {
+  border-color: rgba(127, 227, 143, 0.8);
+  color: #7fe38f;
 }
 
 .colonization-mission__ticks {
