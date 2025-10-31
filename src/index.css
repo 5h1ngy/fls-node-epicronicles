@@ -101,6 +101,20 @@ body {
   background: radial-gradient(circle at top, #101b36, #04060c 70%);
 }
 
+.map-alert {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(5, 10, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+  color: #f6f7ff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
 .galaxy-map__system {
   position: absolute;
   transform: translate(-50%, -50%);

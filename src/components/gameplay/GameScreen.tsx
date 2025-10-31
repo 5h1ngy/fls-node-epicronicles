@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { DebugConsole } from '../debug/DebugConsole';
 import { useGameLoop } from '../../utils/useGameLoop';
@@ -35,6 +35,7 @@ export const GameScreen = () => {
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
   const [districtMessage, setDistrictMessage] = useState<string | null>(null);
   const [populationMessage, setPopulationMessage] = useState<string | null>(null);
+  const [mapMessage, setMapMessage] = useState<string | null>(null);
   const focusedSessionRef = useRef<string | null>(null);
 
   const clearFocusTargets = () => {
@@ -42,6 +43,7 @@ export const GameScreen = () => {
     setShipyardSystemId(null);
     setSelectedPlanetId(null);
     setFocusPlanetId(null);
+    setMapMessage(null);
   };
 
   const closeShipyardPanel = () => {
@@ -99,6 +101,10 @@ export const GameScreen = () => {
   const viewportHeight =
     typeof window !== 'undefined' ? window.innerHeight : 800;
   const systems = session.galaxy.systems;
+  const colonizedSystems = useMemo(
+    () => new Set(session.economy.planets.map((planet) => planet.systemId)),
+    [session.economy.planets],
+  );
   const shipyardSystem: StarSystem | null = shipyardSystemId
     ? systems.find((system) => system.id === shipyardSystemId) ?? null
     : null;
@@ -216,13 +222,28 @@ export const GameScreen = () => {
           focusSystemId={focusSystemId}
           focusPlanetId={focusPlanetId}
           onSystemSelect={(systemId, _anchor) => {
-            setShipyardSystemId(systemId);
+            const targetSystem = systems.find(
+              (entry) => entry.id === systemId,
+            );
+            if (!targetSystem) {
+              return;
+            }
+            const isAccessible =
+              targetSystem.visibility === 'surveyed' ||
+              colonizedSystems.has(targetSystem.id);
+            setShipyardSystemId(isAccessible ? systemId : null);
             setSelectedPlanetId(null);
             setFocusSystemId(systemId);
             setFocusPlanetId(null);
+            setMapMessage(
+              isAccessible
+                ? null
+                : 'Sistema non sondato: esplora con una nave scientifica per ottenere i dettagli.',
+            );
           }}
           onClearFocus={clearFocusTargets}
         />
+        {mapMessage ? <div className="map-alert">{mapMessage}</div> : null}
       </div>
       <HudBottomBar
         onToggleDebug={() => setDebugOpen((value) => !value)}
