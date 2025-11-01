@@ -541,6 +541,7 @@ const setEmpireWarStatus = (
   targetId: string,
   status: WarStatus,
   opinionDelta = 0,
+  warSince?: number | null,
 ): Empire[] => {
   let changed = false;
   const updated = empires.map((empire) => {
@@ -548,9 +549,14 @@ const setEmpireWarStatus = (
       return empire;
     }
     changed = true;
+    const nextWarSince =
+      status === 'war'
+        ? warSince ?? empire.warSince ?? 0
+        : null;
     return {
       ...empire,
       warStatus: status,
+      warSince: nextWarSince,
       opinion: empire.opinion + opinionDelta,
     };
   });
@@ -697,11 +703,18 @@ export const declareWarOnEmpire =
     if (target.warStatus === 'war') {
       return { success: false, reason: 'ALREADY_IN_STATE' };
     }
-    const empires = setEmpireWarStatus(session.empires, empireId, 'war', -15);
+    const currentTick = session.clock.tick + 1;
+    const empires = setEmpireWarStatus(
+      session.empires,
+      empireId,
+      'war',
+      -15,
+      currentTick,
+    );
     const galaxyWithPressure = applyWarPressureToGalaxy({
       galaxy: session.galaxy,
       warsStarted: [empireId],
-      tick: session.clock.tick + 1,
+      tick: currentTick,
       config: state.config.diplomacy.warZones,
     });
     const updatedSession = appendNotification(
@@ -735,6 +748,7 @@ export const proposePeaceWithEmpire =
       empireId,
       'peace',
       10,
+      null,
     );
     const updatedSession = appendNotification(
       { ...session, empires },

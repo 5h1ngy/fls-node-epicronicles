@@ -25,7 +25,13 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
     (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
   );
   const warLabels = activeWars
-    .map((empire) => `${empire.name} (${empire.opinion})`)
+    .map((empire) => {
+      const duration =
+        empire.warSince !== undefined && empire.warSince !== null
+          ? ` ${Math.max(0, clock.tick - empire.warSince)}t`
+          : '';
+      return `${empire.name}${duration}`;
+    })
     .slice(0, 3);
 
   return (

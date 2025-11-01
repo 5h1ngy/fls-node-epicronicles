@@ -27,6 +27,7 @@ export interface Empire {
   color: string;
   opinion: number;
   warStatus: WarStatus;
+  warSince?: number | null;
   personality?: string;
 }
 

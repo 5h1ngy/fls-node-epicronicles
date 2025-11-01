@@ -40,6 +40,7 @@ export const advanceDiplomacy = ({
 
     if (empire.warStatus === 'peace' && drifted <= config.warThreshold) {
       empire.warStatus = 'war';
+      empire.warSince = tick;
       warsStarted.push(empire.id);
       notifications.push({
         id: `notif-${crypto.randomUUID()}`,
@@ -52,6 +53,7 @@ export const advanceDiplomacy = ({
       drifted >= config.peaceThreshold
     ) {
       empire.warStatus = 'peace';
+      empire.warSince = null;
       warsEnded.push(empire.id);
       notifications.push({
         id: `notif-${crypto.randomUUID()}`,
@@ -99,5 +101,43 @@ export const applyWarPressureToGalaxy = ({
     }
   });
 
+  return { ...galaxy, systems };
+};
+
+export const intensifyWarZones = ({
+  galaxy,
+  empires,
+  tick,
+  config,
+}: {
+  galaxy: GalaxyState;
+  empires: Empire[];
+  tick: number;
+  config: DiplomacyConfig['warZones'];
+}): GalaxyState => {
+  const warEmps = empires.filter(
+    (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
+  );
+  if (warEmps.length === 0) {
+    return galaxy;
+  }
+  if (tick % 8 !== 0) {
+    return galaxy;
+  }
+  const systems = galaxy.systems.slice();
+  const maxIndex = Math.max(1, systems.length - 1);
+  warEmps.forEach((_, idx) => {
+    const index = 1 + ((tick + idx) % maxIndex);
+    const system = systems[index];
+    if (!system) {
+      return;
+    }
+    const powerSpan = Math.max(1, config.powerMax - config.powerMin);
+    const power = config.powerMin + ((tick + idx) % powerSpan);
+    systems[index] = {
+      ...system,
+      hostilePower: Math.max(system.hostilePower ?? 0, power),
+    };
+  });
   return { ...galaxy, systems };
 };

@@ -11,7 +11,11 @@ import { advanceShipyard } from './shipyard';
 import { advanceFleets } from './fleets';
 import { advanceDistrictConstruction } from './districts';
 import { autoBalancePopulation } from './population';
-import { advanceDiplomacy, applyWarPressureToGalaxy } from './diplomacy';
+import {
+  advanceDiplomacy,
+  applyWarPressureToGalaxy,
+  intensifyWarZones,
+} from './diplomacy';
 
 const combatResultLabel: Record<CombatResultType, string> = {
   playerVictory: 'Vittoria',
@@ -115,8 +119,14 @@ export const advanceSimulation = (
       tick: currentTick,
       config: config.diplomacy.warZones,
     });
+    const warZoneGalaxy = intensifyWarZones({
+      galaxy: galaxyWithWarZones,
+      empires: diplomacy.empires,
+      tick: currentTick,
+      config: config.diplomacy.warZones,
+    });
     const { galaxy, scienceShips } = advanceExploration(
-      galaxyWithWarZones,
+      warZoneGalaxy,
       updatedSession.scienceShips,
       config.exploration,
     );
