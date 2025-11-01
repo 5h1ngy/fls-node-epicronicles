@@ -1,6 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
-import type { ShipClassId, ScienceShipStatus } from '../../domain/types';
+import type {
+  ShipClassId,
+  ScienceShipStatus,
+  WarStatus,
+} from '../../domain/types';
 
 const fleetOrderErrors = {
   NO_SESSION: 'Nessuna sessione.',
@@ -16,6 +20,11 @@ const resultLabel = {
   mutualDestruction: 'Mutua distruzione',
 } as const;
 
+const warStatusLabel: Record<WarStatus, string> = {
+  peace: 'Pace',
+  war: 'Guerra',
+};
+
 export const FleetAndCombatPanel = () => {
   const session = useGameStore((state) => state.session);
   const fleets = session?.fleets ?? [];
@@ -24,6 +33,7 @@ export const FleetAndCombatPanel = () => {
   const designs = useGameStore((state) => state.config.military.shipDesigns);
   const reports = (session?.combatReports ?? []).slice().reverse();
   const scienceShips = session?.scienceShips ?? [];
+  const empires = session?.empires ?? [];
   const [message, setMessage] = useState<string | null>(null);
 
   const systemName = (id: string | null) =>
@@ -97,6 +107,36 @@ const describeFleetShips = (ships: typeof fleets[number]['ships']) => {
 
   return (
     <section className="fleet-combat-panel">
+      <div className="panel-section">
+        <div className="panel-section__header">
+          <h3>Guerre attive</h3>
+        </div>
+        <ul>
+          {empires
+            .filter((empire) => empire.kind === 'ai')
+            .map((empire) => (
+              <li key={empire.id}>
+                <div className="fleet-row">
+                  <div>
+                    <strong>{empire.name}</strong>
+                    <span className="text-muted">
+                      Opinione: {empire.opinion}
+                    </span>
+                  </div>
+                  <span
+                    className={
+                      empire.warStatus === 'war'
+                        ? 'sentiment-negative'
+                        : 'sentiment-positive'
+                    }
+                  >
+                    {warStatusLabel[empire.warStatus]}
+                  </span>
+                </div>
+              </li>
+            ))}
+        </ul>
+      </div>
       <div className="panel-section">
         <div className="panel-section__header">
           <h3>Flotte</h3>

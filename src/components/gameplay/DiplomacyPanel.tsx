@@ -26,6 +26,8 @@ export const DiplomacyPanel = () => {
     return <p className="text-muted">Nessuna sessione attiva.</p>;
   }
 
+  const warCount = aiEmpires.filter((empire) => empire.warStatus === 'war').length;
+
   const changeMessage = (text: string | null) => setMessage(text);
 
   const handleAction = (empire: Empire, targetState: WarStatus) => {
@@ -52,6 +54,10 @@ export const DiplomacyPanel = () => {
 
   return (
     <section className="diplomacy-panel">
+      <header className="panel-section__header">
+        <h3>Diplomazia</h3>
+        <span className="text-muted">{warCount} guerre attive</span>
+      </header>
       {message ? <p className="panel-message">{message}</p> : null}
       {aiEmpires.length === 0 ? (
         <p className="text-muted">Nessun altro impero conosciuto.</p>

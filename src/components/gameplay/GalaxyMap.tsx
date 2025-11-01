@@ -162,6 +162,12 @@ const fleetMaterials = {
     transparent: true,
     opacity: 0.4,
   }),
+  war: new THREE.MeshBasicMaterial({ color: 0xff9b8a }),
+  warLine: new THREE.LineBasicMaterial({
+    color: 0xff9b8a,
+    transparent: true,
+    opacity: 0.5,
+  }),
 };
 
 const toMapPosition = (system: StarSystem) => ({
@@ -191,6 +197,12 @@ export const GalaxyMap = ({
     (state) => state.session?.scienceShips ?? [],
   );
   const fleets = useGameStore((state) => state.session?.fleets ?? []);
+  const empireWar = useGameStore(
+    (state) =>
+      state.session?.empires.some(
+        (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
+      ) ?? false,
+  );
   const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const systemGroupRef = useRef<THREE.Group | null>(null);
@@ -591,7 +603,10 @@ export const GalaxyMap = ({
     fleets.forEach((fleet) => {
       const position = positions.get(fleet.systemId);
       if (position) {
-        const marker = new THREE.Mesh(fleetGeometry, fleetMaterials.idle);
+        const marker = new THREE.Mesh(
+          fleetGeometry,
+          empireWar ? fleetMaterials.war : fleetMaterials.idle,
+        );
         marker.position.set(position.x, position.y, position.z + 3);
         fleetGroup.add(marker);
       }
@@ -607,12 +622,15 @@ export const GalaxyMap = ({
             new THREE.Vector3(to.x, to.y, to.z + 0.2),
           ];
           const geometry = new THREE.BufferGeometry().setFromPoints(points);
-          const line = new THREE.Line(geometry, fleetMaterials.line);
+          const line = new THREE.Line(
+            geometry,
+            empireWar ? fleetMaterials.warLine : fleetMaterials.line,
+          );
           fleetTargetGroup.add(line);
 
           const targetMarker = new THREE.Mesh(
             fleetTargetGeometry,
-            fleetMaterials.idle,
+            empireWar ? fleetMaterials.war : fleetMaterials.idle,
           );
           targetMarker.position.set(to.x, to.y, to.z + 1.5);
           fleetTargetGroup.add(targetMarker);
@@ -622,7 +640,7 @@ export const GalaxyMap = ({
     group.add(fleetTargetGroup);
     group.add(fleetGroup);
 
-  }, [systems, orbitBaseSpeed, scienceShips, fleets]);
+  }, [systems, orbitBaseSpeed, scienceShips, fleets, empireWar]);
 
   return <div className="galaxy-map" ref={containerRef} />;
 };
