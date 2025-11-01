@@ -24,6 +24,10 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
   const activeWars = empires.filter(
     (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
   );
+  const latestWarEvent =
+    session.warEvents.length > 0
+      ? session.warEvents[session.warEvents.length - 1]
+      : null;
   const warLabels = activeWars
     .map((empire) => {
       const duration =
@@ -83,6 +87,14 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
             <span className="text-muted">+{activeWars.length - warLabels.length}</span>
           ) : null}
           {hasWarEvent ? <span className="hud-war-chip hud-war-chip--alert">!</span> : null}
+        </div>
+      ) : null}
+      {latestWarEvent ? (
+        <div className="hud-bottom-bar__wars">
+          <strong>Ultimo evento:</strong>
+          <span className="hud-war-chip">
+            {latestWarEvent.message} (t{latestWarEvent.tick})
+          </span>
         </div>
       ) : null}
       {visibleNotifications.length > 0 ? (
