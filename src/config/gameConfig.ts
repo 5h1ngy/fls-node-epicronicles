@@ -32,6 +32,7 @@ export interface DiplomacyConfig {
     extraPerHostile: number;
     maxShips: number;
   };
+  warEventLogLimit: number;
 }
 
 export interface MilitaryConfig {
@@ -216,6 +217,7 @@ export const gameConfig: GameConfig = {
       extraPerHostile: 1,
       maxShips: 6,
     },
+    warEventLogLimit: 15,
   },
   military: {
     shipyard: {

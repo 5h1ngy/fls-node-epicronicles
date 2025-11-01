@@ -6,15 +6,23 @@ import type { MilitaryConfig, DiplomacyConfig } from '../config/gameConfig';
 const chooseTargetSystem = (
   galaxy: GalaxyState,
   avoidSystemId: string,
+  preferHostile: boolean,
 ): string | null => {
   const hostile = galaxy.systems.filter(
     (system) =>
-      system.hostilePower && system.hostilePower > 0 && system.id !== avoidSystemId,
+      (system.hostilePower ?? 0) > 0 && system.id !== avoidSystemId,
   );
-  if (hostile.length === 0) {
+  if (preferHostile && hostile.length > 0) {
+    return hostile[Math.floor(Math.random() * hostile.length)]?.id ?? null;
+  }
+  const nonHostile = galaxy.systems.filter(
+    (system) => (system.hostilePower ?? 0) === 0 && system.id !== avoidSystemId,
+  );
+  const pool = hostile.length > 0 ? hostile : nonHostile;
+  if (pool.length === 0) {
     return null;
   }
-  return hostile[Math.floor(Math.random() * hostile.length)]?.id ?? null;
+  return pool[Math.floor(Math.random() * pool.length)]?.id ?? null;
 };
 
 export const ensureAiFleet = (
@@ -84,7 +92,8 @@ export const advanceAiWarMoves = ({
       return;
     }
     const target =
-      chooseTargetSystem(session.galaxy, fleet.systemId) ??
+      chooseTargetSystem(session.galaxy, fleet.systemId, true) ??
+      chooseTargetSystem(session.galaxy, fleet.systemId, false) ??
       session.galaxy.systems[0]?.id ??
       null;
     if (!target || target === fleet.systemId) {

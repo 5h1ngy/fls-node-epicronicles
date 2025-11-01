@@ -190,7 +190,9 @@ export const advanceSimulation = (
       galaxy,
       scienceShips,
       empires: diplomacy.empires,
-      warEvents: iterationWarEvents.slice(-12),
+      warEvents: iterationWarEvents.slice(
+        -config.diplomacy.warEventLogLimit,
+      ),
       colonizationTasks: colonization.tasks,
       districtConstructionQueue: districtConstruction.tasks,
       shipyardQueue: shipyard.tasks,
