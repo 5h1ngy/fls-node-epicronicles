@@ -55,7 +55,8 @@ const sumFleetAttack = (
 ): number =>
   fleet.ships.reduce((total, ship) => {
     const design = designLookup.get(ship.designId);
-    return total + (design?.attack ?? 0);
+    const bonus = ship.attackBonus ?? 0;
+    return total + (design?.attack ?? 0) + bonus;
   }, 0);
 
 export interface AdvanceFleetsArgs {

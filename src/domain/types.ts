@@ -183,6 +183,7 @@ export interface FleetShip {
   id: string;
   designId: ShipClassId;
   hullPoints: number;
+  attackBonus?: number;
 }
 
 export interface Fleet {

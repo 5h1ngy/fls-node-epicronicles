@@ -8,12 +8,16 @@ const chooseTargetSystem = (
   avoidSystemId: string,
   preferHostile: boolean,
 ): string | null => {
-  const hostile = galaxy.systems.filter(
-    (system) =>
-      (system.hostilePower ?? 0) > 0 && system.id !== avoidSystemId,
-  );
+  const hostile = galaxy.systems
+    .filter(
+      (system) =>
+        (system.hostilePower ?? 0) > 0 && system.id !== avoidSystemId,
+    )
+    .sort(
+      (a, b) => (b.hostilePower ?? 0) - (a.hostilePower ?? 0),
+    );
   if (preferHostile && hostile.length > 0) {
-    return hostile[Math.floor(Math.random() * hostile.length)]?.id ?? null;
+    return hostile[0]?.id ?? null;
   }
   const nonHostile = galaxy.systems.filter(
     (system) => (system.hostilePower ?? 0) === 0 && system.id !== avoidSystemId,
@@ -60,6 +64,7 @@ export const ensureAiFleet = (
       id: `SHIP-${crypto.randomUUID()}`,
       designId: design.id,
       hullPoints: design.hullPoints + boost,
+      attackBonus: boost > 0 ? Math.max(1, Math.floor(boost / 2)) : 0,
     });
   }
   const newFleet: Fleet = {
