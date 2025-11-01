@@ -33,6 +33,9 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
       return `${empire.name}${duration}`;
     })
     .slice(0, 3);
+  const hasWarEvent =
+    notifications.find((notif) => notif.kind === 'warDeclared' || notif.kind === 'peaceAccepted') !==
+    undefined;
 
   return (
     <div className="hud-bottom-bar">
@@ -79,6 +82,7 @@ export const HudBottomBar = ({ onToggleDebug, debugOpen }: HudBottomBarProps) =>
           {activeWars.length > warLabels.length ? (
             <span className="text-muted">+{activeWars.length - warLabels.length}</span>
           ) : null}
+          {hasWarEvent ? <span className="hud-war-chip hud-war-chip--alert">!</span> : null}
         </div>
       ) : null}
       {visibleNotifications.length > 0 ? (

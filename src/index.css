@@ -251,6 +251,12 @@ body {
   gap: 0.35rem;
   flex-wrap: wrap;
 }
+.hud-war-chip--alert {
+  background: rgba(255, 102, 102, 0.2);
+  border-color: rgba(255, 102, 102, 0.6);
+  color: #ffaaaa;
+  font-weight: 700;
+}
 
 .hud-notification {
   min-width: 180px;

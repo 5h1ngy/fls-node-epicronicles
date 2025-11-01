@@ -54,10 +54,12 @@ export const ensureAiFleet = (
   const ships: Fleet['ships'] = [];
   for (let idx = 0; idx < size; idx += 1) {
     const design = military.shipDesigns[idx % military.shipDesigns.length];
+    const boost =
+      hostileSystems >= 5 ? 6 : hostileSystems >= 3 ? 3 : hostileSystems >= 1 ? 1 : 0;
     ships.push({
       id: `SHIP-${crypto.randomUUID()}`,
       designId: design.id,
-      hullPoints: design.hullPoints,
+      hullPoints: design.hullPoints + boost,
     });
   }
   const newFleet: Fleet = {
