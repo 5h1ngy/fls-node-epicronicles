@@ -37,6 +37,9 @@ export const advanceSimulation = (
 
   for (let iteration = 0; iteration < ticks; iteration += 1) {
     const iterationNotifications: GameNotification[] = [];
+    const iterationWarEvents: GameSession['warEvents'] = [
+      ...updatedSession.warEvents,
+    ];
     const fallbackSystemId =
       updatedSession.fleets[0]?.systemId ??
       updatedSession.galaxy.systems[0]?.id ??
@@ -129,6 +132,28 @@ export const advanceSimulation = (
     if (diplomacy.notifications.length > 0) {
       iterationNotifications.push(...diplomacy.notifications);
     }
+    if (diplomacy.warsStarted.length > 0) {
+      diplomacy.warsStarted.forEach((empireId) => {
+        iterationWarEvents.push({
+          id: `war-${crypto.randomUUID()}`,
+          type: 'warStart',
+          empireId,
+          tick: currentTick,
+          message: 'Guerra dichiarata.',
+        });
+      });
+    }
+    if (diplomacy.warsEnded.length > 0) {
+      diplomacy.warsEnded.forEach((empireId) => {
+        iterationWarEvents.push({
+          id: `war-${crypto.randomUUID()}`,
+          type: 'warEnd',
+          empireId,
+          tick: currentTick,
+          message: 'Pace raggiunta.',
+        });
+      });
+    }
     const galaxyWithWarZones = applyWarPressureToGalaxy({
       galaxy: fleetsAdvance.galaxy,
       warsStarted: diplomacy.warsStarted,
@@ -161,6 +186,7 @@ export const advanceSimulation = (
       galaxy,
       scienceShips,
       empires: diplomacy.empires,
+      warEvents: iterationWarEvents.slice(-12),
       colonizationTasks: colonization.tasks,
       districtConstructionQueue: districtConstruction.tasks,
       shipyardQueue: shipyard.tasks,

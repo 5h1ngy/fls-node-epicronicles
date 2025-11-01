@@ -31,6 +31,16 @@ export interface Empire {
   personality?: string;
 }
 
+export type WarEventType = 'warStart' | 'warEnd';
+
+export interface WarEvent {
+  id: string;
+  empireId: string;
+  type: WarEventType;
+  tick: number;
+  message: string;
+}
+
 export interface ResourceLedger {
   amount: number;
   income: number;
@@ -234,6 +244,7 @@ export interface GameSession {
   createdAt: number;
   galaxy: GalaxyState;
   empires: Empire[];
+  warEvents: WarEvent[];
   clock: SimulationClock;
   scienceShips: ScienceShip[];
   economy: EconomyState;

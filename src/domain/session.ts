@@ -96,6 +96,7 @@ export const createSession = ({
     createdAt: Date.now(),
     galaxy,
     empires: createEmpires(seed, diplomacyConfig),
+    warEvents: [],
     clock: createClock(),
     scienceShips: createInitialScienceShips(galaxy),
     economy: createInitialEconomy(homeSystemId, economyConfig),

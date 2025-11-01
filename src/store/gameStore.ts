@@ -36,6 +36,7 @@ import { createShipyardTask } from '../domain/shipyard';
 import { calculateTravelTicks } from '../domain/fleets';
 import { createDistrictConstructionTask } from '../domain/districts';
 import { applyWarPressureToGalaxy } from '../domain/diplomacy';
+import type { WarEvent, WarEventType } from '../domain/types';
 
 export interface StartSessionArgs {
   seed?: string;
@@ -536,6 +537,26 @@ const appendNotification = (
   };
 };
 
+const appendWarEvent = (
+  session: GameSession,
+  type: WarEventType,
+  empireId: string,
+  tick: number,
+  message: string,
+): GameSession => {
+  const event: WarEvent = {
+    id: `war-${crypto.randomUUID()}`,
+    type,
+    empireId,
+    tick,
+    message,
+  };
+  return {
+    ...session,
+    warEvents: [...session.warEvents, event].slice(-12),
+  };
+};
+
 const setEmpireWarStatus = (
   empires: Empire[],
   targetId: string,
@@ -717,8 +738,15 @@ export const declareWarOnEmpire =
       tick: currentTick,
       config: state.config.diplomacy.warZones,
     });
-    const updatedSession = appendNotification(
+    const sessionWithWar = appendWarEvent(
       { ...session, empires, galaxy: galaxyWithPressure },
+      'warStart',
+      empireId,
+      currentTick,
+      `Guerra dichiarata contro ${target.name}.`,
+    );
+    const updatedSession = appendNotification(
+      sessionWithWar,
       `Guerra dichiarata contro ${target.name}.`,
       'warDeclared',
     );
@@ -750,8 +778,15 @@ export const proposePeaceWithEmpire =
       10,
       null,
     );
-    const updatedSession = appendNotification(
+    const sessionWithWar = appendWarEvent(
       { ...session, empires },
+      'warEnd',
+      empireId,
+      session.clock.tick,
+      `Pace raggiunta con ${target.name}.`,
+    );
+    const updatedSession = appendNotification(
+      sessionWithWar,
       `Tregua firmata con ${target.name}.`,
       'peaceAccepted',
     );
