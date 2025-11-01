@@ -4,6 +4,7 @@ import type {
   ShipClassId,
   ScienceShipStatus,
   WarStatus,
+  WarEventType,
 } from '../../domain/types';
 
 const fleetOrderErrors = {
@@ -37,6 +38,7 @@ export const FleetAndCombatPanel = () => {
   const [message, setMessage] = useState<string | null>(null);
   const warLog = empires.filter((empire) => empire.kind === 'ai');
   const warEvents = (session?.warEvents ?? []).slice().reverse();
+  const [warFilter, setWarFilter] = useState<'all' | WarEventType>('all');
 
   const systemName = (id: string | null) =>
     systems.find((system) => system.id === id)?.name ?? '???';
@@ -85,6 +87,11 @@ const describeFleetShips = (ships: typeof fleets[number]['ships']) => {
     traveling: 'In viaggio',
     surveying: 'Sondando',
   };
+
+  const filteredWarEvents =
+    warFilter === 'all'
+      ? warEvents
+      : warEvents.filter((event) => event.type === warFilter);
 
   const renderScienceShips = (fleet: (typeof fleets)[number]) => {
     const ships = scienceShips.filter(
@@ -149,12 +156,25 @@ const describeFleetShips = (ships: typeof fleets[number]['ships']) => {
       <div className="panel-section">
         <div className="panel-section__header">
           <h3>Eventi di guerra</h3>
+          <label className="fleet-panel__order">
+            <span className="text-muted">Filtro</span>
+            <select
+              value={warFilter}
+              onChange={(event) =>
+                setWarFilter(event.target.value as 'all' | WarEventType)
+              }
+            >
+              <option value="all">Tutti</option>
+              <option value="warStart">Inizio guerra</option>
+              <option value="warEnd">Pace</option>
+            </select>
+          </label>
         </div>
         <ul>
-          {warEvents.length === 0 ? (
+          {filteredWarEvents.length === 0 ? (
             <li className="text-muted">Nessun evento registrato.</li>
           ) : (
-            warEvents.map((event) => {
+            filteredWarEvents.map((event) => {
               const empire = empires.find((e) => e.id === event.empireId);
               return (
                 <li key={event.id}>
