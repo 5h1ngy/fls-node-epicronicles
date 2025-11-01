@@ -178,6 +178,7 @@ export interface FleetShip {
 export interface Fleet {
   id: string;
   name: string;
+  ownerId?: string;
   systemId: string;
   targetSystemId: string | null;
   ticksToArrival: number;

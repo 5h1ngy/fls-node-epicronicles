@@ -16,6 +16,7 @@ import {
   applyWarPressureToGalaxy,
   intensifyWarZones,
 } from './diplomacy';
+import { advanceAiWarMoves, ensureAiFleet } from './ai';
 
 const combatResultLabel: Record<CombatResultType, string> = {
   playerVictory: 'Vittoria',
@@ -41,6 +42,7 @@ export const advanceSimulation = (
       updatedSession.galaxy.systems[0]?.id ??
       'unknown';
     const currentTick = updatedSession.clock.tick + iteration + 1;
+    updatedSession = ensureAiFleet(updatedSession, config.military);
     const colonization = advanceColonization(
       updatedSession.colonizationTasks,
       updatedSession.economy,
@@ -125,6 +127,10 @@ export const advanceSimulation = (
       tick: currentTick,
       config: config.diplomacy.warZones,
     });
+    const sessionWithAiOrders = advanceAiWarMoves({
+      session: { ...updatedSession, fleets: fleetsAdvance.fleets, galaxy: warZoneGalaxy },
+      military: config.military,
+    });
     const { galaxy, scienceShips } = advanceExploration(
       warZoneGalaxy,
       updatedSession.scienceShips,
@@ -144,7 +150,7 @@ export const advanceSimulation = (
       colonizationTasks: colonization.tasks,
       districtConstructionQueue: districtConstruction.tasks,
       shipyardQueue: shipyard.tasks,
-      fleets: fleetsAdvance.fleets,
+      fleets: sessionWithAiOrders.fleets,
       combatReports: [
         ...updatedSession.combatReports,
         ...fleetsAdvance.reports,

@@ -76,9 +76,10 @@ export const advanceFleets = ({
   fleets: Fleet[];
   galaxy: GalaxyState;
   reports: CombatReport[];
+  hostilesCleared: string[];
 } => {
   if (fleets.length === 0) {
-    return { fleets, galaxy, reports: [] };
+    return { fleets, galaxy, reports: [], hostilesCleared: [] };
   }
 
   const designLookup = buildDesignMap(config);
@@ -149,6 +150,10 @@ export const advanceFleets = ({
       hostilePower: Math.max(0, hostileRemaining),
     };
 
+    if (hostileRemaining <= 0) {
+      hostilesCleared.push(system.id);
+    }
+
     reports.push({
       id: `COMBAT-${system.id}-${tick}-${crypto.randomUUID()}`,
       systemId: system.id,
@@ -180,6 +185,7 @@ export const advanceFleets = ({
     fleets: sanitizedFleets,
     galaxy: systemsCloned ? { ...galaxy, systems: updatedGalaxySystems } : galaxy,
     reports,
+    hostilesCleared,
   };
 };
 

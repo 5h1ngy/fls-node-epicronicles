@@ -25,6 +25,7 @@ export const createFleetShip = (
 export const createInitialFleet = (
   homeSystemId: string,
   config: MilitaryConfig,
+  ownerId = 'player',
 ): Fleet => {
   const starterDesign = getShipDesign(
     config,
@@ -45,6 +46,7 @@ export const createInitialFleet = (
   return {
     id: `FLEET-${crypto.randomUUID()}`,
     name: '1 Flotta',
+    ownerId,
     systemId: homeSystemId,
     targetSystemId: null,
     ticksToArrival: 0,
