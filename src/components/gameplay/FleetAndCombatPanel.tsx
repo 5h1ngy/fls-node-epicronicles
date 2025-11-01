@@ -35,6 +35,7 @@ export const FleetAndCombatPanel = () => {
   const scienceShips = session?.scienceShips ?? [];
   const empires = session?.empires ?? [];
   const [message, setMessage] = useState<string | null>(null);
+  const warLog = empires.filter((empire) => empire.kind === 'ai');
 
   const systemName = (id: string | null) =>
     systems.find((system) => system.id === id)?.name ?? '???';
@@ -112,15 +113,21 @@ const describeFleetShips = (ships: typeof fleets[number]['ships']) => {
           <h3>Guerre attive</h3>
         </div>
         <ul>
-          {empires
-            .filter((empire) => empire.kind === 'ai')
-            .map((empire) => (
+          {warLog.map((empire) => {
+            const duration =
+              empire.warSince && session
+                ? Math.max(0, session.clock.tick - empire.warSince)
+                : 0;
+            return (
               <li key={empire.id}>
                 <div className="fleet-row">
                   <div>
                     <strong>{empire.name}</strong>
                     <span className="text-muted">
                       Opinione: {empire.opinion}
+                    </span>
+                    <span className="text-muted">
+                      Durata: {duration} tick
                     </span>
                   </div>
                   <span
@@ -134,7 +141,8 @@ const describeFleetShips = (ships: typeof fleets[number]['ships']) => {
                   </span>
                 </div>
               </li>
-            ))}
+            );
+          })}
         </ul>
       </div>
       <div className="panel-section">
