@@ -1058,6 +1058,15 @@ body {
   color: #7fe38f;
   font-size: 0.85rem;
 }
+.sentiment-positive {
+  color: #7fe38f;
+}
+.sentiment-negative {
+  color: #ff9b8a;
+}
+.sentiment-neutral {
+  color: rgba(255, 255, 255, 0.75);
+}
 .panel-section {
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);

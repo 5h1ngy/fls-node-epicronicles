@@ -20,6 +20,7 @@ import {
   computePlanetProduction,
 } from '../../domain/economy';
 import type { StarSystem, PopulationJobId } from '../../domain/types';
+import { DiplomacyPanel } from './DiplomacyPanel';
 
 export const GameScreen = () => {
   useGameLoop();
@@ -349,6 +350,15 @@ export const GameScreen = () => {
           initialY={320}
         >
           <FleetAndCombatPanel />
+        </DraggablePanel>
+        <DraggablePanel
+          title="Diplomazia"
+          initialX={Math.max(12, viewportWidth - 640)}
+          initialY={360}
+          initialWidth={300}
+          initialHeight={220}
+        >
+          <DiplomacyPanel />
         </DraggablePanel>
         {debugOpen ? (
           <div className="debug-modal">
