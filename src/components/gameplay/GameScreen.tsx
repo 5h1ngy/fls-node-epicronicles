@@ -40,6 +40,8 @@ export const GameScreen = () => {
   const [mapMessage, setMapMessage] = useState<string | null>(null);
   const focusedSessionRef = useRef<string | null>(null);
   const warEventsRef = useRef<HTMLDivElement | null>(null);
+  const [warUnread, setWarUnread] = useState(0);
+  const [lastSeenWarId, setLastSeenWarId] = useState<string | null>(null);
 
   const clearFocusTargets = () => {
     setFocusSystemId(null);
@@ -98,6 +100,19 @@ export const GameScreen = () => {
     }
     focusedSessionRef.current = session.id;
   }, [session, setFocusPlanetId, setFocusSystemId]);
+
+  useEffect(() => {
+    if (!session) {
+      setWarUnread(0);
+      setLastSeenWarId(null);
+      return;
+    }
+    const latestId = session.warEvents.at(-1)?.id ?? null;
+    if (!latestId || latestId === lastSeenWarId) {
+      return;
+    }
+    setWarUnread((current) => current + 1);
+  }, [session, lastSeenWarId]);
 
   const viewportWidth =
     typeof window !== 'undefined' ? window.innerWidth : 1200;
@@ -269,7 +284,12 @@ export const GameScreen = () => {
           if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
+          if (session?.warEvents?.length) {
+            setLastSeenWarId(session.warEvents.at(-1)?.id ?? null);
+            setWarUnread(0);
+          }
         }}
+        warUnread={warUnread}
       />
       <div className="floating-panels">
         <DraggablePanel

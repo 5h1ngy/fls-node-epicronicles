@@ -4,12 +4,14 @@ interface HudBottomBarProps {
   onToggleDebug: () => void;
   debugOpen: boolean;
   onShowWars?: () => void;
+  warUnread?: number;
 }
 
 export const HudBottomBar = ({
   onToggleDebug,
   debugOpen,
   onShowWars,
+  warUnread = 0,
 }: HudBottomBarProps) => {
   const session = useGameStore((state) => state.session);
   const returnToMenu = useGameStore((state) => state.returnToMenu);
@@ -99,6 +101,11 @@ export const HudBottomBar = ({
             >
               Journal
             </button>
+          ) : null}
+          {warUnread > 0 ? (
+            <span className="hud-war-chip hud-war-chip--alert" title="Eventi guerra non letti">
+              {warUnread}
+            </span>
           ) : null}
         </div>
       ) : null}

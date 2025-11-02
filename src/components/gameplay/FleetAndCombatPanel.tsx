@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type RefObject } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import type {
   ShipClassId,
@@ -27,7 +27,7 @@ const warStatusLabel: Record<WarStatus, string> = {
 };
 
 interface FleetAndCombatPanelProps {
-  warEventsRef?: React.RefObject<HTMLDivElement>;
+  warEventsRef?: RefObject<HTMLDivElement>;
 }
 
 export const FleetAndCombatPanel = ({ warEventsRef }: FleetAndCombatPanelProps) => {
