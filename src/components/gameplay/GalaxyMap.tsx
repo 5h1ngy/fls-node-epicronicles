@@ -176,6 +176,12 @@ const hostileIndicatorMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.6,
 });
 
+const combatIndicatorMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffc857,
+  transparent: true,
+  opacity: 0.7,
+});
+
 const toMapPosition = (system: StarSystem) => ({
   x: system.mapPosition?.x ?? system.position.x,
   y: system.mapPosition?.y ?? system.position.y,
@@ -208,6 +214,14 @@ export const GalaxyMap = ({
       state.session?.empires.some(
         (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
       ) ?? false,
+  );
+  const recentCombatSystems = useGameStore(
+    (state) =>
+      new Set(
+        (state.session?.combatReports ?? [])
+          .slice(-3)
+          .map((report) => report.systemId),
+      ),
   );
   const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -548,6 +562,20 @@ export const GalaxyMap = ({
             24,
           ),
           hostileIndicatorMaterial,
+        );
+        ring.rotation.x = Math.PI / 2;
+        ring.userData.systemId = system.id;
+        node.add(ring);
+      }
+
+      if (recentCombatSystems.has(system.id)) {
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry(
+            starMesh.geometry.parameters.radius + 2.2,
+            starMesh.geometry.parameters.radius + 3.6,
+            24,
+          ),
+          combatIndicatorMaterial,
         );
         ring.rotation.x = Math.PI / 2;
         ring.userData.systemId = system.id;
