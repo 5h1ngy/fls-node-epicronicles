@@ -194,6 +194,7 @@ export interface Fleet {
   targetSystemId: string | null;
   ticksToArrival: number;
   ships: FleetShip[];
+  lastTargetSystemId?: string | null;
 }
 
 export interface ShipyardTask {

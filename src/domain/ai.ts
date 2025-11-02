@@ -5,13 +5,14 @@ import type { MilitaryConfig, DiplomacyConfig } from '../config/gameConfig';
 
 const chooseTargetSystem = (
   galaxy: GalaxyState,
-  avoidSystemId: string,
+  avoidSystemIds: string[],
   preferHostile: boolean,
 ): string | null => {
   const hostile = galaxy.systems
     .filter(
       (system) =>
-        (system.hostilePower ?? 0) > 0 && system.id !== avoidSystemId,
+        (system.hostilePower ?? 0) > 0 &&
+        !avoidSystemIds.includes(system.id),
     )
     .sort(
       (a, b) => (b.hostilePower ?? 0) - (a.hostilePower ?? 0),
@@ -20,7 +21,9 @@ const chooseTargetSystem = (
     return hostile[0]?.id ?? null;
   }
   const nonHostile = galaxy.systems.filter(
-    (system) => (system.hostilePower ?? 0) === 0 && system.id !== avoidSystemId,
+    (system) =>
+      (system.hostilePower ?? 0) === 0 &&
+      !avoidSystemIds.includes(system.id),
   );
   const pool = hostile.length > 0 ? hostile : nonHostile;
   if (pool.length === 0) {
@@ -98,9 +101,13 @@ export const advanceAiWarMoves = ({
     if (!fleet || fleet.targetSystemId) {
       return;
     }
+    const avoidIds = [fleet.systemId];
+    if (fleet.lastTargetSystemId) {
+      avoidIds.push(fleet.lastTargetSystemId);
+    }
     const target =
-      chooseTargetSystem(session.galaxy, fleet.systemId, true) ??
-      chooseTargetSystem(session.galaxy, fleet.systemId, false) ??
+      chooseTargetSystem(session.galaxy, avoidIds, true) ??
+      chooseTargetSystem(session.galaxy, avoidIds, false) ??
       session.galaxy.systems[0]?.id ??
       null;
     if (!target || target === fleet.systemId) {
@@ -114,6 +121,7 @@ export const advanceAiWarMoves = ({
     );
     fleet.targetSystemId = target;
     fleet.ticksToArrival = Math.max(1, travelTicks);
+    fleet.lastTargetSystemId = target;
     changed = true;
   });
   if (!changed) {
