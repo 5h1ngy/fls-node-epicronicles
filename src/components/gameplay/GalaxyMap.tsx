@@ -182,6 +182,12 @@ const combatIndicatorMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.7,
 });
 
+const battleIconMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff6b6b,
+  transparent: true,
+  opacity: 0.9,
+});
+
 const toMapPosition = (system: StarSystem) => ({
   x: system.mapPosition?.x ?? system.position.x,
   y: system.mapPosition?.y ?? system.position.y,
@@ -223,6 +229,24 @@ export const GalaxyMap = ({
           .map((report) => report.systemId),
       ),
   );
+  const activeBattles = useGameStore((state) => {
+    const session = state.session;
+    if (!session) {
+      return new Set<string>();
+    }
+    const hostileSet = new Set(
+      session.galaxy.systems
+        .filter((system) => (system.hostilePower ?? 0) > 0)
+        .map((system) => system.id),
+    );
+    const current = session.fleets
+      .filter(
+        (fleet) =>
+          hostileSet.has(fleet.systemId) && fleet.targetSystemId === null,
+      )
+      .map((fleet) => fleet.systemId);
+    return new Set(current);
+  });
   const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const systemGroupRef = useRef<THREE.Group | null>(null);
@@ -580,6 +604,23 @@ export const GalaxyMap = ({
         ring.rotation.x = Math.PI / 2;
         ring.userData.systemId = system.id;
         node.add(ring);
+      }
+
+      if (activeBattles.has(system.id)) {
+        const cross = new THREE.Mesh(
+          new THREE.PlaneGeometry(
+            (starMesh.geometry.parameters.radius + 3) * 1.6,
+            (starMesh.geometry.parameters.radius + 3) * 1.6,
+          ),
+          battleIconMaterial,
+        );
+        cross.rotation.x = Math.PI / 2;
+        cross.position.z = 0.5;
+        cross.userData.systemId = system.id;
+        cross.material = battleIconMaterial;
+        battleIconMaterial.depthWrite = false;
+        cross.scale.set(1, 0.2, 1);
+        node.add(cross);
       }
 
       if (isSurveyed && system.orbitingPlanets.length > 0) {
