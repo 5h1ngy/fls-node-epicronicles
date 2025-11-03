@@ -22,6 +22,7 @@ const combatResultLabel: Record<CombatResultType, string> = {
   playerVictory: 'Vittoria',
   playerDefeat: 'Sconfitta',
   mutualDestruction: 'Mutua distruzione',
+  stalemate: 'Stallo',
 };
 
 export const advanceSimulation = (

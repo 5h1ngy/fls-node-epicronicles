@@ -21,6 +21,7 @@ const resultLabel = {
   playerVictory: 'Vittoria',
   playerDefeat: 'Sconfitta',
   mutualDestruction: 'Mutua distruzione',
+  stalemate: 'Stallo',
 } as const;
 
 const warStatusLabel: Record<WarStatus, string> = {

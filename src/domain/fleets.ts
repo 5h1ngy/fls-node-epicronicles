@@ -156,7 +156,7 @@ export const advanceFleets = ({
     } else if (hostileRemaining > 0 && fleet.ships.length === 0) {
       result = 'playerDefeat';
     } else if (hostileRemaining > 0 && fleet.ships.length > 0) {
-      result = 'playerDefeat';
+      result = 'stalemate';
     }
 
     updatedGalaxySystems[systemIndex] = {

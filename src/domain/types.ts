@@ -223,7 +223,11 @@ export interface CombatLoss {
   shipsLost: number;
 }
 
-export type CombatResultType = 'playerVictory' | 'playerDefeat' | 'mutualDestruction';
+export type CombatResultType =
+  | 'playerVictory'
+  | 'playerDefeat'
+  | 'mutualDestruction'
+  | 'stalemate';
 
 export interface CombatReport {
   id: string;
