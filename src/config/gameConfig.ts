@@ -61,6 +61,7 @@ export interface MilitaryConfig {
 export interface GameConfig {
   ticksPerSecond: number;
   defaultGalaxy: GalaxyGenerationParams;
+  galaxyPresets: Array<GalaxyGenerationParams & { id: string; label: string }>;
   debug: {
     autoStart: boolean;
   };
@@ -84,6 +85,11 @@ export const gameConfig: GameConfig = {
     systemCount: 18,
     galaxyRadius: 260,
   },
+  galaxyPresets: [
+    { id: 'test', label: 'Test (piccola)', seed: 'debug-seed', systemCount: 8, galaxyRadius: 140 },
+    { id: 'standard', label: 'Standard', seed: 'debug-seed', systemCount: 18, galaxyRadius: 260 },
+    { id: 'large', label: 'Grande', seed: 'debug-seed', systemCount: 28, galaxyRadius: 320 },
+  ],
   debug: {
     autoStart: false,
   },

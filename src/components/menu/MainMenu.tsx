@@ -5,6 +5,11 @@ export const MainMenu = () => {
   const startNewSession = useGameStore((state) => state.startNewSession);
   const config = useGameStore((state) => state.config);
   const [seed, setSeed] = useState(config.defaultGalaxy.seed);
+  const defaultPresetId =
+    config.galaxyPresets.find((preset) => preset.id === 'standard')?.id ??
+    config.galaxyPresets[0]?.id ??
+    'standard';
+  const [presetId, setPresetId] = useState(defaultPresetId);
 
   return (
     <div className="panel">
@@ -20,9 +25,24 @@ export const MainMenu = () => {
         />
       </label>
 
+      <label className="panel__field">
+        <span>Galaxy preset</span>
+        <select
+          value={presetId}
+          onChange={(event) => setPresetId(event.target.value)}
+          aria-label="Galaxy preset"
+        >
+          {config.galaxyPresets.map((preset) => (
+            <option key={preset.id} value={preset.id}>
+              {preset.label} ({preset.systemCount} sistemi)
+            </option>
+          ))}
+        </select>
+      </label>
+
       <button
         className="panel__action"
-        onClick={() => startNewSession({ seed })}
+        onClick={() => startNewSession({ seed, presetId })}
       >
         Start simulation
       </button>

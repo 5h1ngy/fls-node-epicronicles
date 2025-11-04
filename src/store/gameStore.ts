@@ -41,6 +41,7 @@ import type { WarEvent, WarEventType } from '../domain/types';
 export interface StartSessionArgs {
   seed?: string;
   label?: string;
+  presetId?: string;
 }
 
 export type ColonizationError =
@@ -206,13 +207,20 @@ export const startNewSession =
   (args?: StartSessionArgs): AppThunk<void> =>
   (dispatch, getState) => {
     const cfg = getState().game.config;
-    const seed = args?.seed ?? cfg.defaultGalaxy.seed;
+    const preset =
+      (args?.presetId &&
+        cfg.galaxyPresets.find((entry) => entry.id === args.presetId)) ??
+      cfg.galaxyPresets.find((entry) => entry.id === 'standard') ??
+      null;
+    const seed = args?.seed ?? preset?.seed ?? cfg.defaultGalaxy.seed;
     const session = createSession({
       seed,
       label: args?.label,
       galaxyOverrides: {
-        systemCount: cfg.defaultGalaxy.systemCount,
-        galaxyRadius: cfg.defaultGalaxy.galaxyRadius,
+        systemCount:
+          preset?.systemCount ?? cfg.defaultGalaxy.systemCount,
+        galaxyRadius:
+          preset?.galaxyRadius ?? cfg.defaultGalaxy.galaxyRadius,
       },
       economyConfig: cfg.economy,
       militaryConfig: cfg.military,
