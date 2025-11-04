@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
 
 interface HudBottomBarProps {
@@ -13,8 +14,12 @@ export const HudBottomBar = ({
   onShowWars,
   warUnread = 0,
 }: HudBottomBarProps) => {
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const session = useGameStore((state) => state.session);
   const returnToMenu = useGameStore((state) => state.returnToMenu);
+  const saveSession = useGameStore((state) => state.saveSession);
+  const loadSession = useGameStore((state) => state.loadSession);
+  const hasSavedSession = useGameStore((state) => state.hasSavedSession);
 
   if (!session) {
     return null;
@@ -133,6 +138,33 @@ export const HudBottomBar = ({
       <div className="hud-bottom-bar__actions">
         <button
           className="panel__action panel__action--inline panel__action--compact"
+          onClick={() => {
+            const result = saveSession();
+            setSaveMessage(
+              result.success
+                ? 'Partita salvata.'
+                : 'Salvataggio non riuscito.',
+            );
+          }}
+        >
+          Save
+        </button>
+        <button
+          className="panel__action panel__action--inline panel__action--compact"
+          onClick={() => {
+            const result = loadSession();
+            setSaveMessage(
+              result.success
+                ? 'Partita caricata.'
+                : 'Caricamento non riuscito.',
+            );
+          }}
+          disabled={!hasSavedSession()}
+        >
+          Load
+        </button>
+        <button
+          className="panel__action panel__action--inline panel__action--compact"
           onClick={onToggleDebug}
         >
           {debugOpen ? 'Hide debug' : 'Debug'}
@@ -143,6 +175,9 @@ export const HudBottomBar = ({
         >
           Quit to menu
         </button>
+        {saveMessage ? (
+          <span className="text-muted">{saveMessage}</span>
+        ) : null}
       </div>
     </div>
   );

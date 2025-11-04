@@ -3,6 +3,8 @@ import { useGameStore } from '../../store/gameStore';
 
 export const MainMenu = () => {
   const startNewSession = useGameStore((state) => state.startNewSession);
+  const loadSession = useGameStore((state) => state.loadSession);
+  const hasSavedSession = useGameStore((state) => state.hasSavedSession);
   const config = useGameStore((state) => state.config);
   const [seed, setSeed] = useState(config.defaultGalaxy.seed);
   const defaultPresetId =
@@ -10,6 +12,16 @@ export const MainMenu = () => {
     config.galaxyPresets[0]?.id ??
     'standard';
   const [presetId, setPresetId] = useState(defaultPresetId);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const handleLoad = () => {
+    const result = loadSession();
+    setMessage(
+      result.success
+        ? 'Partita caricata.'
+        : 'Nessun salvataggio disponibile o file non valido.',
+    );
+  };
 
   return (
     <div className="panel">
@@ -47,9 +59,14 @@ export const MainMenu = () => {
         Start simulation
       </button>
 
-      <button className="panel__action" disabled>
-        Load save (coming soon)
+      <button
+        className="panel__action"
+        onClick={handleLoad}
+        disabled={!hasSavedSession()}
+      >
+        Load save
       </button>
+      {message ? <p className="panel-message">{message}</p> : null}
     </div>
   );
 };

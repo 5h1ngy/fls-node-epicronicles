@@ -145,6 +145,24 @@ export type DiplomacyActionResult =
   | { success: true }
   | { success: false; reason: DiplomacyActionError };
 
+export type SaveGameError =
+  | 'NO_SESSION'
+  | 'STORAGE_UNAVAILABLE'
+  | 'WRITE_FAILED';
+
+export type LoadGameError =
+  | 'STORAGE_UNAVAILABLE'
+  | 'NOT_FOUND'
+  | 'PARSE_ERROR';
+
+export type SaveGameResult =
+  | { success: true }
+  | { success: false; reason: SaveGameError };
+
+export type LoadGameResult =
+  | { success: true }
+  | { success: false; reason: LoadGameError };
+
 interface GameSliceState {
   view: GameView;
   config: GameConfig;
@@ -156,6 +174,53 @@ const initialState: GameSliceState = {
   config: gameConfig,
   session: null,
 };
+
+const SAVE_KEY = 'fls-save-v1';
+
+interface StoredGamePayload {
+  version: 1;
+  savedAt: number;
+  session: GameSession;
+}
+
+const isStorageAvailable = () =>
+  typeof localStorage !== 'undefined';
+
+const writeSavedGame = (payload: StoredGamePayload): boolean => {
+  if (!isStorageAvailable()) {
+    return false;
+  }
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+    return true;
+  } catch (error) {
+    console.error('Failed to write save', error);
+    return false;
+  }
+};
+
+const readSavedGame = (): StoredGamePayload | null => {
+  if (!isStorageAvailable()) {
+    return null;
+  }
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(raw) as StoredGamePayload;
+    if (parsed?.version === 1 && parsed.session) {
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Failed to parse save', error);
+    return null;
+  }
+  return null;
+};
+
+export const hasSavedSession = (): boolean =>
+  isStorageAvailable() && Boolean(localStorage.getItem(SAVE_KEY));
 
 const gameSlice = createSlice({
   name: 'game',
@@ -227,6 +292,58 @@ export const startNewSession =
       diplomacyConfig: cfg.diplomacy,
     });
     dispatch(startSessionSuccess(session));
+  };
+
+export const saveSessionToStorage =
+  (): AppThunk<SaveGameResult> =>
+  (_dispatch, getState) => {
+    const session = getState().game.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    if (!isStorageAvailable()) {
+      return { success: false, reason: 'STORAGE_UNAVAILABLE' };
+    }
+    const payload: StoredGamePayload = {
+      version: 1,
+      savedAt: Date.now(),
+      session: {
+        ...session,
+        clock: {
+          ...session.clock,
+          lastUpdate: null,
+        },
+      },
+    };
+    const ok = writeSavedGame(payload);
+    return ok
+      ? { success: true }
+      : { success: false, reason: 'WRITE_FAILED' };
+  };
+
+export const loadSessionFromStorage =
+  (): AppThunk<LoadGameResult> =>
+  (dispatch) => {
+    if (!isStorageAvailable()) {
+      return { success: false, reason: 'STORAGE_UNAVAILABLE' };
+    }
+    const raw = isStorageAvailable() ? localStorage.getItem(SAVE_KEY) : null;
+    if (!raw) {
+      return { success: false, reason: 'NOT_FOUND' };
+    }
+    const payload = readSavedGame();
+    if (!payload) {
+      return { success: false, reason: 'PARSE_ERROR' };
+    }
+    const hydrated: GameSession = {
+      ...payload.session,
+      clock: {
+        ...payload.session.clock,
+        lastUpdate: Date.now(),
+      },
+    };
+    dispatch(startSessionSuccess(hydrated));
+    return { success: true };
   };
 
 export const setSimulationRunning =
@@ -1087,6 +1204,9 @@ interface HookState extends GameSliceState {
   ) => DiplomacyActionResult;
   mergeFleets: (sourceId: string, targetId: string) => FleetMergeResult;
   splitFleet: (fleetId: string) => FleetSplitResult;
+  saveSession: () => SaveGameResult;
+  loadSession: () => LoadGameResult;
+  hasSavedSession: () => boolean;
 }
 
 export const useGameStore = <T>(
@@ -1132,6 +1252,9 @@ export const useGameStore = <T>(
       mergeFleets: (sourceId: string, targetId: string) =>
         dispatch(mergeFleets(sourceId, targetId)),
       splitFleet: (fleetId: string) => dispatch(splitFleet(fleetId)),
+      saveSession: () => dispatch(saveSessionToStorage()),
+      loadSession: () => dispatch(loadSessionFromStorage()),
+      hasSavedSession: () => hasSavedSession(),
     }),
     [dispatch],
   );
