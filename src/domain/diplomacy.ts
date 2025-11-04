@@ -170,15 +170,3 @@ export const getNextColonizableSystem = (
   );
   return candidates[0] ?? null;
 };
-
-export const evaluatePeaceAcceptance = ({
-  empire,
-  playerFleetPower,
-}: {
-  empire: Empire;
-  playerFleetPower: number;
-}): boolean => {
-  const hostility = Math.abs(empire.opinion);
-  const needsPeace = empire.opinion > -20 && playerFleetPower > 12;
-  return needsPeace || hostility < 15;
-};
