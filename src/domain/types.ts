@@ -72,6 +72,7 @@ export interface DistrictDefinition {
   buildTime: number;
   production: Partial<Record<ResourceType, number>>;
   upkeep: Partial<Record<ResourceType, number>>;
+  requiresColonists?: number;
 }
 
 export type NotificationKind =

@@ -3,6 +3,7 @@ import type {
   EconomyState,
   Planet,
 } from './types';
+import type { EconomyConfig } from './economy';
 
 export const createDistrictConstructionTask = ({
   planetId,
@@ -34,9 +35,11 @@ const applyDistrictToPlanet = (
 export const advanceDistrictConstruction = ({
   tasks,
   economy,
+  config,
 }: {
   tasks: DistrictConstructionTask[];
   economy: EconomyState;
+  config?: EconomyConfig;
 }): {
   tasks: DistrictConstructionTask[];
   economy: EconomyState;
@@ -53,14 +56,26 @@ export const advanceDistrictConstruction = ({
     const remaining = Math.max(0, task.ticksRemaining - 1);
     if (remaining === 0) {
       completedTasks.push(task);
-      updatedEconomy = {
-        ...updatedEconomy,
-        planets: updatedEconomy.planets.map((planet) =>
-          planet.id === task.planetId
-            ? applyDistrictToPlanet(planet, task.districtId)
-            : planet,
-        ),
-      };
+      const planet = updatedEconomy.planets.find(
+        (candidate) => candidate.id === task.planetId,
+      );
+      const definition = config?.districts.find(
+        (entry) => entry.id === task.districtId,
+      );
+      const canApply =
+        !definition?.requiresColonists ||
+        (planet?.population.total ?? 0) >=
+          (definition.requiresColonists ?? 0);
+      updatedEconomy = canApply
+        ? {
+            ...updatedEconomy,
+            planets: updatedEconomy.planets.map((entry) =>
+              entry.id === task.planetId
+                ? applyDistrictToPlanet(entry, task.districtId)
+                : entry,
+            ),
+          }
+        : updatedEconomy;
     } else {
       updatedTasks.push({
         ...task,
