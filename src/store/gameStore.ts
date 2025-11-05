@@ -480,7 +480,17 @@ export const startColonization =
   };
 
 export const queueShipBuild =
-  (designId: ShipClassId, templateId?: string): AppThunk<QueueShipBuildResult> =>
+  (
+    designId: ShipClassId,
+    templateId?: string,
+    customization?: {
+      attackBonus: number;
+      defenseBonus: number;
+      hullBonus: number;
+      costMultiplier: number;
+      name?: string;
+    },
+  ): AppThunk<QueueShipBuildResult> =>
   (dispatch, getState) => {
     const state = getState().game;
     const session = state.session;
@@ -501,12 +511,47 @@ export const queueShipBuild =
       return { success: false, reason: 'QUEUE_FULL' };
     }
 
-    if (!canAffordCost(session.economy, design.buildCost)) {
+    const template = templateId
+      ? state.config.military.templates.find((entry) => entry.id === templateId)
+      : undefined;
+    const effectiveDesign =
+      template && template.base === design.id
+        ? {
+            ...design,
+            attack: design.attack + template.attack,
+            defense: design.defense + template.defense,
+            hullPoints: design.hullPoints + template.hull,
+            buildCost: Object.fromEntries(
+              Object.entries(design.buildCost).map(([key, value]) => [
+                key,
+                Math.round((value ?? 0) * template.costMultiplier),
+              ]),
+            ) as typeof design.buildCost,
+          }
+        : design;
+    const customizedCost = customization
+      ? Object.fromEntries(
+          Object.entries(effectiveDesign.buildCost).map(([key, value]) => [
+            key,
+            Math.round((value ?? 0) * customization.costMultiplier),
+          ]),
+        )
+      : effectiveDesign.buildCost;
+
+    if (!canAffordCost(session.economy, customizedCost)) {
       return { success: false, reason: 'INSUFFICIENT_RESOURCES' };
     }
 
-    const updatedEconomy = spendResources(session.economy, design.buildCost);
-    const task = createShipyardTask(design.id, design.buildTime, templateId);
+    const updatedEconomy = spendResources(
+      session.economy,
+      customizedCost,
+    );
+    const task = createShipyardTask(
+      design.id,
+      design.buildTime,
+      templateId,
+      customization,
+    );
 
     dispatch(
       setSession({
@@ -1175,7 +1220,17 @@ interface HookState extends GameSliceState {
   setSpeedMultiplier: (speed: number) => void;
   advanceClockBy: (elapsedMs: number, now: number) => void;
   startColonization: (systemId: string) => StartColonizationResult;
-  queueShipBuild: (designId: ShipClassId) => QueueShipBuildResult;
+  queueShipBuild: (
+    designId: ShipClassId,
+    templateId?: string,
+    customization?: {
+      attackBonus: number;
+      defenseBonus: number;
+      hullBonus: number;
+      costMultiplier: number;
+      name?: string;
+    },
+  ) => QueueShipBuildResult;
   orderFleetMove: (fleetId: string, systemId: string) => FleetMoveResult;
   orderScienceShip: (
     shipId: string,
@@ -1231,8 +1286,17 @@ export const useGameStore = <T>(
         dispatch(advanceClockBy(elapsed, now)),
       startColonization: (systemId: string) =>
         dispatch(startColonization(systemId)),
-      queueShipBuild: (designId: ShipClassId) =>
-        dispatch(queueShipBuild(designId)),
+      queueShipBuild: (
+        designId: ShipClassId,
+        templateId?: string,
+        customization?: {
+          attackBonus: number;
+          defenseBonus: number;
+          hullBonus: number;
+          costMultiplier: number;
+          name?: string;
+        },
+      ) => dispatch(queueShipBuild(designId, templateId, customization)),
       orderFleetMove: (fleetId: string, systemId: string) =>
         dispatch(orderFleetMove(fleetId, systemId)),
       orderScienceShip: (shipId: string, systemId: string) =>

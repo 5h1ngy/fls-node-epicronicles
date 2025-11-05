@@ -3,20 +3,27 @@ import {
   createFleetShip,
   createInitialFleet,
   getShipDesign,
-  applyShipTemplate,
+  composeDesign,
 } from './ships';
-import type { Fleet, ShipClassId, ShipyardTask } from './types';
+import type {
+  Fleet,
+  ShipClassId,
+  ShipyardTask,
+  ShipCustomization,
+} from './types';
 
 export const createShipyardTask = (
   designId: ShipClassId,
   buildTime: number,
   templateId?: string,
+  customization?: ShipCustomization,
 ): ShipyardTask => ({
   id: `YARD-${crypto.randomUUID()}`,
   designId,
   ticksRemaining: buildTime,
   totalTicks: buildTime,
   templateId,
+  customization,
 });
 
 interface AdvanceShipyardArgs {
@@ -58,16 +65,17 @@ export const advanceShipyard = ({
   tasks.forEach((task) => {
     const ticksRemaining = Math.max(0, task.ticksRemaining - 1);
     if (ticksRemaining === 0) {
-    const baseDesign = getShipDesign(military, task.designId);
-    const template = task.templateId
-      ? military.templates.find((entry) => entry.id === task.templateId)
-      : military.templates.find((entry) => entry.base === baseDesign.id);
-    const effectiveDesign =
-      template && template.base === baseDesign.id
-        ? applyShipTemplate(baseDesign, template)
-        : baseDesign;
-    const fleet = ensureFleetAvailable();
-    fleet.ships.push(createFleetShip(effectiveDesign));
+      const baseDesign = getShipDesign(military, task.designId);
+      const template = task.templateId
+        ? military.templates.find((entry) => entry.id === task.templateId)
+        : military.templates.find((entry) => entry.base === baseDesign.id);
+      const effectiveDesign = composeDesign({
+        design: baseDesign,
+        template,
+        customization: task.customization,
+      });
+      const fleet = ensureFleetAvailable();
+      fleet.ships.push(createFleetShip(effectiveDesign));
     } else {
       remainingTasks.push({
         ...task,

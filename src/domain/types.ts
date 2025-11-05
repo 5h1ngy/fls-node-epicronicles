@@ -207,6 +207,15 @@ export interface ShipyardTask {
   ticksRemaining: number;
   totalTicks: number;
   templateId?: string;
+  customization?: ShipCustomization;
+}
+
+export interface ShipCustomization {
+  name?: string;
+  attackBonus: number;
+  defenseBonus: number;
+  hullBonus: number;
+  costMultiplier: number;
 }
 
 export type ColonizationStatus = 'preparing' | 'traveling' | 'colonizing';

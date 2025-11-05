@@ -1,5 +1,6 @@
 import type { MilitaryConfig } from '../config/gameConfig';
 import type { Fleet, FleetShip, ShipClassId, ShipDesign } from './types';
+import type { ShipCustomization } from './types';
 
 export const getShipDesign = (
   config: MilitaryConfig,
@@ -39,6 +40,46 @@ export const applyShipTemplate = (
     ]),
   ) as ShipDesign['buildCost'],
 });
+
+export const applyCustomization = (
+  design: ShipDesign,
+  customization?: ShipCustomization,
+): ShipDesign => {
+  if (!customization) {
+    return design;
+  }
+  const { attackBonus, defenseBonus, hullBonus, costMultiplier, name } =
+    customization;
+  return {
+    ...design,
+    name: name ? `${design.name} - ${name}` : design.name,
+    attack: design.attack + attackBonus,
+    defense: design.defense + defenseBonus,
+    hullPoints: design.hullPoints + hullBonus,
+    buildCost: Object.fromEntries(
+      Object.entries(design.buildCost).map(([key, value]) => [
+        key,
+        Math.round((value ?? 0) * costMultiplier),
+      ]),
+    ) as ShipDesign['buildCost'],
+  };
+};
+
+export const composeDesign = ({
+  design,
+  template,
+  customization,
+}: {
+  design: ShipDesign;
+  template?: MilitaryConfig['templates'][number];
+  customization?: ShipCustomization;
+}): ShipDesign => {
+  const withTemplate =
+    template && template.base === design.id
+      ? applyShipTemplate(design, template)
+      : design;
+  return applyCustomization(withTemplate, customization);
+};
 
 export const createInitialFleet = (
   homeSystemId: string,

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { resourceLabels } from '../../domain/resourceMetadata';
 import type { ShipClassId, StarSystem } from '../../domain/types';
-import { applyShipTemplate } from '../../domain/ships';
+import { applyShipTemplate, applyCustomization } from '../../domain/ships';
 
 const buildMessages = {
   NO_SESSION: 'Nessuna sessione.',
@@ -25,6 +25,17 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
   const shipTemplates = useGameStore((state) => state.config.military.templates);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Record<string, string>>({});
+  const [customConfig, setCustomConfig] = useState<
+    Record<
+      string,
+      {
+        offense: number;
+        defense: number;
+        hull: number;
+        name: string;
+      }
+    >
+  >({});
 
   const resources = session?.economy.resources;
   const queue = session?.shipyardQueue ?? [];
@@ -49,6 +60,36 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
     const result = queueShipBuild(designId, templateId);
     if (result.success) {
       setMessage(`Costruzione ${designName} avviata.`);
+    } else {
+      setMessage(buildMessages[result.reason]);
+    }
+  };
+
+  const handleBuildCustom = (
+    designId: ShipClassId,
+    designName: string,
+    customization: {
+      offense: number;
+      defense: number;
+      hull: number;
+      name: string;
+    },
+    templateId?: string,
+  ) => {
+    const attackBonus = customization.offense * 2;
+    const defenseBonus = customization.defense * 1.5;
+    const hullBonus = customization.hull * 3;
+    const points = customization.offense + customization.defense + customization.hull;
+    const costMultiplier = 1 + points * 0.08;
+    const result = queueShipBuild(designId, templateId, {
+      attackBonus,
+      defenseBonus,
+      hullBonus,
+      costMultiplier,
+      name: customization.name ? customization.name : undefined,
+    });
+    if (result.success) {
+      setMessage(`Variante ${customization.name || 'custom'} avviata.`);
     } else {
       setMessage(buildMessages[result.reason]);
     }
@@ -90,13 +131,32 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
           const templateId = selectedTemplate[design.id] ?? '';
           const effectiveDesign =
             templateId && templates.length > 0
-              ? applyShipTemplate(
-                  design,
-                  templates.find((tpl) => tpl.id === templateId) ?? templates[0],
-                )
-              : design;
+        ? applyShipTemplate(
+            design,
+            templates.find((tpl) => tpl.id === templateId) ?? templates[0],
+          )
+        : design;
+          const customState = customConfig[design.id] ?? {
+            offense: 0,
+            defense: 0,
+            hull: 0,
+            name: '',
+          };
+          const points =
+            customState.offense + customState.defense + customState.hull;
+          const costMultiplier = 1 + points * 0.08;
+          const customizedDesign = applyCustomization(effectiveDesign, {
+            attackBonus: customState.offense * 2,
+            defenseBonus: customState.defense * 1.5,
+            hullBonus: customState.hull * 3,
+            costMultiplier,
+            name: customState.name || undefined,
+          });
           const affordable = canAfford(design.buildCost);
           const disabled = queue.length >= queueLimit || !affordable;
+          const customAffordable = canAfford(customizedDesign.buildCost);
+          const customDisabled =
+            queue.length >= queueLimit || !customAffordable || points <= 0;
           return (
             <div key={design.id} className="shipyard-panel__card">
               <strong>{effectiveDesign.name}</strong>
@@ -147,6 +207,113 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
               >
                 Costruisci
               </button>
+              <div className="fleet-panel__order">
+                <span className="text-muted">Designer rapido (distribuisci punti)</span>
+                <label className="panel__field">
+                  Offesa (+2 atk per punto)
+                  <input
+                    type="range"
+                    min={0}
+                    max={4}
+                    value={customState.offense}
+                    onChange={(e) =>
+                      setCustomConfig((prev) => ({
+                        ...prev,
+                        [design.id]: {
+                          ...customState,
+                          offense: Number(e.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="panel__field">
+                  Difesa (+1.5 def per punto)
+                  <input
+                    type="range"
+                    min={0}
+                    max={4}
+                    value={customState.defense}
+                    onChange={(e) =>
+                      setCustomConfig((prev) => ({
+                        ...prev,
+                        [design.id]: {
+                          ...customState,
+                          defense: Number(e.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="panel__field">
+                  Hull (+3 hp per punto)
+                  <input
+                    type="range"
+                    min={0}
+                    max={4}
+                    value={customState.hull}
+                    onChange={(e) =>
+                      setCustomConfig((prev) => ({
+                        ...prev,
+                        [design.id]: {
+                          ...customState,
+                          hull: Number(e.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="panel__field">
+                  Nome variante
+                  <input
+                    type="text"
+                    value={customState.name}
+                    onChange={(e) =>
+                      setCustomConfig((prev) => ({
+                        ...prev,
+                        [design.id]: {
+                          ...customState,
+                          name: e.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <p className="text-muted">
+                  Punti: {points} · Moltiplicatore costo: {costMultiplier.toFixed(2)}
+                </p>
+                <p className="text-muted">
+                  Statistiche: Atk {customizedDesign.attack} · Dif {customizedDesign.defense} · Hull{' '}
+                  {customizedDesign.hullPoints}
+                </p>
+                <p>
+                  Costi:{' '}
+                  {Object.entries(customizedDesign.buildCost)
+                    .filter(([, amount]) => amount && amount > 0)
+                    .map(
+                      ([type, amount]) =>
+                        `${resourceLabels[type as keyof typeof resourceLabels]} ${amount}`,
+                    )
+                    .join(' | ')}
+                </p>
+                <button
+                  className="panel__action panel__action--compact"
+                  disabled={customDisabled}
+                  onClick={() =>
+                    handleBuildCustom(
+                      design.id,
+                      design.name,
+                      customState,
+                      templateId,
+                    )
+                  }
+                >
+                  Costruisci variante
+                </button>
+                {!customAffordable ? (
+                  <p className="text-muted">Risorse insufficienti per la variante.</p>
+                ) : null}
+              </div>
             </div>
           );
         })}

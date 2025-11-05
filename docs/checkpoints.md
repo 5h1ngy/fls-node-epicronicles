@@ -36,7 +36,7 @@ Stato sintetico per fasi, con feature flaggate tramite checkbox `[x]` (complete)
 - [x] Creazione/merge/split flotte, ordini di movimento con travel ticks
 - [x] Combattimento contro minacce di sistema, report e notifiche
 - [x] Indicatori combattimento su mappa/HUD, log battaglie recente
-- [ ] Designer navi avanzato (slot/moduli) e ulteriori classi/potenziamenti
+- [x] Designer navi avanzato (varianti custom con potenziamenti rapidi)
 - [ ] IA militare completa (ingaggio/ritiro, targeting strategico)
 - [ ] UI riepilogo battaglie e statistiche approfondite
 
