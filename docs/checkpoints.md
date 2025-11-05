@@ -7,8 +7,8 @@ Stato sintetico per fasi, con feature flaggate tramite checkbox `[x]` (complete)
 - [x] Loop simulazione con clock, pausa/play e speed
 - [x] Debug console/pannelli, modalità auto-start da config
 - [x] Menu principale con nuova sessione e seed
-- [ ] Sistema di salvataggio/caricamento partite
-- [ ] Modalità “galassia di test” e profili di generazione multipli
+- [x] Sistema di salvataggio/caricamento partite
+- [x] Modalità “galassia di test” e profili di generazione multipli
 
 ## Fase 1 – Galassia + Esplorazione (vertical slice)
 - [x] Generazione galassia procedurale (sistemi, rotte, classe stella, mondo abitabile opzionale)
@@ -16,7 +16,7 @@ Stato sintetico per fasi, con feature flaggate tramite checkbox `[x]` (complete)
 - [x] Navi scientifiche iniziali con ordini muovi/sonda e auto-explore
 - [x] Stati visibilità: unknown/revealed/surveyed con gating UI
 - [x] Pannello sistema e overview galassia
-- [ ] Configurazione parametri galassia da UI nuova partita
+- [x] Configurazione parametri galassia da UI nuova partita
 
 ## Fase 2 – Economia base, Pianeti e Colonizzazione
 - [x] Risorse globali (energia, minerali, cibo, ricerca), bilancio per tick e stock
