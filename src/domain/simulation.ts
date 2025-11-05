@@ -17,7 +17,7 @@ import {
   intensifyWarZones,
   assignBordersToPlayer,
 } from './diplomacy';
-import { advanceAiWarMoves, ensureAiFleet } from './ai';
+import { advanceAiWarMoves, ensureAiFleet, reinforceAiFleets } from './ai';
 import { calculatePlayerFleetPower } from './fleets';
 
 const assignAiExpansion = (
@@ -72,6 +72,11 @@ export const advanceSimulation = (
       'unknown';
     const currentTick = updatedSession.clock.tick + iteration + 1;
     updatedSession = ensureAiFleet(
+      updatedSession,
+      config.military,
+      config.diplomacy,
+    );
+    updatedSession = reinforceAiFleets(
       updatedSession,
       config.military,
       config.diplomacy,

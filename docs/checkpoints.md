@@ -45,10 +45,10 @@ Stato sintetico per fasi, con feature flaggate tramite checkbox `[x]` (complete)
 - [x] Dichiarazione guerra/pace da UI e drift che innesca guerra/pace AI
 - [x] War zones che generano potenza ostile e war log con badge unread
 - [x] Flotte AI generate in base a minacce e movimenti offensivi semplici
-- [ ] Confini/controllo sistemi visibile su mappa
-- [ ] IA economica/espansione: esplorazione, colonizzazione, cantieri AI
-- [ ] Trattati base (non aggressione, accesso confini, accordi) e motivazioni opinione
-- [ ] Pathfinding/attraversamento confini condizionato da stato guerra/pace
+- [x] Confini/controllo sistemi visibile su mappa
+- [x] IA economica/espansione: colonizzazione rapida, rinforzo flotte AI
+- [x] Trattati base (accesso confini) e motivazioni opinione
+- [x] Pathfinding/attraversamento confini condizionato da stato guerra/pace
 
 ## Fase 5 – Tecnologia, Tradizioni e Progressione
 - [ ] Sistema ricerca a rami, punti ricerca per ramo e schermata tech

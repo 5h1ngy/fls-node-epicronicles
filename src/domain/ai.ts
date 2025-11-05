@@ -1,5 +1,5 @@
 import type { GalaxyState, Fleet, GameSession } from './types';
-import { createInitialFleet } from './ships';
+import { createFleetShip, createInitialFleet } from './ships';
 import { calculateTravelTicks, sumFleetAttack } from './fleets';
 import type { MilitaryConfig, DiplomacyConfig } from '../config/gameConfig';
 
@@ -101,6 +101,40 @@ export const ensureAiFleet = (
     ...session,
     fleets: [...session.fleets, newFleet],
   };
+};
+
+export const reinforceAiFleets = (
+  session: GameSession,
+  military: MilitaryConfig,
+  diplomacy: DiplomacyConfig,
+): GameSession => {
+  const hostileSystems = session.galaxy.systems.filter(
+    (system) => (system.hostilePower ?? 0) > 0,
+  ).length;
+  const desiredShips =
+    diplomacy.aiFleetStrength.baseShips +
+    Math.min(
+      hostileSystems * diplomacy.aiFleetStrength.extraPerHostile,
+      diplomacy.aiFleetStrength.maxShips,
+    );
+  const fleets = session.fleets.map((fleet) => ({ ...fleet, ships: [...fleet.ships] }));
+  let changed = false;
+  fleets.forEach((fleet) => {
+    if (!fleet.ownerId || fleet.ownerId === 'player') {
+      return;
+    }
+    while (fleet.ships.length < desiredShips) {
+      const design =
+        military.shipDesigns[fleet.ships.length % military.shipDesigns.length];
+      fleet.ships.push(
+        createFleetShip(design, {
+          attackBonus: hostileSystems >= 3 ? 2 : 0,
+        }),
+      );
+      changed = true;
+    }
+  });
+  return changed ? { ...session, fleets } : session;
 };
 
 export const advanceAiWarMoves = ({
