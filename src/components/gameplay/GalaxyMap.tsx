@@ -7,11 +7,9 @@ import {
   scienceMaterials,
   scienceLineMaterials,
   fleetMaterials,
-  hostileIndicatorMaterial,
-  combatIndicatorMaterial,
-  battleIconMaterial,
-  ownerMaterials,
 } from '@three/materials';
+import { createScene } from '@three/scene';
+import { createSystemNode } from '@three/mapUtils';
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
