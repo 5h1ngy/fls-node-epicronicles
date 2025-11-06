@@ -1,4 +1,4 @@
-import { type ThunkAction, type AnyAction } from '@reduxjs/toolkit';
+﻿import { type ThunkAction, type AnyAction } from '@reduxjs/toolkit';
 import type { RootState } from '../index';
 import {
   startSessionSuccess,
@@ -21,7 +21,7 @@ import type {
   StartSessionArgs,
 } from '../slice/gameSlice';
 import { gameConfig, type GameConfig } from '@config/gameConfig';
-import { createSession } from '@domain/session/session';
+import { createSession } from '@domain/session';
 import {
   advanceClock,
   setClockRunning as setClockRunningDomain,
@@ -31,19 +31,19 @@ import {
   canAffordCost,
   spendResources,
 } from '@domain/economy/economy';
-import { createShipyardTask, advanceShipyard } from '@domain/fleet/shipyard';
-import { advanceFleets, calculateTravelTicks } from '@domain/fleet/fleets';
-import { advanceDistrictConstruction, createDistrictConstructionTask } from '@domain/economy/districts';
-import { advanceColonization, createColonizationTask } from '@domain/session/colonization';
-import { autoBalancePopulation } from '@domain/economy/population';
-import { advanceExploration } from '@domain/galaxy/exploration';
-import { advanceSimulation } from '@domain/session/simulation';
+import { createShipyardTask, advanceShipyard } from '@domain/fleet';
+import { advanceFleets, calculateTravelTicks } from '@domain/fleet';
+import { advanceDistrictConstruction, createDistrictConstructionTask } from '@domain/economy';
+import { advanceColonization, createColonizationTask } from '@domain/session';
+import { autoBalancePopulation } from '@domain/economy';
+import { advanceExploration } from '@domain/galaxy';
+import { advanceSimulation } from '@domain/session';
 import {
   advanceDiplomacy,
   applyWarPressureToGalaxy,
   intensifyWarZones,
-} from '@domain/diplomacy/diplomacy';
-import { advanceAiWarMoves, ensureAiFleet, reinforceAiFleets } from '@domain/ai/ai';
+} from '@domain/diplomacy';
+import { advanceAiWarMoves, ensureAiFleet, reinforceAiFleets } from '@domain/ai';
 import { createInitialFleet, applyShipTemplate } from '@domain/fleet/ships';
 import type {
   GameNotification,
@@ -979,3 +979,4 @@ export type {
   GameSession,
   EconomyState,
 };
+

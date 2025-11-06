@@ -1,5 +1,5 @@
-import type { GalaxyGenerationParams } from '@domain/galaxy/galaxy';
-import type { EconomyConfig } from '@domain/economy/economy';
+import type { GalaxyGenerationParams } from '@domain/galaxy';
+import type { EconomyConfig } from '@domain/economy';
 import type {
   ResourceCost,
   ShipDesign,
