@@ -2,7 +2,7 @@
 import { useGameStore } from '@store/gameStore';
 import { DebugConsole } from '../debug/DebugConsole';
 import { useGameLoop } from '../../utils/useGameLoop';
-import { GalaxyMap } from './GalaxyMap';
+import { MapLayer } from './MapLayer';
 import { ColonyPanel } from './ColonyPanel';
 import { ShipyardPanel } from './ShipyardPanel';
 import { FleetAndCombatPanel } from './FleetAndCombatPanel';
@@ -320,34 +320,32 @@ export const GameScreen = () => {
   return (
     <div className="game-layout">
       <HudTopBar />
-      <div className="game-map-layer">
-        <GalaxyMap
-          focusSystemId={focusSystemId}
-          focusPlanetId={focusPlanetId}
-          onSystemSelect={(systemId, _anchor) => {
-            const targetSystem = systems.find(
-              (entry) => entry.id === systemId,
-            );
-            if (!targetSystem) {
-              return;
-            }
-            const isAccessible =
-              targetSystem.visibility === 'surveyed' ||
-              colonizedSystems.has(targetSystem.id);
-            setShipyardSystemId(isAccessible ? systemId : null);
-            setSelectedPlanetId(null);
-            setFocusSystemId(systemId);
-            setFocusPlanetId(null);
-            setMapMessage(
-              isAccessible
-                ? null
-                : 'Sistema non sondato: esplora con una nave scientifica per ottenere i dettagli.',
-            );
-          }}
-          onClearFocus={clearFocusTargets}
-        />
-        {mapMessage ? <div className="map-alert">{mapMessage}</div> : null}
-      </div>
+      <MapLayer
+        focusSystemId={focusSystemId}
+        focusPlanetId={focusPlanetId}
+        mapMessage={mapMessage}
+        onSelectSystem={(systemId, _anchor) => {
+          const targetSystem = systems.find(
+            (entry) => entry.id === systemId,
+          );
+          if (!targetSystem) {
+            return;
+          }
+          const isAccessible =
+            targetSystem.visibility === 'surveyed' ||
+            colonizedSystems.has(targetSystem.id);
+          setShipyardSystemId(isAccessible ? systemId : null);
+          setSelectedPlanetId(null);
+          setFocusSystemId(systemId);
+          setFocusPlanetId(null);
+          setMapMessage(
+            isAccessible
+              ? null
+              : 'Sistema non sondato: esplora con una nave scientifica per ottenere i dettagli.',
+          );
+        }}
+        onClearFocus={clearFocusTargets}
+      />
       <HudBottomBar
         onToggleDebug={() => setDebugOpen((value) => !value)}
         debugOpen={debugOpen}

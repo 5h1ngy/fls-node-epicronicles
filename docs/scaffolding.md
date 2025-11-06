@@ -31,6 +31,10 @@ Usali per evitare percorsi relativi annidati.
 ## UI
 - Componenti React sotto `src/components/` organizzati per area (gameplay, debug, app shell, UI di supporto).
 - Hook `useGameStore` usato dai componenti per accedere allo stato e dispatchare i thunk.
+- Barrel utili:
+  - `src/components/gameplay/index.ts`
+  - `src/components/ui/index.ts`
+- Three.js estratto in `src/three/` (`materials.ts`, `scene.ts`, `mapUtils.ts`); `GalaxyMap` usa questi helper.
 
 ## Entry point
 - `src/main.tsx` monta l’app e collega lo store Redux.
