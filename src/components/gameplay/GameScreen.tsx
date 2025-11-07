@@ -5,13 +5,9 @@ import { useGameLoop } from '../../utils/useGameLoop';
 import { MapLayer } from './MapLayer';
 import { HudTopBar } from './HudTopBar';
 import { HudBottomBar } from './HudBottomBar';
-import { resourceLabels } from '@domain/shared/resourceMetadata';
-import {
-  RESOURCE_TYPES,
-  computePlanetProduction,
-} from '@domain/economy/economy';
 import type { StarSystem, PopulationJobId } from '@domain/types';
 import { MapPanels } from './MapPanels';
+import { PlanetDetail } from './PlanetDetail';
 
 const WAR_SEEN_KEY = 'warSeen';
 
@@ -240,33 +236,6 @@ export const GameScreen = () => {
     NO_POPULATION: 'Nessun pop assegnato al ruolo.',
   };
 
-  const formatCost = (cost: Record<string, number | undefined>) => {
-    const entries = Object.entries(cost).filter(
-      ([, amount]) => amount && amount > 0,
-    );
-    if (entries.length === 0) {
-      return 'N/A';
-    }
-    return entries
-      .map(
-        ([type, amount]) =>
-          `${resourceLabels[type as keyof typeof resourceLabels]} ${amount}`,
-      )
-      .join(' | ');
-  };
-
-  const formatSigned = (value: number) => {
-    if (Math.abs(value) < 0.001) {
-      return '+0';
-    }
-    const magnitude = Math.abs(value);
-    const isInteger = Math.abs(Math.round(magnitude) - magnitude) < 0.01;
-    const formatted = isInteger
-      ? Math.round(magnitude).toString()
-      : magnitude.toFixed(1);
-    return `${value >= 0 ? '+' : '-'}${formatted}`;
-  };
-
   const handleQueueDistrict = (districtId: string) => {
     if (!selectedPlanet) {
       return;
@@ -278,11 +247,6 @@ export const GameScreen = () => {
         : districtErrorMessages[result.reason],
     );
   };
-
-  const planetProductionSummary =
-    selectedPlanet && economyConfig
-      ? computePlanetProduction(selectedPlanet, economyConfig)
-      : null;
 
   const handlePromotePopulation = (jobId: PopulationJobId) => {
     if (!selectedPlanet) {
@@ -417,60 +381,26 @@ export const GameScreen = () => {
         ) : null}
         {selectedPlanet && selectedPlanetSystem ? (
           <DraggablePanel
-            title={`${selectedPlanet.name} (${selectedPlanet.id})`}
+            title={${selectedPlanet.name} ()}
             initialX={viewportWidth / 2 - 180}
             initialY={viewportHeight / 2 - 140}
             onClose={closePlanetPanel}
           >
-            <div className="planet-detail">
-              <p>Sistema: {selectedPlanetSystem.name}</p>
-              <p>
-                Popolazione: {selectedPlanet.population.workers} lavoratori /
-                {selectedPlanet.population.specialists} specialisti /
-                {selectedPlanet.population.researchers} ricercatori
-              </p>
-              <p>
-                StabilitÃ : {Math.round(selectedPlanet.stability)} / FelicitÃ :{' '}
-                {Math.round(selectedPlanet.happiness)}
-              </p>
-              <p>Tipo stella: {selectedPlanetSystem.starClass}</p>
-              {planetProductionSummary ? (
-                <div className="planet-production">
-                  <h4>Produzione netta</h4>
-                  <div className="planet-production__grid">
-                    {RESOURCE_TYPES.map((type) => {
-                      const summary = planetProductionSummary[type];
-                      if (!summary) {
-                        return null;
-                      }
-                      const label =
-                        resourceLabels[type as keyof typeof resourceLabels];
-                      return (
-                        <div key={type} className="planet-production__card">
-                          <div className="planet-production__header">
-                            <span>{label}</span>
-                            <span
-                              className={
-                                summary.net >= 0 ? 'is-positive' : 'is-negative'
-                              }
-                            >
-                              {formatSigned(summary.net)}
-                            </span>
-                          </div>
-                          <ul className="planet-production__breakdown">
-                            <li>Base {formatSigned(summary.base)}</li>
-                            <li>Distretti {formatSigned(summary.districts)}</li>
-                            <li>
-                              Popolazione {formatSigned(summary.population)}
-                            </li>
-                            <li>Upkeep {formatSigned(-summary.upkeep)}</li>
-                          </ul>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : null}
+            <PlanetDetail
+              planet={selectedPlanet}
+              systemName={selectedPlanetSystem.name}
+              onPromote={handlePromotePopulation}
+              onDemote={handleDemotePopulation}
+              automationConfig={automationConfig}
+              populationJobs={populationJobs}
+              districtDefinitions={districtDefinitions}
+              planetDistrictQueue={planetDistrictQueue}
+              districtMessage={districtMessage}
+              populationMessage={populationMessage}
+              onQueueDistrict={handleQueueDistrict}
+            />
+          </DraggablePanel>
+        ) : null}
               <div className="planet-population">
                 <h4>Ruoli popolazione</h4>
                 {automationConfig?.enabled ? (
