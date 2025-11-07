@@ -35,6 +35,10 @@ Usali per evitare percorsi relativi annidati.
   - `src/components/gameplay/index.ts`
   - `src/components/ui/index.ts`
 - Three.js estratto in `src/three/` (`materials.ts`, `scene.ts`, `mapUtils.ts`); `GalaxyMap` usa questi helper.
+- Componenti scomposti:
+  - `MapLayer` (mappa) e `MapPanels` (pannelli flottanti)
+  - `PlanetDetail` incapsula il pannello di dettaglio pianeta
+  - `HudTopBar`, `HudBottomBar`, `ResourceBar`, pannelli feature (Colony, Fleet, Diplomazia, Shipyard, ecc.)
 
 ## Entry point
 - `src/main.tsx` monta l’app e collega lo store Redux.
