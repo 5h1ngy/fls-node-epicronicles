@@ -14,7 +14,17 @@ Configurati in `tsconfig.app.json` e `vite.config.ts`:
 ## Store
 - `src/store/index.ts`: crea lo store Redux (`store`, `RootState`, `AppDispatch`).
 - `src/store/slice/gameSlice.ts`: slice `game` con stato base (`view`, `config`, `session`) e reducer (`startSessionSuccess`, `returnToMenu`, `setSessionState`).
-- `src/store/thunks/gameThunks.ts`: tutti i thunk di gameplay (sessione/clock, colonizzazione, cantieri, distretti, flotte, navi scientifiche, popolazione, diplomazia, salvataggi). Espone tipi di risultato (es. `StartColonizationResult`).
+- `src/store/thunks/`: thunks suddivisi per dominio:
+  - `sessionThunks.ts` (bootstrap sessione, clock/speed, advance tick),
+  - `colonizationThunks.ts`,
+  - `shipyardThunks.ts`,
+  - `districtThunks.ts`,
+  - `populationThunks.ts`,
+  - `fleetThunks.ts`,
+  - `scienceThunks.ts`,
+  - `diplomacyThunks.ts`,
+  - `persistenceThunks.ts`,
+  - `helpers.ts` (utility comuni), `index.ts` (barrel).
 - `src/store/utils/sessionUtils.ts`: helper condivisi (notifiche, war events, refund risorse, update popolazione).
 - `src/store/hooks.ts`: hook `useGameStore`, `useAppDispatch`, `useAppSelector`.
 - `src/store/gameStore.ts`: shim di compatibilita' che re-esporta `store` e `useGameStore` per non toccare gli import storici.

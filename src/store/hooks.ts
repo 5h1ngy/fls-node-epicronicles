@@ -29,7 +29,7 @@ import {
   saveSessionToStorage,
   loadSessionFromStorage,
   hasSavedSession,
-} from './thunks/gameThunks';
+} from './thunks';
 import type {
   StartSessionArgs,
   StartColonizationResult,
@@ -44,7 +44,7 @@ import type {
   FleetSplitResult,
   SaveGameResult,
   LoadGameResult,
-} from './thunks/gameThunks';
+} from './thunks';
 
 export const useAppDispatch: () => AppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
