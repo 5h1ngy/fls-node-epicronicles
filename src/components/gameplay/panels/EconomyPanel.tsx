@@ -2,6 +2,7 @@
 import { useGameStore } from '@store/gameStore';
 import { resourceLabels } from '@domain/shared/resourceMetadata';
 import type { ResourceType } from '@domain/types';
+import { formatSigned } from './shared/formatters';
 
 const RESOURCE_DISPLAY_ORDER: ResourceType[] = [
   'energy',
@@ -10,9 +11,6 @@ const RESOURCE_DISPLAY_ORDER: ResourceType[] = [
   'research',
   'influence',
 ];
-
-const formatDelta = (value: number) =>
-  `${value >= 0 ? '+' : '-'}${Math.abs(value).toFixed(1)}`;
 
 export const EconomyPanel = () => {
   const resources = useGameStore((state) => state.session?.economy.resources);
@@ -69,7 +67,7 @@ export const EconomyPanel = () => {
                       : 'economy-panel__net is-negative'
                   }
                 >
-                  Net: {formatDelta(aggregate.net[type])}
+                  Net: {formatSigned(aggregate.net[type])}
                 </span>
               </div>
             </li>
