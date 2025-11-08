@@ -1,8 +1,9 @@
 ﻿import { useMemo } from 'react';
-import { useGameStore } from '@store/gameStore';
+import { useAppSelector } from '@store/gameStore';
 import { resourceLabels } from '@domain/shared/resourceMetadata';
 import type { ResourceType } from '@domain/types';
 import { formatSigned } from './shared/formatters';
+import { selectNetResources, selectPlanets, selectResources } from '@store/selectors';
 
 const RESOURCE_DISPLAY_ORDER: ResourceType[] = [
   'energy',
@@ -13,28 +14,16 @@ const RESOURCE_DISPLAY_ORDER: ResourceType[] = [
 ];
 
 export const EconomyPanel = () => {
-  const resources = useGameStore((state) => state.session?.economy.resources);
-  const planets = useGameStore((state) => state.session?.economy.planets ?? []);
+  const resources = useAppSelector(selectResources);
+  const planets = useAppSelector(selectPlanets);
+  const net = useAppSelector(selectNetResources);
 
   const aggregate = useMemo(() => {
-    if (!resources) {
+    if (!resources || !net) {
       return null;
     }
-    const net: Record<ResourceType, number> = {
-      energy: 0,
-      minerals: 0,
-      food: 0,
-      research: 0,
-    };
-    RESOURCE_DISPLAY_ORDER.forEach((type) => {
-      const ledger = resources[type];
-      if (!ledger) {
-        return;
-      }
-      net[type] = ledger.income - ledger.upkeep;
-    });
     return { net, resources };
-  }, [resources]);
+  }, [resources, net]);
 
   if (!aggregate) {
     return <p className="text-muted">Nessuna informazione economica.</p>;
