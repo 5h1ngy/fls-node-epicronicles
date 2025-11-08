@@ -1,10 +1,14 @@
 ﻿import { useMemo, useState } from 'react';
-import { useGameStore, type ColonizationError } from '@store/gameStore';
-import type {
-  ColonizationStatus,
-  ColonizationTask,
-} from '@domain/types';
+import { useGameStore, type ColonizationError, useAppSelector } from '@store/gameStore';
+import type { ColonizationStatus, ColonizationTask } from '@domain/types';
 import { formatCost } from './shared/formatters';
+import {
+  selectColonizationTasks,
+  selectColonizedSystems,
+  selectPlanets,
+  selectResources,
+} from '@store/selectors';
+import { selectSystemsMap } from '@store/selectors';
 
 const colonizationErrors: Record<ColonizationError, string> = {
   NO_SESSION: 'Nessuna sessione.',
@@ -39,10 +43,11 @@ export const ColonyPanel = ({
   onFocusSystem,
 }: ColonyPanelProps) => {
   const session = useGameStore((state) => state.session);
-  const systems = session?.galaxy.systems ?? [];
-  const planets = session?.economy.planets ?? [];
-  const resources = session?.economy.resources ?? null;
-  const colonizationTasks = session?.colonizationTasks ?? [];
+  const systems = useAppSelector(selectSystemsMap);
+  const planets = useAppSelector(selectPlanets);
+  const resources = useAppSelector(selectResources);
+  const colonizationTasks = useAppSelector(selectColonizationTasks);
+  const colonizedSystems = useAppSelector(selectColonizedSystems);
   const startColonization = useGameStore((state) => state.startColonization);
   const colonizationConfig = useGameStore(
     (state) => state.config.colonization,
@@ -52,14 +57,6 @@ export const ColonyPanel = ({
   );
   const [message, setMessage] = useState<string | null>(null);
 
-  const colonizedSystems = useMemo(
-    () => new Set(planets.map((planet) => planet.systemId)),
-    [planets],
-  );
-  const systemLookup = useMemo(
-    () => new Map(systems.map((system) => [system.id, system])),
-    [systems],
-  );
   const tasksBySystem = useMemo(() => {
     const map = new Map<string, ColonizationTask>();
     colonizationTasks.forEach((task) => {
@@ -152,7 +149,7 @@ export const ColonyPanel = ({
               ) : (
                 <ul>
                   {colonizationTasks.map((task) => {
-                    const system = systemLookup.get(task.systemId);
+                    const system = systems.get(task.systemId);
                     const missionProgress = missionProgressPercent(task);
                     return (
                       <li key={task.id}>

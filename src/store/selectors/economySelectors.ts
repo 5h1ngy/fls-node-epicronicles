@@ -36,3 +36,6 @@ export const selectDistrictQueue = (state: RootState) =>
 
 export const selectDistrictDefinitions = (state: RootState) =>
   state.game.config.economy.districts;
+
+export const selectColonizationTasks = (state: RootState) =>
+  state.game.session?.colonizationTasks ?? [];

@@ -8,3 +8,8 @@ export const selectScienceShips = (state: RootState) =>
 
 export const selectFleets = (state: RootState) =>
   state.game.session?.fleets ?? [];
+
+export const selectSystemsMap = (state: RootState) => {
+  const systems = selectSystems(state);
+  return new Map(systems.map((system) => [system.id, system]));
+};
