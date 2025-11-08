@@ -12,7 +12,6 @@ import type { StarSystem } from '@domain/types';
 
 interface MapPanelsProps {
   focusSystemId: string | null;
-  focusPlanetId: string | null;
   viewportWidth: number;
   viewportHeight: number;
   warEventsRef: React.RefObject<HTMLDivElement>;
@@ -26,13 +25,10 @@ interface MapPanelsProps {
   selectedPlanetSystem: StarSystem | null;
   closeShipyard: () => void;
   closePlanet: () => void;
-  setFocusSystemId: (id: string | null) => void;
-  setFocusPlanetId: (id: string | null) => void;
 }
 
 export const MapPanels = ({
   focusSystemId,
-  focusPlanetId,
   viewportWidth,
   viewportHeight,
   warEventsRef,
@@ -46,8 +42,6 @@ export const MapPanels = ({
   selectedPlanetSystem,
   closeShipyard,
   closePlanet,
-  setFocusSystemId,
-  setFocusPlanetId,
 }: MapPanelsProps) => (
   <div className="floating-panels">
     <DraggablePanel

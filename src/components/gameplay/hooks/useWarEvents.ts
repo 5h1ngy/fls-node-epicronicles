@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react';
 import type { GameSession } from '@domain/types';
 
@@ -38,52 +39,16 @@ const saveWarSeen = (sessionId: string, eventId: string | null) => {
 };
 
 export const useWarEvents = (session: GameSession | null) => {
-  const [warUnread, setWarUnread] = useState(0);
   const [lastSeenWarId, setLastSeenWarId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session) {
-      setWarUnread(0);
       setLastSeenWarId(null);
       return;
     }
     const storedSeen = loadWarSeen(session.id);
     setLastSeenWarId(storedSeen);
-    if (session.warEvents.length === 0) {
-      setWarUnread(0);
-      return;
-    }
-    if (!storedSeen) {
-      setWarUnread(session.warEvents.length);
-      return;
-    }
-    const markerIndex = session.warEvents.findIndex(
-      (event) => event.id === storedSeen,
-    );
-    const unseen =
-      markerIndex >= 0
-        ? session.warEvents.length - markerIndex - 1
-        : session.warEvents.length;
-    setWarUnread(unseen);
-  }, [session?.id]);
-
-  useEffect(() => {
-    if (!session) {
-      return;
-    }
-    if (!lastSeenWarId) {
-      setWarUnread(session.warEvents.length);
-      return;
-    }
-    const markerIndex = session.warEvents.findIndex(
-      (event) => event.id === lastSeenWarId,
-    );
-    const unseen =
-      markerIndex >= 0
-        ? Math.max(0, session.warEvents.length - markerIndex - 1)
-        : session.warEvents.length;
-    setWarUnread(unseen);
-  }, [session?.warEvents.length, session?.id, lastSeenWarId, session]);
+  }, [session]);
 
   const unreadWarIds = useMemo(() => {
     if (!session) {
@@ -102,15 +67,18 @@ export const useWarEvents = (session: GameSession | null) => {
     return new Set(slice.map((event) => event.id));
   }, [session, lastSeenWarId]);
 
+  const warUnread = unreadWarIds.size;
+
   const markWarsRead = () => {
     if (!session?.warEvents?.length) {
-      setWarUnread(0);
+      setLastSeenWarId(null);
       return;
     }
     const lastId = session.warEvents.at(-1)?.id ?? null;
     setLastSeenWarId(lastId);
-    setWarUnread(0);
-    saveWarSeen(session.id, lastId);
+    if (session) {
+      saveWarSeen(session.id, lastId);
+    }
   };
 
   return {

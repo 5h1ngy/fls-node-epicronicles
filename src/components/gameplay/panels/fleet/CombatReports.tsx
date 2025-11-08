@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { CombatReport, WarEvent } from '@domain/types';
+import type { CombatReport } from '@domain/types';
 import type { StarSystem } from '@domain/types';
 
 const resultLabel = {

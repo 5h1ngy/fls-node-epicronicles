@@ -17,7 +17,6 @@ interface ShipyardPanelProps {
 }
 
 export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
-  const session = useGameStore((state) => state.session);
   const designs = useGameStore((state) => state.config.military.shipDesigns);
   const queueLimit = useGameStore(
     (state) => state.config.military.shipyard.queueSize,
@@ -95,10 +94,6 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
       setMessage(buildMessages[result.reason]);
     }
   };
-
-  if (!session) {
-    return null;
-  }
 
   const queueWithProgress = useMemo(
     () =>

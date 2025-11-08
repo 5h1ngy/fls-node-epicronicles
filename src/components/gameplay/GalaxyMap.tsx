@@ -266,7 +266,7 @@ export const GalaxyMap = ({
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
       dispose();
     };
-  }, []);
+  }, [onClearFocus, onSystemSelect]);
 
   useEffect(() => {
     if (!focusSystemId || focusPlanetId) {

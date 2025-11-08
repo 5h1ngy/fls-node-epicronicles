@@ -58,7 +58,6 @@ export const DraggablePanel = ({
     draggingRef.current = false;
     resizingRef.current = false;
     window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove]);
 
   const handleMouseDown = useCallback(
@@ -69,7 +68,7 @@ export const DraggablePanel = ({
         y: event.clientY - position.y,
       };
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseup', handleMouseUp, { once: true });
     },
     [handleMouseMove, handleMouseUp, position.x, position.y],
   );
@@ -85,7 +84,7 @@ export const DraggablePanel = ({
         height: size.height,
       };
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseup', handleMouseUp, { once: true });
     },
     [handleMouseMove, handleMouseUp, size.height, size.width],
   );

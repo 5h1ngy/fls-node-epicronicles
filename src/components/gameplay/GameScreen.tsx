@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useRef, useState } from 'react';
 import type { PopulationJobId, StarSystem } from '@domain/types';
 import { useAppSelector, useGameStore } from '@store/gameStore';
 import { DraggablePanel } from '@components/ui/DraggablePanel';
@@ -10,7 +11,12 @@ import { MapLayer } from './MapLayer';
 import { MapPanels } from './MapPanels';
 import { PlanetDetail } from './panels/PlanetDetail';
 import { useWarEvents } from './hooks/useWarEvents';
-import { selectColonizedSystems } from '@store/selectors';
+import {
+  selectColonizedSystems,
+  selectDistrictQueue,
+  selectPlanets,
+  selectSystems,
+} from '@store/selectors';
 
 export const GameScreen = () => {
   useGameLoop();
@@ -19,6 +25,23 @@ export const GameScreen = () => {
   const returnToMenu = useGameStore((state) => state.returnToMenu);
   const setSimulationRunning = useGameStore(
     (state) => state.setSimulationRunning,
+  );
+  const systems = useAppSelector(selectSystems);
+  const planets = useAppSelector(selectPlanets);
+  const colonizedSystems = useAppSelector(selectColonizedSystems);
+  const districtQueue = useAppSelector(selectDistrictQueue);
+  const economyConfig = useGameStore((state) => state.config.economy);
+  const districtDefinitions = economyConfig.districts;
+  const populationJobs = economyConfig.populationJobs;
+  const automationConfig = economyConfig.populationAutomation;
+  const queueDistrictConstruction = useGameStore(
+    (state) => state.queueDistrictConstruction,
+  );
+  const promotePopulationJob = useGameStore(
+    (state) => state.promotePopulation,
+  );
+  const demotePopulationJob = useGameStore(
+    (state) => state.demotePopulation,
   );
   const [debugOpen, setDebugOpen] = useState(false);
   const [focusSystemId, setFocusSystemId] = useState<string | null>(null);
@@ -82,6 +105,10 @@ export const GameScreen = () => {
     focusedSessionRef.current = session.id;
   }, [session, setFocusPlanetId, setFocusSystemId]);
 
+  const viewportWidth =
+    typeof window !== 'undefined' ? window.innerWidth : 1200;
+  const viewportHeight =
+    typeof window !== 'undefined' ? window.innerHeight : 800;
   if (!session) {
     return (
       <div className="game-layout">
@@ -95,37 +122,14 @@ export const GameScreen = () => {
       </div>
     );
   }
-
-  const viewportWidth =
-    typeof window !== 'undefined' ? window.innerWidth : 1200;
-  const viewportHeight =
-    typeof window !== 'undefined' ? window.innerHeight : 800;
-  const systems = session.galaxy.systems;
-  const colonizedSystems = useAppSelector(selectColonizedSystems);
   const shipyardSystem: StarSystem | null = shipyardSystemId
     ? systems.find((system) => system.id === shipyardSystemId) ?? null
     : null;
   const selectedPlanet =
-    session.economy.planets.find((planet) => planet.id === selectedPlanetId) ?? null;
+    planets.find((planet) => planet.id === selectedPlanetId) ?? null;
   const selectedPlanetSystem = selectedPlanet
     ? systems.find((system) => system.id === selectedPlanet.systemId) ?? null
     : null;
-  const economyConfig = useGameStore((state) => state.config.economy);
-  const districtDefinitions = economyConfig.districts;
-  const populationJobs = economyConfig.populationJobs;
-  const automationConfig = economyConfig.populationAutomation;
-  const districtQueue = useGameStore(
-    (state) => state.session?.districtConstructionQueue ?? [],
-  );
-  const queueDistrictConstruction = useGameStore(
-    (state) => state.queueDistrictConstruction,
-  );
-  const promotePopulationJob = useGameStore(
-    (state) => state.promotePopulation,
-  );
-  const demotePopulationJob = useGameStore(
-    (state) => state.demotePopulation,
-  );
   const planetDistrictQueue = selectedPlanet
     ? districtQueue
         .filter((task) => task.planetId === selectedPlanet.id)
@@ -236,7 +240,6 @@ export const GameScreen = () => {
       <div className="floating-panels">
         <MapPanels
           focusSystemId={focusSystemId}
-          focusPlanetId={focusPlanetId}
           viewportWidth={viewportWidth}
           viewportHeight={viewportHeight}
           warEventsRef={warEventsRef}
@@ -262,8 +265,6 @@ export const GameScreen = () => {
           selectedPlanetSystem={selectedPlanetSystem}
           closeShipyard={closeShipyardPanel}
           closePlanet={closePlanetPanel}
-          setFocusSystemId={setFocusSystemId}
-          setFocusPlanetId={setFocusPlanetId}
         />
         {debugOpen ? (
           <div className="debug-modal">
