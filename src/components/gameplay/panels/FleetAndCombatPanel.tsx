@@ -1,43 +1,8 @@
-﻿import { useMemo, useState, type RefObject } from 'react';
+import type { RefObject } from 'react';
 import { useGameStore } from '@store/gameStore';
-import type {
-  ShipClassId,
-  ScienceShipStatus,
-  WarStatus,
-  WarEventType,
-  FleetMergeResult,
-  FleetSplitResult,
-} from '@domain/types';
-
-const fleetOrderErrors = {
-  NO_SESSION: 'Nessuna sessione.',
-  FLEET_NOT_FOUND: 'Flotta non trovata.',
-  SYSTEM_NOT_FOUND: 'Sistema non valido.',
-  ALREADY_IN_SYSTEM: 'La flotta è già nel sistema.',
-  NO_SHIPS: 'La flotta non ha navi.',
-  BORDER_CLOSED: 'Confini chiusi: richiedi accesso o dichiara guerra.',
-} as const;
-
-const resultLabel = {
-  playerVictory: 'Vittoria',
-  playerDefeat: 'Sconfitta',
-  mutualDestruction: 'Mutua distruzione',
-  stalemate: 'Stallo',
-} as const;
-
-const warStatusLabel: Record<WarStatus, string> = {
-  peace: 'Pace',
-  war: 'Guerra',
-};
-
-const fleetManageErrors: Record<string, string> = {
-  NO_SESSION: 'Nessuna sessione attiva.',
-  FLEET_NOT_FOUND: 'Flotta non trovata.',
-  TARGET_NOT_FOUND: 'Flotta bersaglio non trovata.',
-  SAME_FLEET: 'Seleziona una flotta diversa.',
-  DIFFERENT_SYSTEM: 'Le flotte devono essere nello stesso sistema.',
-  INSUFFICIENT_SHIPS: 'Servono almeno 2 navi per dividere.',
-};
+import { WarOverview, WarEvents } from './fleet/WarOverview';
+import { FleetList } from './fleet/FleetList';
+import { CombatReports } from './fleet/CombatReports';
 
 interface FleetAndCombatPanelProps {
   warEventsRef?: RefObject<HTMLDivElement>;
@@ -58,328 +23,30 @@ export const FleetAndCombatPanel = ({
   const reports = (session?.combatReports ?? []).slice().reverse();
   const scienceShips = session?.scienceShips ?? [];
   const empires = session?.empires ?? [];
-  const [message, setMessage] = useState<string | null>(null);
   const mergeFleetsAction = useGameStore((state) => state.mergeFleets);
   const splitFleetAction = useGameStore((state) => state.splitFleet);
-  const warLog = empires.filter((empire) => empire.kind === 'ai');
   const warEvents = (session?.warEvents ?? []).slice().reverse();
-  const [warFilter, setWarFilter] = useState<'all' | WarEventType>('all');
-
-  const systemName = (id: string | null) =>
-    systems.find((system) => system.id === id)?.name ?? '???';
-
-  const designLookup = useMemo(
-    () =>
-      new Map<ShipClassId, (typeof designs)[number]>(
-        designs.map((design) => [design.id, design]),
-      ),
-    [designs],
-  );
-
-const describeFleetShips = (ships: typeof fleets[number]['ships']) => {
-    const counts = ships.reduce<Record<string, number>>((acc, ship) => {
-      const key: string = ship.designId;
-      acc[key] = (acc[key] ?? 0) + 1;
-      return acc;
-    }, {});
-    return Object.entries(counts)
-      .map(([designId, count]) => {
-        const typedId = designId as ShipClassId;
-        const design = designLookup.get(typedId);
-        return `${design?.name ?? designId} x${count}`;
-      })
-      .join(', ');
-  };
-
-  const handleOrder = (fleetId: string, systemId: string) => {
-    const result = orderFleetMove(fleetId, systemId);
-    if (result.success) {
-      setMessage('Rotta aggiornata.');
-    } else {
-      setMessage(fleetOrderErrors[result.reason]);
-    }
-  };
-
-  const surveyedSystems = systems.filter(
-    (system) => system.visibility === 'surveyed',
-  );
-
-  const resolveName = (systemId: string) =>
-    systems.find((system) => system.id === systemId)?.name ?? systemId;
-
-  const scienceStatusLabel: Record<ScienceShipStatus, string> = {
-    idle: 'In stazione',
-    traveling: 'In viaggio',
-    surveying: 'Sondando',
-  };
-
-  const filteredWarEvents =
-    warFilter === 'all'
-      ? warEvents
-      : warEvents.filter((event) => event.type === warFilter);
-
-  const renderScienceShips = (fleet: (typeof fleets)[number]) => {
-    const ships = scienceShips.filter(
-      (ship) =>
-        ship.currentSystemId === fleet.systemId ||
-        ship.targetSystemId === fleet.systemId,
-    );
-    if (ships.length === 0) {
-      return null;
-    }
-    return (
-      <div className="fleet-science">
-        {ships.map((ship) => (
-          <span key={ship.id} className="fleet-chip">
-            <span>{ship.name}</span>
-            <small>{scienceStatusLabel[ship.status]}</small>
-          </span>
-        ))}
-      </div>
-    );
-  };
-
-  const battleSummary = useMemo(() => {
-    const totals = {
-      total: reports.length,
-      victories: reports.filter((r) => r.result === 'playerVictory').length,
-      defeats: reports.filter((r) => r.result === 'playerDefeat').length,
-      mutual: reports.filter((r) => r.result === 'mutualDestruction').length,
-      stalemate: reports.filter((r) => r.result === 'stalemate').length,
-      shipsLost: reports.reduce(
-        (sum, r) => sum + r.losses.reduce((acc, loss) => acc + loss.shipsLost, 0),
-        0,
-      ),
-      avgDamageTaken:
-        reports.length > 0
-          ? Math.round(
-              reports.reduce((sum, r) => sum + r.damageTaken, 0) / reports.length,
-            )
-          : 0,
-    };
-    return totals;
-  }, [reports]);
 
   return (
     <section className="fleet-combat-panel">
-      <div className="panel-section">
-        <div className="panel-section__header">
-          <h3>Guerre attive</h3>
-        </div>
-        <ul>
-          {warLog.map((empire) => {
-            const duration =
-              empire.warSince && session
-                ? Math.max(0, session.clock.tick - empire.warSince)
-                : 0;
-            return (
-              <li key={empire.id}>
-                <div className="fleet-row">
-                  <div>
-                    <strong>{empire.name}</strong>
-                    <span className="text-muted">
-                      Opinione: {empire.opinion}
-                    </span>
-                    <span className="text-muted">
-                      Durata: {duration} tick
-                    </span>
-                  </div>
-                  <span
-                    className={
-                      empire.warStatus === 'war'
-                        ? 'sentiment-negative'
-                        : 'sentiment-positive'
-                    }
-                  >
-                    {warStatusLabel[empire.warStatus]}
-                  </span>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      <div className="panel-section">
-        <div className="panel-section__header">
-          <h3>Eventi di guerra</h3>
-          <label className="fleet-panel__order">
-            <span className="text-muted">Filtro</span>
-            <select
-              value={warFilter}
-              onChange={(event) =>
-                setWarFilter(event.target.value as 'all' | WarEventType)
-              }
-            >
-              <option value="all">Tutti</option>
-              <option value="warStart">Inizio guerra</option>
-              <option value="warEnd">Pace</option>
-            </select>
-          </label>
-          {onMarkWarRead ? (
-            <button
-              className="panel__action panel__action--compact panel__action--inline"
-              onClick={onMarkWarRead}
-            >
-              Segna letti
-            </button>
-          ) : null}
-        </div>
-        <ul ref={warEventsRef}>
-          {filteredWarEvents.length === 0 ? (
-            <li className="text-muted">Nessun evento registrato.</li>
-          ) : (
-            filteredWarEvents.map((event) => {
-              const empire = empires.find((e) => e.id === event.empireId);
-              const isUnread = unreadWarIds?.has(event.id);
-              return (
-                <li
-                  key={event.id}
-                  className={isUnread ? 'war-event war-event--new' : 'war-event'}
-                >
-                  <div className="fleet-row">
-                    <strong>{empire?.name ?? event.empireId}</strong>
-                    <span className="text-muted">Tick {event.tick}</span>
-                  </div>
-                  <p className="text-muted">{event.message}</p>
-                </li>
-              );
-            })
-          )}
-        </ul>
-      </div>
-      <div className="panel-section">
-        <div className="panel-section__header">
-          <h3>Flotte</h3>
-          {message ? <p className="panel-message">{message}</p> : null}
-        </div>
-        <ul>
-          {fleets.map((fleet) => (
-            <li key={fleet.id}>
-              <div className="fleet-row">
-                <div>
-                  <strong>{fleet.name}</strong>
-                  <span className="text-muted">
-                    Sistema: {systemName(fleet.systemId)}
-                  </span>
-                  {fleet.targetSystemId ? (
-                    <span className="text-muted">
-                      {' -> '}
-                      {systemName(fleet.targetSystemId)} ({fleet.ticksToArrival}{' '}
-                      tick)
-                    </span>
-                  ) : null}
-                </div>
-                <span className="text-muted">Navi: {fleet.ships.length}</span>
-              </div>
-              <p className="fleet-ships">
-                {fleet.ships.length > 0
-                  ? describeFleetShips(fleet.ships)
-                  : 'Nessuna nave attiva'}
-              </p>
-              {renderScienceShips(fleet)}
-              <label className="fleet-panel__order">
-                Destinazione
-                <select
-                  value={fleet.targetSystemId ?? fleet.systemId}
-                  onChange={(event) => handleOrder(fleet.id, event.target.value)}
-                >
-                  {surveyedSystems.map((system) => (
-                    <option key={system.id} value={system.id}>
-                      {system.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="fleet-panel__order">
-                <span className="text-muted">Gestione flotta</span>
-                <div className="fleet-panel__actions">
-                  <select
-                    value=""
-                    onChange={(event) => {
-                      if (!event.target.value) {
-                        return;
-                      }
-                      const result = mergeFleetsAction(fleet.id, event.target.value);
-                      setMessage(
-                        result.success
-                          ? 'Flotte unite.'
-                          : fleetManageErrors[result.reason],
-                      );
-                    }}
-                  >
-                    <option value="">Unisci con...</option>
-                    {fleets
-                      .filter(
-                        (candidate) =>
-                          candidate.id !== fleet.id &&
-                          candidate.systemId === fleet.systemId,
-                      )
-                      .map((candidate) => (
-                        <option key={candidate.id} value={candidate.id}>
-                          {candidate.name}
-                        </option>
-                      ))}
-                  </select>
-                  <button
-                    className="panel__action panel__action--compact"
-                    onClick={() => {
-                      const result = splitFleetAction(fleet.id);
-                      setMessage(
-                        result.success
-                          ? 'Nuova flotta creata.'
-                          : fleetManageErrors[result.reason],
-                      );
-                    }}
-                    disabled={fleet.ships.length <= 1}
-                  >
-                    Dividi 1 nave
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="panel-section">
-        <div className="panel-section__header">
-          <h3>Rapporti di combattimento</h3>
-        </div>
-        <div className="fleet-panel__order">
-          <span className="text-muted">
-            Totali: {battleSummary.total} Â· Vittorie {battleSummary.victories} Â·
-            Sconfitte {battleSummary.defeats} Â· Stallo {battleSummary.stalemate} Â·
-            Mutua {battleSummary.mutual}
-          </span>
-          <span className="text-muted">
-            Navi perse: {battleSummary.shipsLost} Â· Danno medio subito:{' '}
-            {battleSummary.avgDamageTaken}
-          </span>
-        </div>
-        <ul>
-          {reports.map((report) => (
-            <li key={report.id}>
-              <div className="combat-log__header">
-                <strong>{resultLabel[report.result]}</strong>
-                <span className="text-muted">
-                  Tick {report.tick} &mdash; {resolveName(report.systemId)}
-                </span>
-              </div>
-              <p>
-                Potenza flotta: {report.playerPower} | Difesa: {report.playerDefense} | Danno subito: {report.damageTaken}
-              </p>
-              <p>Minaccia: {report.hostilePower}</p>
-              {report.losses.map((loss) => (
-                <p key={`${report.id}-${loss.fleetId}`} className="text-muted">
-                  Perdite flotta {loss.fleetId.slice(0, 6)}: {loss.shipsLost}
-                </p>
-              ))}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <WarOverview empires={empires} sessionTick={session?.clock.tick ?? 0} />
+      <WarEvents
+        warEvents={warEvents}
+        empires={empires}
+        unreadWarIds={unreadWarIds}
+        onMarkWarRead={onMarkWarRead}
+        warEventsRef={warEventsRef}
+      />
+      <FleetList
+        fleets={fleets}
+        systems={systems}
+        scienceShips={scienceShips}
+        designs={designs}
+        onOrder={(fleetId, systemId) => orderFleetMove(fleetId, systemId)}
+        onMerge={mergeFleetsAction}
+        onSplit={splitFleetAction}
+      />
+      <CombatReports reports={reports} systems={systems} />
     </section>
   );
 };
-
-
-
