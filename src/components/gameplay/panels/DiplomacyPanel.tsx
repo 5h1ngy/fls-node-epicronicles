@@ -1,6 +1,7 @@
-﻿import { useState } from 'react';
-import { useGameStore } from '@store/gameStore';
+import { useState } from 'react';
+import { useAppSelector, useGameStore } from '@store/gameStore';
 import type { Empire, WarStatus } from '@domain/types';
+import { selectEmpires } from '@store/selectors';
 
 const statusLabel: Record<WarStatus, string> = {
   peace: 'Pace',
@@ -14,8 +15,8 @@ const sentiment = (opinion: number) => {
 };
 
 export const DiplomacyPanel = () => {
-  const session = useGameStore((state) => state.session);
-  const empires = session?.empires ?? [];
+  const hasSession = useGameStore((state) => Boolean(state.session));
+  const empires = useAppSelector(selectEmpires);
   const declareWar = useGameStore((state) => state.declareWarOnEmpire);
   const proposePeace = useGameStore((state) => state.proposePeaceWithEmpire);
   const requestBorders = useGameStore((state) => state.requestBorderAccess);
@@ -23,7 +24,7 @@ export const DiplomacyPanel = () => {
 
   const aiEmpires = empires.filter((empire) => empire.kind === 'ai');
 
-  if (!session) {
+  if (!hasSession) {
     return <p className="text-muted">Nessuna sessione attiva.</p>;
   }
 
@@ -62,7 +63,7 @@ export const DiplomacyPanel = () => {
         NO_SESSION: 'Nessuna sessione attiva.',
         EMPIRE_NOT_FOUND: 'Impero non trovato.',
         INVALID_TARGET: 'Bersaglio non valido.',
-        ALREADY_GRANTED: 'Confini giÃ  aperti.',
+        ALREADY_GRANTED: 'Confini gia aperti.',
       };
       changeMessage(reasons[result.reason] ?? 'Richiesta non accettata.');
     }
@@ -85,7 +86,7 @@ export const DiplomacyPanel = () => {
                 <div>
                   <strong>{empire.name}</strong>
                   <span className="text-muted">
-                    Personalit&#224;: {empire.personality ?? 'Sconosciuta'}
+                    Personalita: {empire.personality ?? 'Sconosciuta'}
                   </span>
                   <span
                     className={`text-muted sentiment-${sentiment(empire.opinion)}`}
@@ -133,4 +134,3 @@ export const DiplomacyPanel = () => {
     </section>
   );
 };
-

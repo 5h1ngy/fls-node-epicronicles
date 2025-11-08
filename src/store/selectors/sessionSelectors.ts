@@ -9,3 +9,5 @@ export const selectCombatReports = (state: RootState) =>
   state.game.session?.combatReports ?? [];
 export const selectSessionTick = (state: RootState) =>
   state.game.session?.clock.tick ?? 0;
+export const selectPlayerEmpire = (state: RootState) =>
+  state.game.session?.empires.find((empire) => empire.kind === 'player') ?? null;
