@@ -17,6 +17,47 @@ export type ScienceShipStatus = 'idle' | 'traveling' | 'surveying';
 export type ResourceType = 'energy' | 'minerals' | 'food' | 'research' | 'influence';
 export type ResourceCost = Partial<Record<ResourceType, number>>;
 
+export type ResearchBranch = 'physics' | 'society' | 'engineering';
+
+export interface ResearchTech {
+  id: string;
+  branch: ResearchBranch;
+  name: string;
+  description: string;
+  cost: number;
+  prerequisites?: string[];
+  effects?: string[];
+}
+
+export interface ResearchBranchState {
+  currentTechId: string | null;
+  progress: number;
+  completed: string[];
+}
+
+export interface ResearchState {
+  branches: Record<ResearchBranch, ResearchBranchState>;
+  backlog: ResearchTech[];
+}
+
+export type TraditionTreeId = 'exploration' | 'economy' | 'military';
+
+export interface TraditionPerk {
+  id: string;
+  tree: TraditionTreeId;
+  name: string;
+  description: string;
+  cost: number;
+  prerequisites?: string[];
+  effects?: string[];
+}
+
+export interface TraditionState {
+  availablePoints: number;
+  unlocked: string[];
+  backlog: TraditionPerk[];
+}
+
 export type EmpireKind = 'player' | 'ai';
 export type WarStatus = 'peace' | 'war';
 
@@ -83,7 +124,9 @@ export type NotificationKind =
   | 'colonizationCompleted'
   | 'combatReport'
   | 'warDeclared'
-  | 'peaceAccepted';
+  | 'peaceAccepted'
+  | 'researchComplete'
+  | 'traditionUnlocked';
 
 export interface GameNotification {
   id: string;
@@ -288,6 +331,8 @@ export interface GameSession {
   clock: SimulationClock;
   scienceShips: ScienceShip[];
   economy: EconomyState;
+  research: ResearchState;
+  traditions: TraditionState;
   colonizationTasks: ColonizationTask[];
   fleets: Fleet[];
   shipyardQueue: ShipyardTask[];

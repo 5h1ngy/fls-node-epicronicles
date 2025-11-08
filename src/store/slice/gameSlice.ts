@@ -156,6 +156,28 @@ export type LoadGameResult =
   | { success: true }
   | { success: false; reason: LoadReason };
 
+export type ResearchActionReason =
+  | 'NO_SESSION'
+  | 'INVALID_TECH'
+  | 'PREREQ_NOT_MET'
+  | 'ALREADY_COMPLETED'
+  | 'BRANCH_MISMATCH';
+
+export type StartResearchResult =
+  | { success: true }
+  | { success: false; reason: ResearchActionReason };
+
+export type TraditionActionReason =
+  | 'NO_SESSION'
+  | 'INVALID_PERK'
+  | 'ALREADY_UNLOCKED'
+  | 'PREREQ_NOT_MET'
+  | 'INSUFFICIENT_POINTS';
+
+export type UnlockTraditionResult =
+  | { success: true }
+  | { success: false; reason: TraditionActionReason };
+
 export type PopulationJobId =
   | 'workers'
   | 'specialists'

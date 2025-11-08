@@ -27,6 +27,8 @@ export const startNewSession =
         galaxyRadius: preset?.galaxyRadius ?? cfg.defaultGalaxy.galaxyRadius,
       },
       economyConfig: cfg.economy,
+      researchConfig: cfg.research,
+      traditionConfig: cfg.traditions,
       militaryConfig: cfg.military,
       diplomacyConfig: cfg.diplomacy,
     });

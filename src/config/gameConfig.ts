@@ -4,6 +4,10 @@ import type {
   ResourceCost,
   ShipDesign,
   ShipClassId,
+  ResearchTech,
+  TraditionPerk,
+  ResearchBranch,
+  TraditionTreeId,
 } from '@domain/types';
 
 export interface ColonizationConfig {
@@ -34,6 +38,30 @@ export interface DiplomacyConfig {
     attackBonusPerThreat: number;
   };
   warEventLogLimit: number;
+}
+
+export interface ResearchBranchConfig {
+  id: ResearchBranch;
+  label: string;
+  description: string;
+}
+
+export interface ResearchConfig {
+  branches: ResearchBranchConfig[];
+  techs: ResearchTech[];
+  pointsPerResearchIncome: number;
+}
+
+export interface TraditionTreeConfig {
+  id: TraditionTreeId;
+  label: string;
+  description: string;
+}
+
+export interface TraditionConfig {
+  trees: TraditionTreeConfig[];
+  perks: TraditionPerk[];
+  pointsPerInfluenceIncome: number;
 }
 
 export interface MilitaryConfig {
@@ -70,6 +98,8 @@ export interface GameConfig {
     surveyTicks: number;
   };
   economy: EconomyConfig;
+  research: ResearchConfig;
+  traditions: TraditionConfig;
   colonization: ColonizationConfig;
   diplomacy: DiplomacyConfig;
   military: MilitaryConfig;
@@ -211,6 +241,132 @@ export const gameConfig: GameConfig = {
       desert: 0.6,
       tundra: 0.65,
     },
+  },
+  research: {
+    branches: [
+      {
+        id: 'physics',
+        label: 'Fisica',
+        description: 'Energia, sensori e propulsione.',
+      },
+      {
+        id: 'society',
+        label: 'Societa',
+        description: 'Biologia, amministrazione, tradizioni civili.',
+      },
+      {
+        id: 'engineering',
+        label: 'Ingegneria',
+        description: 'Materiali, costruzioni e armamenti.',
+      },
+    ],
+    techs: [
+      {
+        id: 'photonics',
+        branch: 'physics',
+        name: 'Energia fotonica',
+        description: '+10% produzione energia.',
+        cost: 40,
+        effects: ['energyIncome:+0.1'],
+      },
+      {
+        id: 'advanced-sensors',
+        branch: 'physics',
+        name: 'Sensori avanzati',
+        description: '+10% produzione ricerca.',
+        cost: 30,
+        effects: ['researchIncome:+0.1'],
+      },
+      {
+        id: 'bio-domes',
+        branch: 'society',
+        name: 'Bio-cupole',
+        description: '+10% produzione cibo.',
+        cost: 35,
+        effects: ['foodIncome:+0.1'],
+      },
+      {
+        id: 'bureaucracy',
+        branch: 'society',
+        name: 'Burosfera',
+        description: '+1 influenza per tick.',
+        cost: 45,
+        effects: ['influenceFlat:+1'],
+      },
+      {
+        id: 'reinforced-alloys',
+        branch: 'engineering',
+        name: 'Leghe rinforzate',
+        description: '+10% produzione minerali.',
+        cost: 45,
+        effects: ['mineralsIncome:+0.1'],
+      },
+      {
+        id: 'modular-yards',
+        branch: 'engineering',
+        name: 'Cantieri modulari',
+        description: '+10% produzione energia e minerali.',
+        cost: 55,
+        effects: ['energyIncome:+0.1', 'mineralsIncome:+0.1'],
+        prerequisites: ['reinforced-alloys'],
+      },
+    ],
+    pointsPerResearchIncome: 1,
+  },
+  traditions: {
+    trees: [
+      {
+        id: 'exploration',
+        label: 'Esplorazione',
+        description: 'Scoperta rapida della galassia.',
+      },
+      {
+        id: 'economy',
+        label: 'Economia',
+        description: 'Crescita risorse e stabilita.',
+      },
+      {
+        id: 'military',
+        label: 'Militare',
+        description: 'Potenza e mobilità delle flotte.',
+      },
+    ],
+    perks: [
+      {
+        id: 'survey-speed',
+        tree: 'exploration',
+        name: 'Scansioni fulminee',
+        description: '+5% produzione ricerca.',
+        cost: 2,
+        effects: ['researchIncome:+0.05'],
+      },
+      {
+        id: 'logistics',
+        tree: 'military',
+        name: 'Logistica avanzata',
+        description: '+5% produzione energia.',
+        cost: 3,
+        effects: ['energyIncome:+0.05'],
+      },
+      {
+        id: 'bureaucrats',
+        tree: 'economy',
+        name: 'Quadri amministrativi',
+        description: '+0.5 influenza/tick.',
+        cost: 2,
+        effects: ['influenceFlat:+0.5'],
+      },
+      {
+        id: 'planetary-planning',
+        tree: 'economy',
+        name: 'Pianificazione planetaria',
+        description: '+5% produzione minerali.',
+        cost: 3,
+        effects: ['mineralsIncome:+0.05'],
+        prerequisites: ['bureaucrats'],
+      },
+    ],
+    pointsPerInfluenceIncome: 0.05,
   },
   colonization: {
     cost: {

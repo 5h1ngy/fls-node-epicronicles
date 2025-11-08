@@ -12,6 +12,9 @@ import { advanceShipyard } from '@domain/fleet/shipyard';
 import { advanceFleets } from '@domain/fleet/fleets';
 import { advanceDistrictConstruction } from '@domain/economy/districts';
 import { autoBalancePopulation } from '@domain/economy/population';
+import { advanceResearch } from '@domain/research/research';
+import { advanceTraditions } from '@domain/traditions/traditions';
+import { deriveProgressionModifiers } from '@domain/progression/modifiers';
 import {
   advanceDiplomacy,
   applyWarPressureToGalaxy,
@@ -67,6 +70,12 @@ export const advanceSimulation = (
     const iterationWarEvents: GameSession['warEvents'] = [
       ...updatedSession.warEvents,
     ];
+    const progressionModifiers = deriveProgressionModifiers({
+      research: updatedSession.research,
+      traditions: updatedSession.traditions,
+      researchConfig: config.research,
+      traditionConfig: config.traditions,
+    });
     const fallbackSystemId =
       updatedSession.fleets[0]?.systemId ??
       updatedSession.galaxy.systems[0]?.id ??
@@ -228,13 +237,39 @@ export const advanceSimulation = (
       economy: districtConstruction.economy,
       config: config.economy,
     });
-    const { economy } = advanceEconomy(balancedEconomy, config.economy);
+    const { economy, netProduction } = advanceEconomy(
+      balancedEconomy,
+      config.economy,
+      progressionModifiers,
+    );
+    const researchAdvance = advanceResearch({
+      state: updatedSession.research,
+      researchIncome: Math.max(0, netProduction.research),
+      config: config.research,
+    });
+    const traditions = advanceTraditions({
+      state: updatedSession.traditions,
+      influenceIncome: Math.max(0, netProduction.influence),
+      config: config.traditions,
+    });
+    if (researchAdvance.completed.length > 0) {
+      researchAdvance.completed.forEach((tech) => {
+        iterationNotifications.push({
+          id: `notif-tech-${tech.id}-${currentTick}`,
+          tick: currentTick,
+          kind: 'combatReport',
+          message: `Ricerca completata: ${tech.name}.`,
+        });
+      });
+    }
 
     updatedSession = {
       ...updatedSession,
       galaxy,
       scienceShips,
       empires: diplomacy.empires,
+      research: researchAdvance.research,
+      traditions,
       warEvents: iterationWarEvents.slice(
         -config.diplomacy.warEventLogLimit,
       ),

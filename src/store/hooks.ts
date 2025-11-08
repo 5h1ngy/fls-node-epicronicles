@@ -2,7 +2,12 @@
 import type { TypedUseSelectorHook } from 'react-redux';
 import { useMemo } from 'react';
 import type { AppDispatch, RootState } from './index';
-import type { GameSession, PopulationJobId, ShipClassId } from '@domain/types';
+import type {
+  GameSession,
+  PopulationJobId,
+  ShipClassId,
+  ResearchBranch,
+} from '@domain/types';
 import type { GameConfig } from '@config/gameConfig';
 import type { GameView } from './slice/gameSlice';
 import {
@@ -29,6 +34,8 @@ import {
   saveSessionToStorage,
   loadSessionFromStorage,
   hasSavedSession,
+  beginResearch,
+  unlockTraditionPerk,
 } from './thunks';
 export * from './selectors';
 import type {
@@ -45,6 +52,8 @@ import type {
   FleetSplitResult,
   SaveGameResult,
   LoadGameResult,
+  StartResearchResult,
+  UnlockTraditionResult,
 } from './thunks';
 
 export const useAppDispatch: () => AppDispatch = () => useDispatch<AppDispatch>();
@@ -107,6 +116,8 @@ interface HookState {
   saveSession: () => SaveGameResult;
   loadSession: () => LoadGameResult;
   hasSavedSession: () => boolean;
+  beginResearch: (branch: ResearchBranch, techId: string) => StartResearchResult;
+  unlockTraditionPerk: (perkId: string) => UnlockTraditionResult;
 }
 
 export const useGameStore = <T>(selector: (state: HookState) => T): T => {
@@ -164,6 +175,10 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
       saveSession: () => dispatch(saveSessionToStorage()),
       loadSession: () => dispatch(loadSessionFromStorage()),
       hasSavedSession: () => hasSavedSession(),
+      beginResearch: (branch: ResearchBranch, techId: string) =>
+        dispatch(beginResearch(branch, techId)),
+      unlockTraditionPerk: (perkId: string) =>
+        dispatch(unlockTraditionPerk(perkId)),
     }),
     [dispatch],
   );

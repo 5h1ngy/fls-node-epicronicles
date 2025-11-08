@@ -1073,6 +1073,66 @@ body {
   color: #7fe38f;
   font-size: 0.85rem;
 }
+.tech-panel__branches {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.tech-branch {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.6rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.tech-branch__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+}
+.tech-branch__title {
+  font-weight: 600;
+}
+.tech-branch__techs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.tech-card {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 0.45rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.tech-card__title {
+  font-weight: 600;
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+.tech-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+}
+.tech-card__badge {
+  border: 1px solid rgba(127, 227, 143, 0.5);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  color: #7fe38f;
+  font-size: 0.7rem;
+}
+.tech-card__badge--active {
+  border-color: rgba(77, 226, 255, 0.5);
+  color: #4de2ff;
+}
 .sentiment-positive {
   color: #7fe38f;
 }

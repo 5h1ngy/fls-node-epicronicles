@@ -8,6 +8,7 @@ import { SystemPanel } from './panels/SystemPanel';
 import { FleetAndCombatPanel } from './panels/FleetAndCombatPanel';
 import { DiplomacyPanel } from './panels/DiplomacyPanel';
 import { ShipyardPanel } from './panels/ShipyardPanel';
+import { TechPanel } from './panels/TechPanel';
 import type { StarSystem } from '@domain/types';
 
 interface MapPanelsProps {
@@ -120,6 +121,15 @@ export const MapPanels = ({
       initialHeight={220}
     >
       <DiplomacyPanel />
+    </DraggablePanel>
+    <DraggablePanel
+      title="Ricerca & Tradizioni"
+      initialX={Math.max(12, viewportWidth - 640)}
+      initialY={600}
+      initialWidth={360}
+      initialHeight={320}
+    >
+      <TechPanel />
     </DraggablePanel>
     {shipyardSystem ? (
       <DraggablePanel

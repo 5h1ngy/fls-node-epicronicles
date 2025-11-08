@@ -5,6 +5,10 @@ export const selectConfig = (state: RootState) => state.game.config;
 export const selectView = (state: RootState) => state.game.view;
 export const selectEmpires = (state: RootState) =>
   state.game.session?.empires ?? [];
+export const selectResearch = (state: RootState) =>
+  state.game.session?.research;
+export const selectTraditions = (state: RootState) =>
+  state.game.session?.traditions;
 export const selectCombatReports = (state: RootState) =>
   state.game.session?.combatReports ?? [];
 export const selectSessionTick = (state: RootState) =>

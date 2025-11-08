@@ -51,9 +51,9 @@ Stato sintetico per fasi, con feature flaggate tramite checkbox `[x]` (complete)
 - [x] Pathfinding/attraversamento confini condizionato da stato guerra/pace
 
 ## Fase 5 - Tecnologia, Tradizioni e Progressione
-- [ ] Sistema ricerca a rami, punti ricerca per ramo e schermata tech
-- [ ] Effetti di ricerca (sblocchi edifici/moduli/bonus)
-- [ ] Tradizioni/perk con progressione dedicata
+- [x] Sistema ricerca a rami, punti ricerca per ramo e schermata tech
+- [x] Effetti di ricerca (sblocchi edifici/moduli/bonus)
+- [x] Tradizioni/perk con progressione dedicata
 
 ## Fase 6 - Eventi, Anomalie avanzate e Crisi
 - [ ] Sistema eventi generico con condizioni, opzioni, effetti e log

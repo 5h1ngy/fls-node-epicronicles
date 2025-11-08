@@ -10,8 +10,12 @@ import { createInitialEconomy, type EconomyConfig } from '@domain/economy/econom
 import type {
   DiplomacyConfig,
   MilitaryConfig,
+  ResearchConfig,
+  TraditionConfig,
 } from '@config/gameConfig';
 import { createInitialFleet } from '@domain/fleet/ships';
+import { createInitialResearch } from '@domain/research/research';
+import { createInitialTraditions } from '@domain/traditions/traditions';
 
 export interface SessionParams {
   seed: string;
@@ -20,6 +24,8 @@ export interface SessionParams {
   economyConfig: EconomyConfig;
   militaryConfig: MilitaryConfig;
   diplomacyConfig: DiplomacyConfig;
+  researchConfig: ResearchConfig;
+  traditionConfig: TraditionConfig;
 }
 
 const createClock = (): SimulationClock => ({
@@ -88,6 +94,8 @@ export const createSession = ({
   economyConfig,
   militaryConfig,
   diplomacyConfig,
+  researchConfig,
+  traditionConfig,
 }: SessionParams): GameSession => {
   const baseGalaxy = createTestGalaxy({ seed, ...galaxyOverrides });
   const systems = baseGalaxy.systems.map((system, index) => {
@@ -107,6 +115,8 @@ export const createSession = ({
     createdAt: Date.now(),
     galaxy,
     empires: createEmpires(seed, diplomacyConfig),
+    research: createInitialResearch(researchConfig),
+    traditions: createInitialTraditions(traditionConfig),
     warEvents: [],
     clock: createClock(),
     scienceShips: createInitialScienceShips(galaxy),

@@ -282,9 +282,24 @@ export interface AdvanceEconomyResult {
   netProduction: Record<ResourceType, number>;
 }
 
+export interface EconomyModifiers {
+  incomeMultipliers?: Partial<Record<ResourceType, number>>;
+  influenceFlat?: number;
+}
+
+const applyIncomeMultiplier = (
+  value: number,
+  type: ResourceType,
+  modifiers?: EconomyModifiers,
+): number => {
+  const mult = modifiers?.incomeMultipliers?.[type] ?? 0;
+  return value * (1 + mult);
+};
+
 export const advanceEconomy = (
   state: EconomyState,
   config: EconomyConfig,
+  modifiers?: EconomyModifiers,
 ): AdvanceEconomyResult => {
   const totals = RESOURCE_TYPES.reduce(
     (acc, type) => {
@@ -310,7 +325,11 @@ export const advanceEconomy = (
   state.planets.forEach((planet) => {
     const morale = calculatePlanetMorale(planet, state, config);
     RESOURCE_TYPES.forEach((type) => {
-      const production = (planet.baseProduction[type] ?? 0) * morale.modifier;
+      const production = applyIncomeMultiplier(
+        (planet.baseProduction[type] ?? 0) * morale.modifier,
+        type,
+        modifiers,
+      );
       const consumption = planet.upkeep[type] ?? 0;
       totals.income[type] += production;
       totals.upkeep[type] += consumption;
@@ -321,7 +340,11 @@ export const advanceEconomy = (
         return;
       }
       RESOURCE_TYPES.forEach((type) => {
-        const income = (definition.production[type] ?? 0) * morale.modifier;
+        const income = applyIncomeMultiplier(
+          (definition.production[type] ?? 0) * morale.modifier,
+          type,
+          modifiers,
+        );
         const upkeep = definition.upkeep[type] ?? 0;
         totals.income[type] += income * count;
         totals.upkeep[type] += upkeep * count;
@@ -333,7 +356,11 @@ export const advanceEconomy = (
         return;
       }
       RESOURCE_TYPES.forEach((type) => {
-        const income = (job.production[type] ?? 0) * morale.modifier;
+        const income = applyIncomeMultiplier(
+          (job.production[type] ?? 0) * morale.modifier,
+          type,
+          modifiers,
+        );
         const upkeep = job.upkeep[type] ?? 0;
         totals.income[type] += income * count;
         totals.upkeep[type] += upkeep * count;
@@ -356,8 +383,11 @@ export const advanceEconomy = (
   };
 
   RESOURCE_TYPES.forEach((type) => {
-    const income = totals.income[type];
+    let income = totals.income[type];
     const upkeep = totals.upkeep[type];
+    if (type === 'influence' && (modifiers?.influenceFlat ?? 0) !== 0) {
+      income += modifiers?.influenceFlat ?? 0;
+    }
     const net = income - upkeep;
     netProduction[type] = net;
     const current = resources[type] ?? { amount: 0, income: 0, upkeep: 0 };
