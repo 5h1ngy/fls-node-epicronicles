@@ -1,10 +1,10 @@
 ﻿import { useMemo, useState } from 'react';
 import { useGameStore, type ColonizationError } from '@store/gameStore';
-import { resourceLabels } from '@domain/shared/resourceMetadata';
 import type {
   ColonizationStatus,
   ColonizationTask,
 } from '@domain/types';
+import { formatCost } from './shared/formatters';
 
 const colonizationErrors: Record<ColonizationError, string> = {
   NO_SESSION: 'Nessuna sessione.',
@@ -194,13 +194,7 @@ export const ColonyPanel = ({
         </p>
         <p className="text-muted">
           Costi:{' '}
-          {Object.entries(colonizationConfig.cost)
-            .filter(([, amount]) => amount && amount > 0)
-            .map(
-              ([type, amount]) =>
-                `${resourceLabels[type as keyof typeof resourceLabels]} ${amount}`,
-            )
-            .join(' | ')}
+          {formatCost(colonizationConfig.cost)}
         </p>
         <div className="colonization-panel__table">
           <table>
