@@ -1,17 +1,24 @@
-import * as THREE from 'three';
+import {
+  Scene,
+  Color,
+  PerspectiveCamera,
+  WebGLRenderer,
+  AmbientLight,
+  PointLight,
+} from 'three';
 
 export interface SceneSetup {
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
-  renderer: THREE.WebGLRenderer;
+  scene: Scene;
+  camera: PerspectiveCamera;
+  renderer: WebGLRenderer;
   dispose: () => void;
 }
 
 export const createScene = (container: HTMLDivElement): SceneSetup => {
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x05070d);
+  const scene = new Scene();
+  scene.background = new Color(0x05070d);
 
-  const camera = new THREE.PerspectiveCamera(
+  const camera = new PerspectiveCamera(
     45,
     container.clientWidth / container.clientHeight,
     0.1,
@@ -19,12 +26,12 @@ export const createScene = (container: HTMLDivElement): SceneSetup => {
   );
   camera.position.set(0, 0, 170);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new WebGLRenderer({ antialias: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.35);
-  const keyLight = new THREE.PointLight(0xffffff, 1.2);
+  const ambient = new AmbientLight(0xffffff, 0.35);
+  const keyLight = new PointLight(0xffffff, 1.2);
   keyLight.position.set(60, 60, 100);
   scene.add(ambient);
   scene.add(keyLight);

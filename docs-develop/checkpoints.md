@@ -20,7 +20,7 @@ Stato sintetico delle attività per migliorare drasticamente le performance. Agg
 
 ## Build/Bundle
 - [x] Rollup manualChunks per split `three` e `react`, chunkSizeWarningLimit alzato.
-- [ ] Tree-shake mirato su import Three (evitare wildcard).
+- [ ] Tree-shake mirato su import Three (evitare wildcard) (parziale: scene.ts).
 - [ ] Altri split per pannelli UI (code splitting a route/chunk).
 
 ## Mappa interattiva
