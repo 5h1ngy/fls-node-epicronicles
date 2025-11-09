@@ -1,4 +1,15 @@
-import * as THREE from 'three';
+import {
+  CanvasTexture,
+  SpriteMaterial,
+  Sprite,
+  MeshStandardMaterial,
+  SphereGeometry,
+  Mesh,
+  RingGeometry,
+  MeshBasicMaterial,
+  Group,
+  DoubleSide,
+} from 'three';
 import type { OrbitingPlanet, StarSystem } from '@domain/types';
 import {
   materialCache,
@@ -31,15 +42,15 @@ export const createLabelSprite = (text: string) => {
   ctx.fillStyle = '#e5ecff';
   ctx.fillText(text, 20, fontSize);
 
-  const texture = new THREE.CanvasTexture(canvas);
+  const texture = new CanvasTexture(canvas);
   texture.needsUpdate = true;
-  const material = new THREE.SpriteMaterial({
+  const material = new SpriteMaterial({
     map: texture,
     transparent: true,
     depthWrite: false,
   });
 
-  const sprite = new THREE.Sprite(material);
+  const sprite = new Sprite(material);
   sprite.userData.baseWidth = canvas.width / 30;
   sprite.userData.baseHeight = canvas.height / 30;
   sprite.scale.set(sprite.userData.baseWidth, sprite.userData.baseHeight, 1);
@@ -56,7 +67,7 @@ export const createOrbitingPlanets = (
   angleStore: Map<string, number>,
   planetLookup: Map<string, THREE.Object3D>,
 ) => {
-  const group = new THREE.Group();
+  const group = new Group();
   group.name = 'orbits';
   group.userData.systemId = systemId;
   group.visible = false;
@@ -68,17 +79,17 @@ export const createOrbitingPlanets = (
     const initialAngle =
       angleStore.get(planet.id) ?? Math.random() * Math.PI * 2;
     angleStore.set(planet.id, initialAngle);
-    const meshMaterial = new THREE.MeshStandardMaterial({
+    const meshMaterial = new MeshStandardMaterial({
       color: planet.color ?? orbitPalette[seed % orbitPalette.length],
     });
     const baseGeom =
       planetGeometryCache.get(planet.size) ??
       (() => {
-        const geom = new THREE.SphereGeometry(planet.size, 16, 16);
+        const geom = new SphereGeometry(planet.size, 16, 16);
         planetGeometryCache.set(planet.size, geom);
         return geom;
       })();
-    const planetMesh = new THREE.Mesh(baseGeom, meshMaterial);
+    const planetMesh = new Mesh(baseGeom, meshMaterial);
     planetMesh.raycast = () => null;
     const orbitSpeed = base * planet.orbitSpeed;
     planetMesh.userData = {
@@ -102,7 +113,7 @@ export const createOrbitingPlanets = (
     const ringGeometry =
       ringGeometryCache.get(ringKey) ??
       (() => {
-        const geom = new THREE.RingGeometry(
+        const geom = new RingGeometry(
           planet.orbitRadius - 0.1,
           planet.orbitRadius + 0.1,
           32,
@@ -110,11 +121,11 @@ export const createOrbitingPlanets = (
         ringGeometryCache.set(ringKey, geom);
         return geom;
       })();
-    const orbitRing = new THREE.Mesh(
+    const orbitRing = new Mesh(
       ringGeometry,
-      new THREE.MeshBasicMaterial({
+      new MeshBasicMaterial({
         color: '#345',
-        side: THREE.DoubleSide,
+        side: DoubleSide,
         transparent: true,
         opacity: 0.3,
       }),
