@@ -87,6 +87,17 @@ export const GalaxyMap = ({
   const planetAngleRef = useRef(new Map<string, number>());
   const planetLookupRef = useRef(new Map<string, THREE.Object3D>());
   const clockRef = useRef<THREE.Clock | null>(null);
+  const vectorPoolRef = useRef<THREE.Vector3[]>([]);
+
+  const getVector = () => {
+    const pool = vectorPoolRef.current;
+    return pool.pop() ?? new THREE.Vector3();
+  };
+
+  const releaseVector = (vec: THREE.Vector3) => {
+    vec.set(0, 0, 0);
+    vectorPoolRef.current.push(vec);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -385,10 +396,9 @@ export const GalaxyMap = ({
         const from = positions.get(ship.currentSystemId);
         const to = positions.get(ship.targetSystemId);
         if (from && to) {
-          const points = [
-            new THREE.Vector3(from.x, from.y, from.z + 0.5),
-            new THREE.Vector3(to.x, to.y, to.z + 0.5),
-          ];
+          const a = getVector().set(from.x, from.y, from.z + 0.5);
+          const b = getVector().set(to.x, to.y, to.z + 0.5);
+          const points = [a, b];
           const geometry = new THREE.BufferGeometry().setFromPoints(points);
           const lineMaterial =
             scienceLineMaterials[ship.status] ?? scienceLineMaterials.idle;
@@ -401,6 +411,8 @@ export const GalaxyMap = ({
           );
           targetMarker.position.set(to.x, to.y, to.z + 1.5);
           targetGroup.add(targetMarker);
+          releaseVector(a);
+          releaseVector(b);
         }
       }
     });
@@ -431,10 +443,9 @@ export const GalaxyMap = ({
         const from = positions.get(fleet.systemId);
         const to = positions.get(fleet.targetSystemId);
         if (from && to) {
-          const points = [
-            new THREE.Vector3(from.x, from.y, from.z + 0.2),
-            new THREE.Vector3(to.x, to.y, to.z + 0.2),
-          ];
+          const a = getVector().set(from.x, from.y, from.z + 0.2);
+          const b = getVector().set(to.x, to.y, to.z + 0.2);
+          const points = [a, b];
           const geometry = new THREE.BufferGeometry().setFromPoints(points);
           const line = new THREE.Line(
             geometry,
@@ -448,6 +459,8 @@ export const GalaxyMap = ({
           );
           targetMarker.position.set(to.x, to.y, to.z + 1.5);
           fleetTargetGroup.add(targetMarker);
+          releaseVector(a);
+          releaseVector(b);
         }
       }
     });
