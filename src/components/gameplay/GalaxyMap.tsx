@@ -89,6 +89,7 @@ export const GalaxyMap = ({
   const clockRef = useRef<THREE.Clock | null>(null);
   const vectorPoolRef = useRef<THREE.Vector3[]>([]);
   const matrixPoolRef = useRef<THREE.Matrix4[]>([]);
+  const systemsSignatureRef = useRef<string>('');
 
   const getVector = () => {
     const pool = vectorPoolRef.current;
@@ -109,6 +110,14 @@ export const GalaxyMap = ({
     m.identity();
     matrixPoolRef.current.push(m);
   };
+
+  const computeSystemsSignature = () =>
+    systems
+      .map(
+        (system) =>
+          `${system.id}:${system.visibility}:${system.ownerId ?? ''}:${system.hostilePower ?? 0}:${system.orbitingPlanets.length}`,
+      )
+      .join('|');
 
   useEffect(() => {
     const container = containerRef.current;
@@ -352,6 +361,12 @@ export const GalaxyMap = ({
     if (!group) {
       return;
     }
+
+    const signature = computeSystemsSignature();
+    if (systemsSignatureRef.current === signature) {
+      return;
+    }
+    systemsSignatureRef.current = signature;
 
     group.children.forEach((child) => {
       const orbit = child.getObjectByName('orbits') as THREE.Group | null;
