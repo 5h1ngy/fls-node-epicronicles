@@ -1,4 +1,4 @@
-import { GalaxyMap } from '@components/gameplay/GalaxyMap';
+import { GalaxyMap } from '@components/GalaxyMap';
 
 interface MapLayerProps {
   focusSystemId: string | null;

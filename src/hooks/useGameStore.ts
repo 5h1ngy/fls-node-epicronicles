@@ -1,7 +1,7 @@
 ﻿import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import { useMemo } from 'react';
-import type { AppDispatch, RootState } from './index';
+import type { AppDispatch, RootState } from '../store/index';
 import type {
   GameSession,
   PopulationJobId,
@@ -9,7 +9,7 @@ import type {
   ResearchBranch,
 } from '@domain/types';
 import type { GameConfig } from '@config/gameConfig';
-import type { GameView } from './slice/gameSlice';
+import type { GameView } from '../store/slice/gameSlice';
 import {
   startNewSession,
   returnToMenu,
@@ -37,8 +37,8 @@ import {
   beginResearch,
   unlockTraditionPerk,
   resolveActiveEvent,
-} from './thunks';
-export * from './selectors';
+} from '../store/thunks';
+export * from '../store/selectors';
 import type {
   StartSessionArgs,
   StartColonizationResult,
@@ -56,7 +56,7 @@ import type {
   StartResearchResult,
   UnlockTraditionResult,
   ResolveEventResult,
-} from './thunks';
+} from '../store/thunks';
 
 export const useAppDispatch: () => AppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

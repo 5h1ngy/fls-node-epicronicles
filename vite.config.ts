@@ -8,11 +8,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@store': path.resolve(__dirname, 'src/store'),
-      '@domain': path.resolve(__dirname, 'src/domain'),
+      '@domain': path.resolve(__dirname, 'src/engines'),
       '@components': path.resolve(__dirname, 'src/components'),
+      '@panels': path.resolve(__dirname, 'src/panels'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@shared': path.resolve(__dirname, 'src/shared'),
       '@config': path.resolve(__dirname, 'src/config'),
       '@assets': path.resolve(__dirname, 'src/assets'),
-      '@three': path.resolve(__dirname, 'src/three'),
+      '@three': path.resolve(__dirname, 'src/shared/three'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
     },
   },
   build: {

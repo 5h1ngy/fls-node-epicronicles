@@ -1,5 +1,5 @@
 import { ResourceBar } from './ResourceBar';
-import { useGameStore } from '../../store/gameStore';
+import { useGameStore } from '@store/gameStore';
 
 const speedOptions = [0.5, 1, 2, 4];
 

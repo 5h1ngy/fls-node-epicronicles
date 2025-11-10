@@ -2,15 +2,15 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PopulationJobId, StarSystem } from '@domain/types';
 import { useAppSelector, useGameStore } from '@store/gameStore';
-import { DraggablePanel } from '@components/ui/DraggablePanel';
-import { useGameLoop } from '../../utils/useGameLoop';
-import { DebugConsole } from '../debug/DebugConsole';
+import { DraggablePanel } from '@panels/shared/DraggablePanel';
+import { useGameLoop } from '@shared/useGameLoop';
+import { DebugConsole } from './DebugConsole';
 import { HudBottomBar } from './HudBottomBar';
 import { HudTopBar } from './HudTopBar';
 import { MapLayer } from './MapLayer';
 import { MapPanels } from './MapPanels';
-import { PlanetDetail } from './panels/PlanetDetail';
-import { useWarEvents } from './hooks/useWarEvents';
+import { PlanetDetail } from '@panels/PlanetDetail';
+import { useWarEvents } from '@hooks/useWarEvents';
 import {
   selectColonizedSystems,
   selectDistrictQueue,

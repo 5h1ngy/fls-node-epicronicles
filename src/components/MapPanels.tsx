@@ -1,33 +1,33 @@
-import { DraggablePanel } from '@components/ui/DraggablePanel';
-import { ColonyPanel } from './panels/ColonyPanel';
-import { GalaxyOverview } from './panels/GalaxyOverview';
-import { EconomyPanel } from './panels/EconomyPanel';
-import { DistrictQueuePanel } from './panels/DistrictQueuePanel';
-import { SciencePanel } from './panels/SciencePanel';
-import { SystemPanel } from './panels/SystemPanel';
+import { DraggablePanel } from '@panels/shared/DraggablePanel';
+import { ColonyPanel } from '@panels/ColonyPanel';
+import { GalaxyOverview } from '@panels/GalaxyOverview';
+import { EconomyPanel } from '@panels/EconomyPanel';
+import { DistrictQueuePanel } from '@panels/DistrictQueuePanel';
+import { SciencePanel } from '@panels/SciencePanel';
+import { SystemPanel } from '@panels/SystemPanel';
 import React, { Suspense, lazy } from 'react';
 import type { StarSystem } from '@domain/types';
 
 const FleetAndCombatPanel = lazy(() =>
-  import('./panels/FleetAndCombatPanel').then((m) => ({
+  import('@panels/FleetAndCombatPanel').then((m) => ({
     default: m.FleetAndCombatPanel,
   })),
 );
 const DiplomacyPanel = lazy(() =>
-  import('./panels/DiplomacyPanel').then((m) => ({
+  import('@panels/DiplomacyPanel').then((m) => ({
     default: m.DiplomacyPanel,
   })),
 );
 const ShipyardPanel = lazy(() =>
-  import('./panels/ShipyardPanel').then((m) => ({
+  import('@panels/ShipyardPanel').then((m) => ({
     default: m.ShipyardPanel,
   })),
 );
 const TechPanel = lazy(() =>
-  import('./panels/TechPanel').then((m) => ({ default: m.TechPanel })),
+  import('@panels/TechPanel').then((m) => ({ default: m.TechPanel })),
 );
 const EventPanel = lazy(() =>
-  import('./panels/EventPanel').then((m) => ({ default: m.EventPanel })),
+  import('@panels/EventPanel').then((m) => ({ default: m.EventPanel })),
 );
 
 interface MapPanelsProps {

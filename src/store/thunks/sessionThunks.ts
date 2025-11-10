@@ -35,7 +35,7 @@ const getSimulationWorker = () => {
     return simulationWorker;
   }
   simulationWorker = new Worker(
-    new URL('../../workers/simulationWorker.ts', import.meta.url),
+    new URL('../../shared/workers/simulationWorker.ts', import.meta.url),
     { type: 'module' },
   );
   simulationWorker.onmessage = (event: MessageEvent<SimulationWorkerMessage>) => {
@@ -170,7 +170,7 @@ export const advanceClockBy =
           ticksAdvanced,
           state.config,
         );
-      } catch (err) {
+      } catch {
         // fallback su main thread in caso di errore worker
         simulatedSession = advanceSimulation(session, ticksAdvanced, state.config);
       }

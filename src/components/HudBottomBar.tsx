@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useGameStore } from '../../store/gameStore';
+import { useGameStore } from '@store/gameStore';
 
 interface HudBottomBarProps {
   onToggleDebug: () => void;

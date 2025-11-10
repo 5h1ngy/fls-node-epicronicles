@@ -10,11 +10,15 @@
     "baseUrl": ".",
     "paths": {
       "@store/*": ["src/store/*"],
-      "@domain/*": ["src/domain/*"],
+      "@domain/*": ["src/engines/*"],
       "@components/*": ["src/components/*"],
+      "@panels/*": ["src/panels/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@shared/*": ["src/shared/*"],
       "@config/*": ["src/config/*"],
       "@assets/*": ["src/assets/*"],
-      "@three/*": ["src/three/*"]
+      "@three/*": ["src/shared/three/*"],
+      "@pages/*": ["src/pages/*"]
     },
 
     /* Bundler mode */

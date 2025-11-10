@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useGameStore } from '@store/gameStore';
 import type { StarSystem } from '@domain/types';
@@ -111,13 +111,16 @@ export const GalaxyMap = ({
     matrixPoolRef.current.push(m);
   };
 
-  const computeSystemsSignature = () =>
-    systems
-      .map(
-        (system) =>
-          `${system.id}:${system.visibility}:${system.ownerId ?? ''}:${system.hostilePower ?? 0}:${system.orbitingPlanets.length}`,
-      )
-      .join('|');
+  const systemsSignature = useMemo(
+    () =>
+      systems
+        .map(
+          (system) =>
+            `${system.id}:${system.visibility}:${system.ownerId ?? ''}:${system.hostilePower ?? 0}:${system.orbitingPlanets.length}`,
+        )
+        .join('|'),
+    [systems],
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -362,7 +365,7 @@ export const GalaxyMap = ({
       return;
     }
 
-    const signature = computeSystemsSignature();
+    const signature = systemsSignature;
     if (systemsSignatureRef.current === signature) {
       return;
     }
@@ -459,7 +462,7 @@ export const GalaxyMap = ({
     const fleetTargetGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
 
     (['idle', 'war'] as const).forEach((status) => {
-      const list = fleets.filter((fleet) =>
+      const list = fleets.filter(() =>
         status === 'war' ? empireWar : !empireWar,
       );
       if (list.length === 0) {
@@ -512,8 +515,8 @@ export const GalaxyMap = ({
     empireWar,
     recentCombatSystems,
     activeBattles,
+    systemsSignature,
   ]);
 
   return <div className="galaxy-map" ref={containerRef} />;
 };
-

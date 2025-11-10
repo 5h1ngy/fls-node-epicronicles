@@ -65,8 +65,7 @@ export interface TraditionConfig {
   pointsPerInfluenceIncome: number;
 }
 
-export interface EventDefinition
-  extends Omit<GameEvent, 'systemId' | 'resolvedOptionId'> {}
+export type EventDefinition = Omit<GameEvent, 'systemId' | 'resolvedOptionId'>;
 
 export interface EventsConfig {
   narrative: EventDefinition[];

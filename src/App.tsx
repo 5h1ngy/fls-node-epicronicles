@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import '../../index.css';
-import { GameScreen } from '@components/gameplay/GameScreen';
-import { MainMenu } from '../menu/MainMenu';
+import './index.css';
+import { GameScreen } from '@components/GameScreen';
+import { MainMenu } from '@pages/MainMenu';
 import { useGameStore } from '@store/gameStore';
 
-export const AppShell = () => {
+export const App = () => {
   const view = useGameStore((state) => state.view);
   const autoStart = useGameStore((state) => state.config.debug.autoStart);
   const hasSession = useGameStore((state) => Boolean(state.session));
