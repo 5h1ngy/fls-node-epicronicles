@@ -29,11 +29,6 @@ const statusLabels: Record<ColonizationStatus, string> = {
   traveling: 'In viaggio',
   colonizing: 'Insediamento',
 };
-const statusBadgeClass: Record<ColonizationStatus, string> = {
-  preparing: 'is-preparing',
-  traveling: 'is-traveling',
-  colonizing: 'is-colonizing',
-};
 
 interface ColonyPanelProps {
   onSelectPlanet: (planetId: string, systemId: string) => void;
@@ -100,29 +95,15 @@ const ColonyPanelComponent = ({
     }
   };
 
-  const missionProgressPercent = (task: ColonizationTask) => {
-    if (task.missionTotalTicks <= 0) {
-      return 0;
-    }
-    return Math.round(
-      Math.min(1, task.missionElapsedTicks / task.missionTotalTicks) * 100,
-    );
-  };
-
-  const stageProgressLabel = (task: ColonizationTask) => {
-    if (task.totalTicks <= 0) {
-      return '0/0 tick';
-    }
-    const completed = Math.max(0, task.totalTicks - task.ticksRemaining);
-    return `${completed}/${task.totalTicks} tick`;
-  };
-
   return (
     <section className="colony-panel">
       <div className="panel-section">
         <div className="panel-section__header">
           <h3>Colonie attive</h3>
         </div>
+        <p className="text-muted">
+          Monitora le missioni dal pannello &quot;Missioni in corso&quot; nella barra laterale.
+        </p>
         {planets.length === 0 ? (
           <p className="text-muted">Nessuna colonia attiva.</p>
         ) : (
@@ -139,47 +120,6 @@ const ColonyPanelComponent = ({
                 </button>
               </li>
             ))}
-          </ul>
-        )}
-      </div>
-      <div className="panel-section">
-        <div className="panel-section__header">
-          <h3>Missioni in corso</h3>
-        </div>
-              {colonizationTasks.length === 0 ? (
-                <p className="text-muted">Nessuna missione attiva.</p>
-              ) : (
-                <ul>
-                  {colonizationTasks.map((task) => {
-                    const system = systems.find((entry) => entry.id === task.systemId);
-                    const missionProgress = missionProgressPercent(task);
-                    return (
-                      <li key={task.id}>
-                        <div className="colonization-row">
-                          <div>
-                            <strong>{system?.name ?? task.systemId}</strong>
-                            <span className="colonization-mission__status">
-                              <span
-                                className={`colonization-status ${statusBadgeClass[task.status]}`}
-                              >
-                                {statusLabels[task.status]}
-                              </span>
-                              {stageProgressLabel(task)}
-                            </span>
-                          </div>
-                          <span className="colonization-mission__ticks">
-                            {missionProgress}% missione
-                          </span>
-                  </div>
-                  <div className="colonization-progress">
-                    <div
-                      className="colonization-progress__bar"
-                      style={{ width: `${missionProgress}%` }}
-                    />
-                  </div>
-                </li>
-              );
-            })}
           </ul>
         )}
       </div>

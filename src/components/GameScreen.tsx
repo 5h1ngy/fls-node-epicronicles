@@ -11,6 +11,8 @@ import { MapLayer } from './MapLayer';
 import { MapPanels } from './MapPanels';
 import { PlanetDetail } from '@panels/PlanetDetail';
 import { useWarEvents } from '@hooks/useWarEvents';
+import { MissionsPanel } from '@panels/MissionsPanel';
+import { SideDock } from './SideDock';
 import {
   selectColonizedSystems,
   selectDistrictQueue,
@@ -51,6 +53,8 @@ export const GameScreen = () => {
   const [districtMessage, setDistrictMessage] = useState<string | null>(null);
   const [populationMessage, setPopulationMessage] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [missionsOpen, setMissionsOpen] = useState(false);
   const focusedSessionRef = useRef<string | null>(null);
   const warEventsRef = useRef<HTMLUListElement | null>(null);
   const {
@@ -119,6 +123,8 @@ export const GameScreen = () => {
     typeof window !== 'undefined' ? window.innerWidth : 1200;
   const viewportHeight =
     typeof window !== 'undefined' ? window.innerHeight : 800;
+  const dockWidth = sidebarOpen ? 240 : 76;
+  const panelOffset = dockWidth + 12;
   if (!session) {
     return (
       <div className="game-layout">
@@ -209,6 +215,11 @@ export const GameScreen = () => {
   return (
     <div className="game-layout">
       <HudTopBar />
+      <SideDock
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen((value) => !value)}
+        onOpenMissions={() => setMissionsOpen(true)}
+      />
       <MapLayer
         focusSystemId={focusSystemId}
         focusPlanetId={focusPlanetId}
@@ -250,6 +261,7 @@ export const GameScreen = () => {
       <div className="floating-panels">
         <MapPanels
           focusSystemId={focusSystemId}
+          leftOffset={panelOffset}
           viewportWidth={viewportWidth}
           viewportHeight={viewportHeight}
           warEventsRef={warEventsRef}
@@ -270,6 +282,18 @@ export const GameScreen = () => {
         closeShipyard={closeShipyardPanel}
         setFocusPlanetId={setFocusPlanetId}
       />
+        {missionsOpen ? (
+          <DraggablePanel
+            title="Missioni in corso"
+            initialX={Math.max(40, viewportWidth / 2 - 340)}
+            initialY={Math.max(60, viewportHeight / 2 - 240)}
+            initialWidth={680}
+            initialHeight={520}
+            onClose={() => setMissionsOpen(false)}
+          >
+            <MissionsPanel />
+          </DraggablePanel>
+        ) : null}
         {debugOpen ? (
           <div className="debug-modal">
             <div className="debug-modal__header">

@@ -32,6 +32,7 @@ const EventPanel = lazy(() =>
 
 interface MapPanelsProps {
   focusSystemId: string | null;
+  leftOffset: number;
   viewportWidth: number;
   viewportHeight: number;
   warEventsRef: React.RefObject<HTMLUListElement | null>;
@@ -47,6 +48,7 @@ interface MapPanelsProps {
 
 export const MapPanels = ({
   focusSystemId,
+  leftOffset,
   viewportWidth,
   viewportHeight,
   warEventsRef,
@@ -62,7 +64,7 @@ export const MapPanels = ({
   <div className="floating-panels">
     <DraggablePanel
       title="Colonie"
-      initialX={12}
+      initialX={leftOffset}
       initialY={80}
       initialHeight={320}
       initialWidth={320}
@@ -74,7 +76,7 @@ export const MapPanels = ({
     </DraggablePanel>
     <DraggablePanel
       title="Panoramica galassia"
-      initialX={12}
+      initialX={leftOffset}
       initialY={340}
       initialWidth={360}
       initialHeight={280}
@@ -83,7 +85,7 @@ export const MapPanels = ({
     </DraggablePanel>
     <DraggablePanel
       title="Bilancio economico"
-      initialX={12}
+      initialX={leftOffset}
       initialY={640}
       initialWidth={320}
       initialHeight={260}
