@@ -15,6 +15,7 @@ import { MissionsPanel } from '@panels/MissionsPanel';
 import { SideDock } from './SideDock';
 import { DiplomacyPanel } from '@panels/DiplomacyPanel';
 import { EconomyPanel } from '@panels/EconomyPanel';
+import { EventPanel } from '@panels/EventPanel';
 import {
   selectColonizedSystems,
   selectDistrictQueue,
@@ -56,6 +57,7 @@ export const GameScreen = () => {
   const [populationMessage, setPopulationMessage] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
   const [missionsOpen, setMissionsOpen] = useState(false);
+  const [eventsOpen, setEventsOpen] = useState(false);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
   const [economyOpen, setEconomyOpen] = useState(false);
   const focusedSessionRef = useRef<string | null>(null);
@@ -220,6 +222,7 @@ export const GameScreen = () => {
       <HudTopBar />
       <SideDock
         onOpenMissions={() => setMissionsOpen(true)}
+        onOpenEvents={() => setEventsOpen(true)}
         onOpenDiplomacy={() => setDiplomacyOpen(true)}
         onOpenEconomy={() => setEconomyOpen(true)}
       />
@@ -295,6 +298,18 @@ export const GameScreen = () => {
             onClose={() => setMissionsOpen(false)}
           >
             <MissionsPanel />
+          </DraggablePanel>
+        ) : null}
+        {eventsOpen ? (
+          <DraggablePanel
+            title="Eventi & Anomalie"
+            initialX={Math.max(40, viewportWidth / 2 - 360)}
+            initialY={Math.max(60, viewportHeight / 2 - 260)}
+            initialWidth={720}
+            initialHeight={520}
+            onClose={() => setEventsOpen(false)}
+          >
+            <EventPanel />
           </DraggablePanel>
         ) : null}
         {diplomacyOpen ? (

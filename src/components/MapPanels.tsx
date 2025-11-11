@@ -20,9 +20,6 @@ const ShipyardPanel = lazy(() =>
 const TechPanel = lazy(() =>
   import('@panels/TechPanel').then((m) => ({ default: m.TechPanel })),
 );
-const EventPanel = lazy(() =>
-  import('@panels/EventPanel').then((m) => ({ default: m.EventPanel })),
-);
 
 interface MapPanelsProps {
   focusSystemId: string | null;
@@ -130,17 +127,6 @@ export const MapPanels = ({
     >
       <Suspense fallback={<p className="text-muted">Caricamento...</p>}>
         <TechPanel />
-      </Suspense>
-    </DraggablePanel>
-    <DraggablePanel
-      title="Eventi & Anomalie"
-      initialX={Math.max(12, viewportWidth - 320)}
-      initialY={Math.max(120, viewportHeight - 380)}
-      initialWidth={340}
-      initialHeight={320}
-    >
-      <Suspense fallback={<p className="text-muted">Caricamento...</p>}>
-        <EventPanel />
       </Suspense>
     </DraggablePanel>
     {shipyardSystem ? (

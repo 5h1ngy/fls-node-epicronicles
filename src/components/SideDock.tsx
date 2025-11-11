@@ -1,11 +1,13 @@
 interface SideDockProps {
   onOpenMissions: () => void;
+  onOpenEvents: () => void;
   onOpenDiplomacy: () => void;
   onOpenEconomy: () => void;
 }
 
 export const SideDock = ({
   onOpenMissions,
+  onOpenEvents,
   onOpenDiplomacy,
   onOpenEconomy,
 }: SideDockProps) => (
@@ -19,6 +21,15 @@ export const SideDock = ({
         data-tooltip="Missioni in corso"
       >
         🛰️
+      </button>
+      <button
+        type="button"
+        className="side-dock__btn"
+        onClick={onOpenEvents}
+        aria-label="Eventi e anomalie"
+        data-tooltip="Eventi e anomalie"
+      >
+        ✧
       </button>
       <button
         type="button"
