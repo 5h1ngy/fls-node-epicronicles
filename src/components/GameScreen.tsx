@@ -53,7 +53,6 @@ export const GameScreen = () => {
   const [districtMessage, setDistrictMessage] = useState<string | null>(null);
   const [populationMessage, setPopulationMessage] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [missionsOpen, setMissionsOpen] = useState(false);
   const focusedSessionRef = useRef<string | null>(null);
   const warEventsRef = useRef<HTMLUListElement | null>(null);
@@ -123,7 +122,7 @@ export const GameScreen = () => {
     typeof window !== 'undefined' ? window.innerWidth : 1200;
   const viewportHeight =
     typeof window !== 'undefined' ? window.innerHeight : 800;
-  const dockWidth = sidebarOpen ? 240 : 76;
+  const dockWidth = 76;
   const panelOffset = dockWidth + 12;
   if (!session) {
     return (
@@ -216,8 +215,6 @@ export const GameScreen = () => {
     <div className="game-layout">
       <HudTopBar />
       <SideDock
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen((value) => !value)}
         onOpenMissions={() => setMissionsOpen(true)}
       />
       <MapLayer
