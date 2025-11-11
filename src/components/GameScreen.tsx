@@ -13,6 +13,7 @@ import { PlanetDetail } from '@panels/PlanetDetail';
 import { useWarEvents } from '@hooks/useWarEvents';
 import { MissionsPanel } from '@panels/MissionsPanel';
 import { SideDock } from './SideDock';
+import { DiplomacyPanel } from '@panels/DiplomacyPanel';
 import {
   selectColonizedSystems,
   selectDistrictQueue,
@@ -54,6 +55,7 @@ export const GameScreen = () => {
   const [populationMessage, setPopulationMessage] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
   const [missionsOpen, setMissionsOpen] = useState(false);
+  const [diplomacyOpen, setDiplomacyOpen] = useState(false);
   const focusedSessionRef = useRef<string | null>(null);
   const warEventsRef = useRef<HTMLUListElement | null>(null);
   const {
@@ -216,6 +218,7 @@ export const GameScreen = () => {
       <HudTopBar />
       <SideDock
         onOpenMissions={() => setMissionsOpen(true)}
+        onOpenDiplomacy={() => setDiplomacyOpen(true)}
       />
       <MapLayer
         focusSystemId={focusSystemId}
@@ -289,6 +292,18 @@ export const GameScreen = () => {
             onClose={() => setMissionsOpen(false)}
           >
             <MissionsPanel />
+          </DraggablePanel>
+        ) : null}
+        {diplomacyOpen ? (
+          <DraggablePanel
+            title="Diplomazia"
+            initialX={Math.max(40, viewportWidth / 2 - 360)}
+            initialY={Math.max(60, viewportHeight / 2 - 260)}
+            initialWidth={720}
+            initialHeight={520}
+            onClose={() => setDiplomacyOpen(false)}
+          >
+            <DiplomacyPanel />
           </DraggablePanel>
         ) : null}
         {debugOpen ? (

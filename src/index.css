@@ -1436,6 +1436,12 @@ body {
   background: rgba(127, 227, 143, 0.08);
 }
 
+.pill--alert {
+  border-color: rgba(255, 158, 128, 0.8);
+  color: #ffc6b0;
+  background: rgba(255, 158, 128, 0.1);
+}
+
 .missions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -1506,4 +1512,131 @@ body {
   justify-content: space-between;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.75);
+}
+
+.diplomacy-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.diplomacy-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.diplomacy-panel__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.diplomacy-panel__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.diplomacy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.diplomacy-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem;
+  background: radial-gradient(circle at 18% 18%, rgba(120, 150, 255, 0.08), rgba(255, 255, 255, 0.02));
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.diplomacy-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.diplomacy-card__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.diplomacy-status {
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-peace {
+  border-color: rgba(127, 227, 143, 0.7);
+  color: #a6f0b3;
+}
+
+.status-war {
+  border-color: rgba(255, 140, 120, 0.8);
+  color: #ffc1b3;
+}
+
+.diplomacy-card__sentiment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  font-size: 0.8rem;
+}
+
+.sentiment-badge {
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+}
+
+.sentiment-positive {
+  border-color: rgba(127, 227, 143, 0.7);
+  color: #a6f0b3;
+}
+
+.sentiment-neutral {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sentiment-negative {
+  border-color: rgba(255, 158, 128, 0.8);
+  color: #ffc6b0;
+}
+
+.diplomacy-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.diplomacy-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.diplomacy-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }

@@ -13,11 +13,6 @@ const FleetAndCombatPanel = lazy(() =>
     default: m.FleetAndCombatPanel,
   })),
 );
-const DiplomacyPanel = lazy(() =>
-  import('@panels/DiplomacyPanel').then((m) => ({
-    default: m.DiplomacyPanel,
-  })),
-);
 const ShipyardPanel = lazy(() =>
   import('@panels/ShipyardPanel').then((m) => ({
     default: m.ShipyardPanel,
@@ -134,17 +129,6 @@ export const MapPanels = ({
           unreadWarIds={unreadWarIds}
           onMarkWarRead={onMarkWarRead}
         />
-      </Suspense>
-    </DraggablePanel>
-    <DraggablePanel
-      title="Diplomazia"
-      initialX={Math.max(12, viewportWidth - 640)}
-      initialY={360}
-      initialWidth={300}
-      initialHeight={220}
-    >
-      <Suspense fallback={<p className="text-muted">Caricamento...</p>}>
-        <DiplomacyPanel />
       </Suspense>
     </DraggablePanel>
     <DraggablePanel
