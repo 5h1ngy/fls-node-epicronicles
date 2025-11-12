@@ -1,6 +1,5 @@
 import { DraggablePanel } from '@panels/shared/DraggablePanel';
 import { ColonyPanel } from '@panels/ColonyPanel';
-import { GalaxyOverview } from '@panels/GalaxyOverview';
 import { DistrictQueuePanel } from '@panels/DistrictQueuePanel';
 import { SciencePanel } from '@panels/SciencePanel';
 import { SystemPanel } from '@panels/SystemPanel';
@@ -61,15 +60,6 @@ export const MapPanels = ({
         onSelectPlanet={onSelectPlanet}
         onFocusSystem={onFocusSystem}
       />
-    </DraggablePanel>
-    <DraggablePanel
-      title="Panoramica galassia"
-      initialX={leftOffset}
-      initialY={340}
-      initialWidth={360}
-      initialHeight={280}
-    >
-      <GalaxyOverview onFocusSystem={onFocusSystem} />
     </DraggablePanel>
     <DraggablePanel
       title="Coda distretti"
