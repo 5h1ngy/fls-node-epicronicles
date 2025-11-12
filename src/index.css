@@ -1082,6 +1082,15 @@ body {
   background: rgba(2, 5, 12, 0.9);
 }
 
+.debug-json {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.82rem;
+  color: #e9eefa;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  padding: 0.5rem;
+}
+
 .combat-log__header {
   display: flex;
   justify-content: space-between;
