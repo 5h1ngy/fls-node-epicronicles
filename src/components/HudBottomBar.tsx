@@ -1,5 +1,19 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useGameStore } from '@store/gameStore';
+import {
+  Clock3,
+  Activity,
+  Globe2,
+  ScanEye,
+  Satellite,
+  ShieldHalf,
+  FlaskConical,
+  Swords,
+  Save,
+  Upload,
+  Bug,
+  LogOut,
+} from 'lucide-react';
 
 interface HudBottomBarProps {
   onToggleDebug: () => void;
@@ -21,169 +35,142 @@ export const HudBottomBar = ({
   const loadSession = useGameStore((state) => state.loadSession);
   const hasSavedSession = useGameStore((state) => state.hasSavedSession);
 
-  if (!session) {
+  const stats = useMemo(() => {
+    if (!session) return null;
+    const { clock, galaxy, scienceShips, empires } = session;
+    const revealedCount = galaxy.systems.filter(
+      (system) => system.visibility !== 'unknown',
+    ).length;
+    const surveyedCount = galaxy.systems.filter(
+      (system) => system.visibility === 'surveyed',
+    ).length;
+    const ownedSystems = galaxy.systems.filter(
+      (system) => system.ownerId === 'player',
+    ).length;
+    const activeWars = empires.filter(
+      (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
+    );
+    return [
+      {
+        icon: Clock3,
+        label: 'Tick',
+        desc: 'Tick di simulazione',
+        value: clock.tick,
+      },
+      {
+        icon: Activity,
+        label: 'Status',
+        desc: 'Stato simulazione',
+        value: clock.isRunning ? 'Running' : 'Paused',
+      },
+      {
+        icon: Globe2,
+        label: 'Sistemi',
+        desc: 'Totale sistemi generati',
+        value: galaxy.systems.length,
+      },
+      {
+        icon: ScanEye,
+        label: 'Rivelati',
+        desc: 'Sistemi rivelati',
+        value: `${revealedCount}/${galaxy.systems.length}`,
+      },
+      {
+        icon: Satellite,
+        label: 'Sondati',
+        desc: 'Sistemi sondati',
+        value: `${surveyedCount}/${galaxy.systems.length}`,
+      },
+      {
+        icon: ShieldHalf,
+        label: 'Controllati',
+        desc: 'Sistemi controllati',
+        value: ownedSystems,
+      },
+      {
+        icon: FlaskConical,
+        label: 'Navi scientifiche',
+        desc: 'Flotta di ricerca',
+        value: scienceShips.length,
+      },
+      {
+        icon: Swords,
+        label: 'Guerre',
+        desc: 'Conflitti attivi',
+        value: activeWars.length,
+      },
+    ];
+  }, [session]);
+
+  if (!session || !stats) {
     return null;
   }
 
-  const { clock, galaxy, scienceShips, notifications, empires } = session;
-  const revealedCount = galaxy.systems.filter(
-    (system) => system.visibility !== 'unknown',
-  ).length;
-  const surveyedCount = galaxy.systems.filter(
-    (system) => system.visibility === 'surveyed',
-  ).length;
-  const visibleNotifications = notifications.slice(-2).reverse();
-  const activeWars = empires.filter(
-    (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
-  );
-  const latestWarEvent =
-    session.warEvents.length > 0
-      ? session.warEvents[session.warEvents.length - 1]
-      : null;
-  const ownedSystems = galaxy.systems.filter(
-    (system) => system.ownerId === 'player',
-  ).length;
-  const warLabels = activeWars
-    .map((empire) => {
-      const duration =
-        empire.warSince !== undefined && empire.warSince !== null
-          ? ` ${Math.max(0, clock.tick - empire.warSince)}t`
-          : '';
-      return `${empire.name}${duration}`;
-    })
-    .slice(0, 3);
-  const hasWarEvent =
-    notifications.find((notif) => notif.kind === 'warDeclared' || notif.kind === 'peaceAccepted') !==
-    undefined;
+  const actions = [
+    {
+      icon: Save,
+      label: 'Salva',
+      desc: 'Salva la sessione',
+      onClick: () => {
+        const result = saveSession();
+        setSaveMessage(result.success ? 'Partita salvata.' : 'Salvataggio non riuscito.');
+      },
+      disabled: false,
+    },
+    {
+      icon: Upload,
+      label: 'Carica',
+      desc: 'Carica salvataggio',
+      onClick: () => {
+        const result = loadSession();
+        setSaveMessage(result.success ? 'Partita caricata.' : 'Caricamento non riuscito.');
+      },
+      disabled: !hasSavedSession(),
+    },
+    {
+      icon: Bug,
+      label: 'Debug',
+      desc: debugOpen ? 'Nascondi debug' : 'Apri debug',
+      onClick: onToggleDebug,
+      disabled: false,
+    },
+    {
+      icon: LogOut,
+      label: 'Esci',
+      desc: 'Torna al menu',
+      onClick: returnToMenu,
+      disabled: false,
+    },
+  ];
 
   return (
     <div className="hud-bottom-bar">
-      <div>
-        <dt>Tick</dt>
-        <dd>{clock.tick}</dd>
+      <div className="hud-bottom-bar__stats">
+        {stats.map(({ icon: Icon, label, desc, value }) => (
+          <div key={label} className="hud-stat" data-tooltip={`${label}: ${desc}`}>
+            <Icon size={16} />
+            <div className="hud-stat__value">{value}</div>
+          </div>
+        ))}
       </div>
-      <div>
-        <dt>Status</dt>
-        <dd>{clock.isRunning ? 'Running' : 'Paused'}</dd>
-      </div>
-      <div>
-        <dt>Sistemi</dt>
-        <dd>{galaxy.systems.length}</dd>
-      </div>
-      <div>
-        <dt>Rivelati</dt>
-        <dd>
-          {revealedCount}/{galaxy.systems.length}
-        </dd>
-      </div>
-      <div>
-        <dt>Sondati</dt>
-        <dd>
-          {surveyedCount}/{galaxy.systems.length}
-        </dd>
-      </div>
-      <div>
-        <dt>Controllati</dt>
-        <dd>{ownedSystems}</dd>
-      </div>
-      <div>
-        <dt>Navi scientifiche</dt>
-        <dd>{scienceShips.length}</dd>
-      </div>
-      <div>
-        <dt>Guerre</dt>
-        <dd>{activeWars.length}</dd>
-      </div>
-      {warLabels.length > 0 ? (
-        <div className="hud-bottom-bar__wars">
-          <strong>Conflitti:</strong>
-          {warLabels.map((label) => (
-            <span key={label} className="hud-war-chip">
-              {label}
-            </span>
-          ))}
-          {activeWars.length > warLabels.length ? (
-            <span className="text-muted">+{activeWars.length - warLabels.length}</span>
-          ) : null}
-          {hasWarEvent ? <span className="hud-war-chip hud-war-chip--alert">!</span> : null}
-          {onShowWars ? (
-            <button
-              className="panel__action panel__action--inline panel__action--compact"
-              onClick={onShowWars}
-            >
-              Journal
-            </button>
-          ) : null}
-          {warUnread > 0 ? (
-            <span className="hud-war-chip hud-war-chip--alert" title="Eventi guerra non letti">
-              {warUnread}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      {latestWarEvent ? (
-        <div className="hud-bottom-bar__wars">
-          <strong>Ultimo evento:</strong>
-          <span className="hud-war-chip">
-            {latestWarEvent.message} (t{latestWarEvent.tick})
-          </span>
-        </div>
-      ) : null}
-      {visibleNotifications.length > 0 ? (
-        <div className="hud-bottom-bar__notifications">
-          {visibleNotifications.map((notification) => (
-            <div
-              key={notification.id}
-              className={`hud-notification hud-notification--${notification.kind}`}
-            >
-              <strong>Tick {notification.tick}</strong>
-              <span>{notification.message}</span>
-            </div>
-          ))}
-        </div>
-      ) : null}
       <div className="hud-bottom-bar__actions">
-        <button
-          className="panel__action panel__action--inline panel__action--compact"
-          onClick={() => {
-            const result = saveSession();
-            setSaveMessage(
-              result.success
-                ? 'Partita salvata.'
-                : 'Salvataggio non riuscito.',
-            );
-          }}
-        >
-          Save
-        </button>
-        <button
-          className="panel__action panel__action--inline panel__action--compact"
-          onClick={() => {
-            const result = loadSession();
-            setSaveMessage(
-              result.success
-                ? 'Partita caricata.'
-                : 'Caricamento non riuscito.',
-            );
-          }}
-          disabled={!hasSavedSession()}
-        >
-          Load
-        </button>
-        <button
-          className="panel__action panel__action--inline panel__action--compact"
-          onClick={onToggleDebug}
-        >
-          {debugOpen ? 'Hide debug' : 'Debug'}
-        </button>
-        <button
-          className="panel__action panel__action--inline panel__action--compact"
-          onClick={returnToMenu}
-        >
-          Quit to menu
-        </button>
-        {saveMessage ? (
-          <span className="text-muted">{saveMessage}</span>
+        {actions.map(({ icon: Icon, label, desc, onClick, disabled }) => (
+          <button
+            key={label}
+            className="hud-icon-btn"
+            onClick={onClick}
+            disabled={disabled}
+            data-tooltip={`${label} – ${desc}`}
+            aria-label={label}
+          >
+            <Icon size={16} />
+          </button>
+        ))}
+        {saveMessage ? <span className="text-muted">{saveMessage}</span> : null}
+        {onShowWars && warUnread > 0 ? (
+          <span className="hud-war-chip hud-war-chip--alert" title="Eventi guerra non letti">
+            {warUnread}
+          </span>
         ) : null}
       </div>
     </div>
