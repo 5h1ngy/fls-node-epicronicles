@@ -303,10 +303,10 @@ export const GameScreen = () => {
         {missionsOpen ? (
           <DraggablePanel
             title="Missioni in corso"
-            initialX={Math.max(40, viewportWidth / 2 - 340)}
-            initialY={Math.max(60, viewportHeight / 2 - 240)}
-            initialWidth={680}
-            initialHeight={520}
+            initialX={Math.max(40, viewportWidth / 2 - 380)}
+            initialY={Math.max(40, viewportHeight / 2 - 280)}
+            initialWidth={840}
+            initialHeight={620}
             onClose={() => setMissionsOpen(false)}
           >
             <MissionsPanel />
@@ -315,10 +315,10 @@ export const GameScreen = () => {
         {eventsOpen ? (
           <DraggablePanel
             title="Eventi & Anomalie"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={720}
-            initialHeight={520}
+            initialX={Math.max(40, viewportWidth / 2 - 400)}
+            initialY={Math.max(40, viewportHeight / 2 - 300)}
+            initialWidth={880}
+            initialHeight={640}
             onClose={() => setEventsOpen(false)}
           >
             <EventPanel />
@@ -327,10 +327,10 @@ export const GameScreen = () => {
         {diplomacyOpen ? (
           <DraggablePanel
             title="Diplomazia"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={720}
-            initialHeight={520}
+            initialX={Math.max(40, viewportWidth / 2 - 400)}
+            initialY={Math.max(40, viewportHeight / 2 - 300)}
+            initialWidth={880}
+            initialHeight={640}
             onClose={() => setDiplomacyOpen(false)}
           >
             <DiplomacyPanel />
@@ -339,10 +339,10 @@ export const GameScreen = () => {
         {economyOpen ? (
           <DraggablePanel
             title="Bilancio economico"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={720}
-            initialHeight={520}
+            initialX={Math.max(40, viewportWidth / 2 - 400)}
+            initialY={Math.max(40, viewportHeight / 2 - 300)}
+            initialWidth={880}
+            initialHeight={640}
             onClose={() => setEconomyOpen(false)}
           >
             <EconomyPanel />
@@ -351,10 +351,10 @@ export const GameScreen = () => {
         {researchOpen ? (
           <DraggablePanel
             title="Ricerca & Tradizioni"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={720}
-            initialHeight={520}
+            initialX={Math.max(40, viewportWidth / 2 - 400)}
+            initialY={Math.max(40, viewportHeight / 2 - 300)}
+            initialWidth={880}
+            initialHeight={640}
             onClose={() => setResearchOpen(false)}
           >
             <TechPanel />
@@ -363,10 +363,10 @@ export const GameScreen = () => {
         {galaxyOpen ? (
           <DraggablePanel
             title="Panoramica galassia"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={760}
-            initialHeight={560}
+            initialX={Math.max(40, viewportWidth / 2 - 420)}
+            initialY={Math.max(40, viewportHeight / 2 - 320)}
+            initialWidth={900}
+            initialHeight={680}
             onClose={() => setGalaxyOpen(false)}
           >
             <GalaxyOverview
@@ -381,10 +381,10 @@ export const GameScreen = () => {
         {colonizationOpen ? (
           <DraggablePanel
             title="Colonizzazione"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={760}
-            initialHeight={560}
+            initialX={Math.max(40, viewportWidth / 2 - 420)}
+            initialY={Math.max(40, viewportHeight / 2 - 320)}
+            initialWidth={900}
+            initialHeight={680}
             onClose={() => setColonizationOpen(false)}
           >
             <ColonizationPanel
@@ -399,10 +399,10 @@ export const GameScreen = () => {
         {battlesOpen ? (
           <DraggablePanel
             title="Flotte & Battaglie"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={760}
-            initialHeight={560}
+            initialX={Math.max(40, viewportWidth / 2 - 420)}
+            initialY={Math.max(40, viewportHeight / 2 - 320)}
+            initialWidth={900}
+            initialHeight={680}
             onClose={() => setBattlesOpen(false)}
           >
             <BattlesPanel
@@ -415,10 +415,10 @@ export const GameScreen = () => {
         {logOpen ? (
           <DraggablePanel
             title="Log eventi"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(60, viewportHeight / 2 - 260)}
-            initialWidth={760}
-            initialHeight={560}
+            initialX={Math.max(40, viewportWidth / 2 - 420)}
+            initialY={Math.max(40, viewportHeight / 2 - 320)}
+            initialWidth={900}
+            initialHeight={680}
             onClose={() => setLogOpen(false)}
           >
             <LogPanel />
@@ -427,10 +427,10 @@ export const GameScreen = () => {
         {debugModalOpen ? (
           <DraggablePanel
             title="Console debug"
-            initialX={Math.max(40, viewportWidth / 2 - 360)}
-            initialY={Math.max(40, viewportHeight / 2 - 280)}
-            initialWidth={760}
-            initialHeight={560}
+            initialX={Math.max(40, viewportWidth / 2 - 420)}
+            initialY={Math.max(40, viewportHeight / 2 - 320)}
+            initialWidth={900}
+            initialHeight={680}
             onClose={() => setDebugModalOpen(false)}
           >
             <DebugConsole />
