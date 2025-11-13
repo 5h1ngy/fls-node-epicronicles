@@ -1,11 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { ReactElement } from 'react';
 import { useGameStore } from '@store/gameStore';
 
 export const DebugConsole = () => {
   const session = useGameStore((state) => state.session);
-
-  const rawData = useMemo(() => session ?? null, [session]);
+  const rawData = session ?? null;
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     root: true,
   });
