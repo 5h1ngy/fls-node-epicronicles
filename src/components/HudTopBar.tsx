@@ -1,4 +1,4 @@
-import { Pause, Play, Gauge } from 'lucide-react';
+import { Pause, Play, Gauge, Clock3, Activity, PauseCircle } from 'lucide-react';
 import { ResourceBar } from './ResourceBar';
 import { useGameStore } from '@store/gameStore';
 
@@ -16,6 +16,8 @@ export const HudTopBar = () => {
   }
 
   const { clock } = session;
+  const StatusIcon = clock.isRunning ? Activity : PauseCircle;
+  const statusLabel = clock.isRunning ? 'Running' : 'Paused';
 
   return (
     <div className="hud-top-bar">
@@ -23,6 +25,19 @@ export const HudTopBar = () => {
         <ResourceBar />
       </div>
       <div className="hud-top-bar__right">
+        <div className="hud-top-bar__meta">
+          <div className="hud-chip" data-tooltip="Tick di simulazione">
+            <Clock3 size={14} />
+            <span>{clock.tick}</span>
+          </div>
+          <div
+            className="hud-chip"
+            data-tooltip={clock.isRunning ? 'Simulazione in esecuzione' : 'Simulazione in pausa'}
+          >
+            <StatusIcon size={14} />
+            <span>{statusLabel}</span>
+          </div>
+        </div>
         <div className="hud-top-bar__controls">
           <button
             className="hud-icon-btn"

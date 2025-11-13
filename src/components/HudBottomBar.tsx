@@ -1,8 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useGameStore } from '@store/gameStore';
 import {
-  Clock3,
-  Activity,
   Globe2,
   ScanEye,
   Satellite,
@@ -37,7 +35,7 @@ export const HudBottomBar = ({
 
   const stats = useMemo(() => {
     if (!session) return null;
-    const { clock, galaxy, scienceShips, empires } = session;
+    const { galaxy, scienceShips, empires } = session;
     const revealedCount = galaxy.systems.filter(
       (system) => system.visibility !== 'unknown',
     ).length;
@@ -51,18 +49,6 @@ export const HudBottomBar = ({
       (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
     );
     return [
-      {
-        icon: Clock3,
-        label: 'Tick',
-        desc: 'Tick di simulazione',
-        value: clock.tick,
-      },
-      {
-        icon: Activity,
-        label: 'Status',
-        desc: 'Stato simulazione',
-        value: clock.isRunning ? 'Running' : 'Paused',
-      },
       {
         icon: Globe2,
         label: 'Sistemi',
