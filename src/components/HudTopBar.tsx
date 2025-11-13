@@ -1,3 +1,4 @@
+import { Pause, Play, Gauge } from 'lucide-react';
 import { ResourceBar } from './ResourceBar';
 import { useGameStore } from '@store/gameStore';
 
@@ -14,7 +15,7 @@ export const HudTopBar = () => {
     return null;
   }
 
-  const { clock, label, galaxy } = session;
+  const { clock } = session;
 
   return (
     <div className="hud-top-bar">
@@ -22,34 +23,26 @@ export const HudTopBar = () => {
         <ResourceBar />
       </div>
       <div className="hud-top-bar__right">
-        <div className="hud-session-pill">
-          <div>
-            <span className="hud-session-pill__label">{label}</span>
-            <span className="hud-session-pill__seed">Seed: {galaxy.seed}</span>
-          </div>
-          <div className="hud-session-pill__elapsed">
-            <span>Elapsed</span>
-            <strong>{clock.elapsedMs.toFixed(0)} ms</strong>
-          </div>
-        </div>
-
         <div className="hud-top-bar__controls">
           <button
-            className="panel__action panel__action--compact hud-top-bar__pause"
+            className="hud-icon-btn"
             onClick={() => setSimulationRunning(!clock.isRunning, Date.now())}
+            data-tooltip={clock.isRunning ? 'Pausa simulazione' : 'Riprendi simulazione'}
+            aria-label="Toggle pausa"
           >
-            {clock.isRunning ? 'Pausa' : 'Play'}
+            {clock.isRunning ? <Pause size={16} /> : <Play size={16} />}
           </button>
           <div className="speed-options">
             {speedOptions.map((option) => (
               <button
                 key={option}
-                className={`panel__action panel__action--compact ${
-                  option === clock.speedMultiplier ? 'is-active' : ''
-                }`}
+                className={`hud-icon-btn ${option === clock.speedMultiplier ? 'is-active' : ''}`}
                 onClick={() => setSpeedMultiplier(option)}
+                data-tooltip={`Velocità ${option}x`}
+                aria-label={`Velocità ${option}x`}
               >
-                {option}x
+                <Gauge size={14} />
+                <span className="speed-label">{option}x</span>
               </button>
             ))}
           </div>
