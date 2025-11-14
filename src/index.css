@@ -510,6 +510,21 @@ body {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
+.side-entity-stack {
+  position: absolute;
+  top: 80px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.side-entity-stack > .side-entity-dock {
+  pointer-events: auto;
+}
+
 .side-entity-dock h4 {
   margin: 0 0 0.2rem;
   font-size: 0.85rem;

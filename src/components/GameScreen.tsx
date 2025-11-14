@@ -22,6 +22,8 @@ import { ColonizationPanel } from '@panels/ColonizationPanel';
 import { BattlesPanel } from '@panels/BattlesPanel';
 import { LogPanel } from '@panels/LogPanel';
 import { SideEntityDock } from './SideEntityDock';
+import { FleetList } from '@panels/fleet/FleetList';
+import { selectScienceShips } from '@store/selectors';
 import {
   selectColonizedSystems,
   selectDistrictQueue,
@@ -41,6 +43,7 @@ export const GameScreen = () => {
   const planets = useAppSelector(selectPlanets);
   const colonizedSystems = useAppSelector(selectColonizedSystems);
   const districtQueue = useAppSelector(selectDistrictQueue);
+  const scienceShips = useAppSelector(selectScienceShips);
   const economyConfig = useGameStore((state) => state.config.economy);
   const districtDefinitions = economyConfig.districts;
   const populationJobs = economyConfig.populationJobs;
@@ -77,6 +80,10 @@ export const GameScreen = () => {
     | { kind: 'science'; shipId: string; systemId: string }
     | null
   >(null);
+  const orderFleetMove = useGameStore((state) => state.orderFleetMove);
+  const mergeFleets = useGameStore((state) => state.mergeFleets);
+  const splitFleet = useGameStore((state) => state.splitFleet);
+  const shipDesigns = useGameStore((state) => state.config.military.shipDesigns);
   const focusedSessionRef = useRef<string | null>(null);
   const warEventsRef = useRef<HTMLUListElement | null>(null);
   const {
@@ -177,6 +184,14 @@ export const GameScreen = () => {
   const selectedPlanetSystem = selectedPlanet
     ? systems.find((system) => system.id === selectedPlanet.systemId) ?? null
     : null;
+  const selectedFleet =
+    dockSelection?.kind === 'fleet'
+      ? session.fleets.find((fleet) => fleet.id === dockSelection.fleetId) ?? null
+      : null;
+  const selectedScienceShip =
+    dockSelection?.kind === 'science'
+      ? session.scienceShips.find((ship) => ship.id === dockSelection.shipId) ?? null
+      : null;
   const planetDistrictQueue = selectedPlanet
     ? districtQueue
         .filter((task) => task.planetId === selectedPlanet.id)
@@ -257,17 +272,49 @@ export const GameScreen = () => {
         onOpenBattles={() => setBattlesOpen(true)}
         onOpenLog={() => setLogOpen(true)}
       />
-      <SideEntityDock
-        onCenter={(systemId, planetId) => {
-          setFocusSystemId(systemId);
-          setFocusPlanetId(planetId ?? null);
-        }}
-        onSelect={(selection) => {
-          setDockSelection(selection);
-          setFocusSystemId(selection.systemId);
-          setFocusPlanetId(selection.kind === 'colony' ? selection.planetId : null);
-        }}
-      />
+      <div className="side-entity-stack">
+        <SideEntityDock
+          variant="colonies"
+          onCenter={(systemId, planetId) => {
+            setFocusSystemId(systemId);
+            setFocusPlanetId(planetId ?? null);
+            setDockSelection(null);
+            setSelectedPlanetId(planetId ?? null);
+          }}
+          onSelect={(selection) => {
+            if (selection.kind === 'colony') {
+              setSelectedPlanetId(selection.planetId);
+              setFocusSystemId(selection.systemId);
+              setFocusPlanetId(selection.planetId);
+              setDockSelection(null);
+            }
+          }}
+        />
+        <SideEntityDock
+          variant="fleets"
+          onCenter={(systemId) => {
+            setFocusSystemId(systemId);
+            setDockSelection(null);
+          }}
+          onSelect={(selection) => {
+            setDockSelection(selection);
+            setFocusSystemId(selection.systemId);
+            setFocusPlanetId(null);
+          }}
+        />
+        <SideEntityDock
+          variant="science"
+          onCenter={(systemId) => {
+            setFocusSystemId(systemId);
+            setDockSelection(null);
+          }}
+          onSelect={(selection) => {
+            setDockSelection(selection);
+            setFocusSystemId(selection.systemId);
+            setFocusPlanetId(null);
+          }}
+        />
+      </div>
       <MapLayer
         focusSystemId={focusSystemId}
         focusPlanetId={focusPlanetId}
@@ -448,9 +495,19 @@ export const GameScreen = () => {
               </button>
             </div>
             <div className="dock-detail__content">
-              <p className="text-muted">Flotta: {dockSelection.fleetId}</p>
-              <p className="text-muted">Sistema: {dockSelection.systemId}</p>
-              <p className="text-muted">Azioni rapide non ancora implementate.</p>
+              {selectedFleet ? (
+                <FleetList
+                  fleets={[selectedFleet]}
+                  systems={systems}
+                  scienceShips={scienceShips}
+                  designs={shipDesigns}
+                  onOrder={(fleetId, systemId) => orderFleetMove(fleetId, systemId)}
+                  onMerge={(sourceId, targetId) => mergeFleets(sourceId, targetId)}
+                  onSplit={(fleetId) => splitFleet(fleetId)}
+                />
+              ) : (
+                <p className="text-muted">Flotta non trovata.</p>
+              )}
             </div>
           </div>
         ) : null}
@@ -463,9 +520,18 @@ export const GameScreen = () => {
               </button>
             </div>
             <div className="dock-detail__content">
-              <p className="text-muted">Nave: {dockSelection.shipId}</p>
-              <p className="text-muted">Sistema: {dockSelection.systemId}</p>
-              <p className="text-muted">Azioni rapide non ancora implementate.</p>
+              {selectedScienceShip ? (
+                <>
+                  <p className="text-muted">Nave: {selectedScienceShip.name ?? selectedScienceShip.id}</p>
+                  <p className="text-muted">Sistema: {selectedScienceShip.currentSystemId}</p>
+                  <p className="text-muted">Stato: {selectedScienceShip.status}</p>
+                  <p className="text-muted">
+                    Destinazione: {selectedScienceShip.targetSystemId ?? 'Nessuna'}
+                  </p>
+                </>
+              ) : (
+                <p className="text-muted">Nave non trovata.</p>
+              )}
             </div>
           </div>
         ) : null}
