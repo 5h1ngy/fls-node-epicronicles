@@ -21,6 +21,7 @@ import { GalaxyOverview } from '@panels/GalaxyOverview';
 import { ColonizationPanel } from '@panels/ColonizationPanel';
 import { BattlesPanel } from '@panels/BattlesPanel';
 import { LogPanel } from '@panels/LogPanel';
+import { SideEntityDock } from './SideEntityDock';
 import {
   selectColonizedSystems,
   selectDistrictQueue,
@@ -70,6 +71,12 @@ export const GameScreen = () => {
   const [battlesOpen, setBattlesOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
   const [debugModalOpen, setDebugModalOpen] = useState(false);
+  const [dockSelection, setDockSelection] = useState<
+    | { kind: 'colony'; planetId: string; systemId: string }
+    | { kind: 'fleet'; fleetId: string; systemId: string }
+    | { kind: 'science'; shipId: string; systemId: string }
+    | null
+  >(null);
   const focusedSessionRef = useRef<string | null>(null);
   const warEventsRef = useRef<HTMLUListElement | null>(null);
   const {
@@ -138,8 +145,6 @@ export const GameScreen = () => {
     typeof window !== 'undefined' ? window.innerWidth : 1200;
   const viewportHeight =
     typeof window !== 'undefined' ? window.innerHeight : 800;
-  const dockWidth = 76;
-  const panelOffset = dockWidth + 12;
 
   const sizeFor = (w: number, h: number) => {
     const width = Math.min(w, viewportWidth - 40);
@@ -252,6 +257,17 @@ export const GameScreen = () => {
         onOpenBattles={() => setBattlesOpen(true)}
         onOpenLog={() => setLogOpen(true)}
       />
+      <SideEntityDock
+        onCenter={(systemId, planetId) => {
+          setFocusSystemId(systemId);
+          setFocusPlanetId(planetId ?? null);
+        }}
+        onSelect={(selection) => {
+          setDockSelection(selection);
+          setFocusSystemId(selection.systemId);
+          setFocusPlanetId(selection.kind === 'colony' ? selection.planetId : null);
+        }}
+      />
       <MapLayer
         focusSystemId={focusSystemId}
         focusPlanetId={focusPlanetId}
@@ -293,23 +309,11 @@ export const GameScreen = () => {
       <div className="floating-panels">
         <MapPanels
           focusSystemId={focusSystemId}
-          leftOffset={panelOffset}
           viewportWidth={viewportWidth}
           viewportHeight={viewportHeight}
-          onSelectPlanet={(planetId, systemId) => {
-            setFocusSystemId(systemId);
-            setSelectedPlanetId(planetId);
-            setShipyardSystemId(null);
-            setFocusPlanetId(planetId);
-          }}
-        onFocusSystem={(systemId) => {
-          setFocusSystemId(systemId);
-          setFocusPlanetId(null);
-        }}
         onClearFocusTargets={clearFocusTargets}
         shipyardSystem={shipyardSystem}
         closeShipyard={closeShipyardPanel}
-        setFocusPlanetId={setFocusPlanetId}
       />
         {missionsOpen ? (
           <DraggablePanel
@@ -434,6 +438,36 @@ export const GameScreen = () => {
           >
             <LogPanel />
           </DraggablePanel>
+        ) : null}
+        {dockSelection && dockSelection.kind === 'fleet' ? (
+          <div className="dock-detail-modal">
+            <div className="dock-detail__header">
+              <h4>Dettagli flotta</h4>
+              <button className="dock-detail__close" onClick={() => setDockSelection(null)}>
+                X
+              </button>
+            </div>
+            <div className="dock-detail__content">
+              <p className="text-muted">Flotta: {dockSelection.fleetId}</p>
+              <p className="text-muted">Sistema: {dockSelection.systemId}</p>
+              <p className="text-muted">Azioni rapide non ancora implementate.</p>
+            </div>
+          </div>
+        ) : null}
+        {dockSelection && dockSelection.kind === 'science' ? (
+          <div className="dock-detail-modal">
+            <div className="dock-detail__header">
+              <h4>Dettagli nave scientifica</h4>
+              <button className="dock-detail__close" onClick={() => setDockSelection(null)}>
+                X
+              </button>
+            </div>
+            <div className="dock-detail__content">
+              <p className="text-muted">Nave: {dockSelection.shipId}</p>
+              <p className="text-muted">Sistema: {dockSelection.systemId}</p>
+              <p className="text-muted">Azioni rapide non ancora implementate.</p>
+            </div>
+          </div>
         ) : null}
         {debugModalOpen ? (
           <DraggablePanel

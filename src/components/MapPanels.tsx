@@ -1,7 +1,5 @@
 import { DraggablePanel } from '@panels/shared/DraggablePanel';
-import { ColonyPanel } from '@panels/ColonyPanel';
 import { DistrictQueuePanel } from '@panels/DistrictQueuePanel';
-import { SciencePanel } from '@panels/SciencePanel';
 import { SystemPanel } from '@panels/SystemPanel';
 import { Suspense, lazy } from 'react';
 import type { StarSystem } from '@domain/types';
@@ -19,28 +17,20 @@ const ShipyardPanel = lazy(() =>
 
 interface MapPanelsProps {
   focusSystemId: string | null;
-  leftOffset: number;
   viewportWidth: number;
   viewportHeight: number;
-  onSelectPlanet: (planetId: string, systemId: string) => void;
-  onFocusSystem: (systemId: string) => void;
   onClearFocusTargets: () => void;
   shipyardSystem: StarSystem | null;
   closeShipyard: () => void;
-  setFocusPlanetId: (id: string) => void;
 }
 
 export const MapPanels = ({
   focusSystemId,
-  leftOffset,
   viewportWidth,
   viewportHeight,
-  onSelectPlanet,
-  onFocusSystem,
   onClearFocusTargets,
   shipyardSystem,
   closeShipyard,
-  setFocusPlanetId,
 }: MapPanelsProps) => {
   const modalWidth = Math.min(840, viewportWidth - 40);
   const modalHeight = Math.min(620, viewportHeight - 80);
@@ -49,18 +39,6 @@ export const MapPanels = ({
   return (
     <div className="floating-panels">
     <DraggablePanel
-      title="Colonie"
-      initialX={leftOffset}
-      initialY={80}
-      initialHeight={320}
-      initialWidth={320}
-    >
-      <ColonyPanel
-        onSelectPlanet={onSelectPlanet}
-        onFocusSystem={onFocusSystem}
-      />
-    </DraggablePanel>
-    <DraggablePanel
       title="Coda distretti"
       initialX={Math.max(12, viewportWidth - 360)}
       initialY={520}
@@ -68,15 +46,6 @@ export const MapPanels = ({
       initialHeight={260}
     >
       <DistrictQueuePanel />
-    </DraggablePanel>
-    <DraggablePanel
-      title="Navi scientifiche"
-      initialX={Math.max(12, viewportWidth - 360)}
-      initialY={80}
-      initialWidth={320}
-      initialHeight={260}
-    >
-      <SciencePanel onFocusSystem={onFocusSystem} />
     </DraggablePanel>
     {focusSystemId ? (
       <DraggablePanel
@@ -87,7 +56,7 @@ export const MapPanels = ({
       >
         <SystemPanel
           systemId={focusSystemId}
-          onFocusPlanet={(planetId) => setFocusPlanetId(planetId)}
+          onFocusPlanet={() => undefined}
         />
       </DraggablePanel>
     ) : null}
