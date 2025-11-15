@@ -4,6 +4,7 @@ import type { ShipClassId, StarSystem } from '@domain/types';
 import { ShipDesignCard } from './shipyard/ShipDesignCard';
 import { BuildQueue } from './shipyard/BuildQueue';
 import { selectResources, selectShipyardQueue } from '@store/selectors';
+import '../styles/components/ShipyardPanel.scss';
 
 const buildMessages = {
   NO_SESSION: 'Nessuna sessione.',

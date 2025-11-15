@@ -1,6 +1,7 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 import { useAppSelector } from "@store/gameStore";
 import { selectPlanets } from "@store/selectors";
+import "../styles/components/PlanetPanels.scss";
 
 interface ColonyPanelProps {
   onSelectPlanet: (planetId: string, systemId: string) => void;
@@ -17,7 +18,7 @@ const ColonyPanelComponent = ({ onSelectPlanet }: ColonyPanelProps) => {
           <h3>Colonie attive</h3>
         </div>
         <p className="text-muted">
-          La gestione colonizzazione � ora nel dock (icona bandiera).
+          La gestione colonizzazione è ora nel dock (icona bandiera).
         </p>
         {planets.length === 0 ? (
           <p className="text-muted">Nessuna colonia attiva.</p>

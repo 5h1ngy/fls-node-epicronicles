@@ -4,6 +4,8 @@ import { resourceLabels } from "@domain/shared/resourceMetadata";
 import type { ResourceType } from "@domain/types";
 import { formatSigned } from "./shared/formatters";
 import { selectNetResources, selectPlanets, selectResources } from "@store/selectors";
+import "../styles/components/EconomyPanel.scss";
+import "../styles/components/EconomyCards.scss";
 
 const RESOURCE_DISPLAY_ORDER: ResourceType[] = [
   "energy",

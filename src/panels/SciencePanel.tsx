@@ -1,7 +1,9 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useAppSelector, useGameStore } from '@store/gameStore';
 import type { ScienceShipStatus } from '@domain/types';
 import { selectScienceShips, selectSystems } from '@store/selectors';
+import '../styles/components/SciencePanel.scss';
+import '../styles/components/SciencePanel.scss';
 
 const statusLabel: Record<ScienceShipStatus, string> = {
   idle: 'In stazione',
@@ -133,4 +135,6 @@ export const SciencePanel = ({ onFocusSystem }: SciencePanelProps) => {
     </section>
   );
 };
+
+
 

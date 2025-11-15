@@ -6,6 +6,7 @@ import {
 } from '@store/selectors';
 import type { GameEvent, EventOption } from '@domain/types';
 import { canAffordOption, formatOptionCost } from '@domain/events/events';
+import '../styles/components/EventLogPanels.scss';
 
 export const EventPanel = () => {
   const events = useAppSelector(selectEvents);

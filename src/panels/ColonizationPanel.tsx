@@ -9,6 +9,7 @@ import {
   selectSystems,
 } from "@store/selectors";
 import type { ColonyResultReason } from "@store/slice/gameSlice";
+import "../styles/components/ColonizationPanel.scss";
 
 const colonizationErrors: Record<ColonyResultReason, string> = {
   NO_SESSION: "Nessuna sessione.",

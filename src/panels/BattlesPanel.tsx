@@ -45,3 +45,4 @@ const BattlesPanelComponent = ({
 };
 
 export const BattlesPanel = memo(BattlesPanelComponent);
+

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useGameStore } from '@store/gameStore';
+import '../styles/components/EventLogPanels.scss';
 
 type LogEntry =
   | { kind: 'notification'; tick: number; message: string; label: string }

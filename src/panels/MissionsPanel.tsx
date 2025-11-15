@@ -5,6 +5,7 @@ import {
   selectSystems,
 } from '@store/selectors';
 import type { ColonizationStatus, ColonizationTask } from '@domain/types';
+import '../styles/components/MissionsPanel.scss';
 
 const statusLabels: Record<ColonizationStatus, string> = {
   preparing: 'Allestimento',

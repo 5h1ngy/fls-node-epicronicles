@@ -2,6 +2,7 @@ import { RESOURCE_TYPES, computePlanetProduction } from '@domain/economy/economy
 import type { PopulationJobId, Planet } from '@domain/types';
 import type { EconomyConfig } from '@domain/economy/economy';
 import { formatCost, formatSigned } from './shared/formatters';
+import '../styles/components/PlanetDetail.scss';
 import { resourceLabels } from '@domain/shared/resourceMetadata';
 
 interface PlanetDetailProps {
@@ -209,3 +210,4 @@ export const PlanetDetail = ({
     </div>
   );
 };
+

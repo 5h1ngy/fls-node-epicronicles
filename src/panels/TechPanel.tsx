@@ -3,6 +3,7 @@ import { useAppSelector, useGameStore } from '@store/gameStore';
 import { listAvailableTechs } from '@domain/research/research';
 import { listTraditionChoices } from '@domain/traditions/traditions';
 import { selectResearch, selectTraditions } from '@store/selectors';
+import '../styles/components/TechPanel.scss';
 
 export const TechPanel = () => {
   const research = useAppSelector(selectResearch);

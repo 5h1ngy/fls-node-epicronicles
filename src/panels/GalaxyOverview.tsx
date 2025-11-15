@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useGameStore } from "@store/gameStore";
 import type { ScienceShip, StarClass, SystemVisibility } from "@domain/types";
+import "../styles/components/GalaxyOverview.scss";
 
 const MAP_SIZE = 360;
 
