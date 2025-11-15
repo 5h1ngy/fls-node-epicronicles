@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import './index.css';
+import './styles/main.scss';
 import { GameScreen } from '@components/GameScreen';
 import { MainMenu } from '@pages/MainMenu';
 import { useGameStore } from '@store/gameStore';

@@ -1,0 +1,35 @@
+﻿// Palette di base (Sass) e CSS vars esportate
+
+$color-bg: #03060e;
+$color-surface: rgba(3, 8, 20, 0.92);
+$color-surface-strong: rgba(3, 8, 20, 0.85);
+$color-panel-border: rgba(255, 255, 255, 0.08);
+$color-text: #f4f4f4;
+$color-muted: rgba(255, 255, 255, 0.7);
+$color-accent: #7ba2ff;
+$color-accent-strong: #4de2ff;
+$color-success: #7fe38f;
+$color-danger: #ff9b8a;
+$color-warning: #ffc857;
+$color-shadow: rgba(0, 0, 0, 0.4);
+
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 12px;
+
+:root {
+  --color-bg: #{$color-bg};
+  --color-surface: #{$color-surface};
+  --color-surface-strong: #{$color-surface-strong};
+  --color-panel-border: #{$color-panel-border};
+  --color-text: #{$color-text};
+  --color-muted: #{$color-muted};
+  --color-accent: #{$color-accent};
+  --color-accent-strong: #{$color-accent-strong};
+  --color-success: #{$color-success};
+  --color-danger: #{$color-danger};
+  --color-warning: #{$color-warning};
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+}
