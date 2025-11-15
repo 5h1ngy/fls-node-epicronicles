@@ -1,1 +1,88 @@
-// Styles specifici per SciencePanel
+@use "../_tokens";
+
+.science-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.science-detail__header {
+  display: flex;
+  justify-content: space_between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.science-detail__section {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.science-detail__row {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.science-detail__value {
+  margin: 0.1rem 0 0;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.science-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  li {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+
+.science-panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+
+  .text-muted {
+    display: block;
+    font-size: 0.78rem;
+  }
+}
+
+.science-panel__order {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+
+  select {
+    background: rgba(6, 9, 20, 0.9);
+    border: 1px solid rgba(90, 115, 150, 0.5);
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+    color: #e9efff;
+  }
+}
+
+.science-panel__auto {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
