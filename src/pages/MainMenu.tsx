@@ -62,9 +62,13 @@ export const MainMenu = () => {
           alt="FLS Node Epicrnoicles logo"
           className="main-menu__logo"
         />
+        <p className="main-menu__tagline">
+          Deep Space Simulation Protocol · NASApunk Edition
+        </p>
       </header>
 
       <div className="main-menu__dock">
+        <div className="main-menu__dock-title">Mission Control</div>
         <button
           className="main-menu__action"
           onClick={() => setShowSetup(true)}
