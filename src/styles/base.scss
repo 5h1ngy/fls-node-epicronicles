@@ -1,1 +1,71 @@
 @use './tokens';
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.text-danger {
+  color: #ff9b8a;
+}
+
+.panel-message {
+  margin: 0.4rem 0;
+  color: #b9d3ff;
+  font-weight: 600;
+}
+
+.panel__subtitle {
+  margin: 0.15rem 0 0.35rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+
+  input,
+  select {
+    background: rgba(6, 9, 20, 0.9);
+    border: 1px solid rgba(90, 115, 150, 0.5);
+    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+    color: #e9efff;
+  }
+}
+
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #9edcff, #7fe38f);
+  transition: width 0.2s ease;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.8rem;
+}
+
+.pill--success {
+  border-color: rgba(127, 227, 143, 0.6);
+  color: #7fe38f;
+}
+
+.pill--alert {
+  border-color: rgba(255, 158, 128, 0.6);
+  color: #ff9b8a;
+}

@@ -1,6 +1,10 @@
 import { useState, type RefObject } from 'react';
 import type { Empire, WarEvent, WarEventType, WarStatus } from '@domain/types';
 
+import '../../styles/components/FleetShared.scss';
+import '../../styles/components/CombatReports.scss';
+import '../../styles/components/WarOverview.scss';
+
 const warStatusLabel: Record<WarStatus, string> = {
   peace: 'Pace',
   war: 'Guerra',

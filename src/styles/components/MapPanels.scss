@@ -1,0 +1,8 @@
+@use "../_tokens";
+
+.floating-panels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}

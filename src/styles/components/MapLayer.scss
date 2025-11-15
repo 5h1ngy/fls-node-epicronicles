@@ -1,0 +1,7 @@
+@use "../_tokens";
+
+.game-map-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}

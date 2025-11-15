@@ -1,1 +1,7 @@
-// Styles specifici per BattlesPanel
+@use "../_tokens";
+
+.battles-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}

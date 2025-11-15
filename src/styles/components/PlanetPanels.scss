@@ -7,6 +7,43 @@
   gap: 0.6rem;
 }
 
+.colony-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.colony-list li {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.colony-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.85rem;
+}
+
+.colony-table__link {
+  color: #b9d3ff;
+  text-decoration: none;
+}
+
+.colony-table__system {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
 .planet-list header {
   display: flex;
   justify-content: space-between;

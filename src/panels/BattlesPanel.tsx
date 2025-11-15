@@ -12,6 +12,8 @@ import {
   selectWarEvents,
 } from '@store/selectors';
 
+import '../styles/components/BattlesPanel.scss';
+
 interface BattlesPanelProps {
   warEventsRef?: RefObject<HTMLUListElement | null>;
   unreadWarIds?: Set<string>;

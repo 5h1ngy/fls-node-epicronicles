@@ -9,6 +9,8 @@ import type {
   StarSystem,
 } from '@domain/types';
 
+import '../../styles/components/FleetShared.scss';
+
 const fleetOrderErrors = {
   NO_SESSION: 'Nessuna sessione.',
   FLEET_NOT_FOUND: 'Flotta non trovata.',

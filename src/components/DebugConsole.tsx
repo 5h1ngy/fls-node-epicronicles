@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { ReactElement } from 'react';
 import { useGameStore } from '@store/gameStore';
 
+import '../styles/components/DebugConsole.scss';
+
 export const DebugConsole = () => {
   const session = useGameStore((state) => state.session);
   const rawData = session ?? null;

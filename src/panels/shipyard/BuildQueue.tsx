@@ -1,3 +1,5 @@
+import '../../styles/components/ShipyardPanel.scss';
+
 interface BuildQueueProps {
   queue: Array<{
     id: string;

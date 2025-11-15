@@ -1,0 +1,151 @@
+@use "../_tokens";
+
+.debug-console--inline {
+  position: relative;
+}
+
+.debug-console__overlay {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 0;
+  max-height: 200px;
+  width: 280px;
+  background: rgba(5, 8, 18, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+  overflow: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.debug-viewer {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.75rem;
+}
+
+.debug-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(3, 5, 12, 0.95);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.debug-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.debug-json {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.82rem;
+  color: #e9eefa;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.debug-node {
+  margin-left: 0.4rem;
+}
+
+.debug-node__row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.2rem;
+}
+
+.debug-node__toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f6f7ff;
+  cursor: pointer;
+}
+
+.debug-node__spacer {
+  width: 22px;
+}
+
+.debug-node__label {
+  font-weight: 600;
+}
+
+.debug-node__value {
+  color: #cfe3ff;
+}
+
+.debug-node__children {
+  margin-left: 0.8rem;
+  border-left: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-left: 0.4rem;
+}
+
+.debug-node__watch {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.15rem 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f4f4f4;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.debug-watch {
+  min-height: 100%;
+}
+
+.debug-watch__list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.debug-watch__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.debug-watch__path {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+.debug-watch__value {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.35rem;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  color: #e9eefa;
+}
+
+.debug-node__watch:hover {
+  border-color: rgba(120, 170, 255, 0.7);
+}
+
+.debug-node__toggle:hover {
+  border-color: rgba(120, 170, 255, 0.7);
+}
+
+.debug-watch__list p {
+  margin: 0;
+}

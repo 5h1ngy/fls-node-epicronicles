@@ -1,5 +1,7 @@
 import { GalaxyMap } from '@components/GalaxyMap';
 
+import '../styles/components/MapLayer.scss';
+
 interface MapLayerProps {
   focusSystemId: string | null;
   focusPlanetId: string | null;

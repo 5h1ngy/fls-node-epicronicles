@@ -3,6 +3,8 @@ import { SystemPanel } from '@panels/SystemPanel';
 import { Suspense, lazy } from 'react';
 import type { StarSystem } from '@domain/types';
 
+import '../styles/components/MapPanels.scss';
+
 const ShipyardPanel = lazy(() =>
   import('@panels/ShipyardPanel').then((m) => ({
     default: m.ShipyardPanel,

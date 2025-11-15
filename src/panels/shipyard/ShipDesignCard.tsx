@@ -4,6 +4,9 @@ import { applyShipTemplate, applyCustomization } from '@domain/fleet/ships';
 import { formatCost } from '../shared/formatters';
 import type { MilitaryConfig } from '@config/gameConfig';
 
+import '../../styles/components/FleetShared.scss';
+import '../../styles/components/ShipyardPanel.scss';
+
 type CustomState = {
   offense: number;
   defense: number;

@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import type { CombatReport } from '@domain/types';
 import type { StarSystem } from '@domain/types';
 
+import '../../styles/components/CombatReports.scss';
+import '../../styles/components/FleetShared.scss';
+
 const resultLabel = {
   playerVictory: 'Vittoria',
   playerDefeat: 'Sconfitta',

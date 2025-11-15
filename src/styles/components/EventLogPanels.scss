@@ -56,3 +56,65 @@
   color: #f6f7ff;
   font-size: 0.9rem;
 }
+
+.event-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.event-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.event-card__badge {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.event-card__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.event-card__option-title {
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+
+.event-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.event-log__row {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.45rem 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.event-log__title {
+  font-weight: 600;
+}

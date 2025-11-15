@@ -1,5 +1,7 @@
 import type { ScienceShip, StarSystem } from '@domain/types';
 
+import '../../styles/components/FleetShared.scss';
+
 interface ScienceShipDetailPanelProps {
   ship: ScienceShip;
   systems: StarSystem[];

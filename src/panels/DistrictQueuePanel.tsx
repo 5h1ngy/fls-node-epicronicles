@@ -6,6 +6,8 @@ import {
   selectPlanets,
 } from '@store/selectors';
 
+import '../styles/components/DistrictQueuePanel.scss';
+
 const manageErrors = {
   NO_SESSION: 'Nessuna sessione.',
   TASK_NOT_FOUND: 'Attivita non trovata.',

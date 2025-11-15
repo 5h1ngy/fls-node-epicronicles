@@ -88,3 +88,42 @@
   gap: 0.4rem;
   flex-wrap: wrap;
 }
+
+.diplomacy-card__body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.5rem;
+}
+
+.sentiment-badge {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.78rem;
+}
+
+.sentiment-positive {
+  border-color: rgba(127, 227, 143, 0.5);
+  color: #7fe38f;
+}
+
+.sentiment-neutral {
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sentiment-negative {
+  border-color: rgba(255, 155, 138, 0.6);
+  color: #ff9b8a;
+}
+
+.status-peace {
+  color: #7fe38f;
+}
+
+.status-war {
+  color: #ff9b8a;
+}

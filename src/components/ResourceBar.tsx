@@ -4,6 +4,8 @@ import { RESOURCE_TYPES } from "@domain/economy/economy";
 import { resourceLabels } from "@domain/shared/resourceMetadata";
 import { Zap, Pickaxe, Sandwich, FlaskConical, Star } from "lucide-react";
 
+import "../styles/components/ResourceBar.scss";
+
 const resourceIcons: Record<string, ReactElement> = {
   energy: <Zap size={16} />,
   minerals: <Pickaxe size={16} />,
@@ -33,6 +35,7 @@ export const ResourceBar = () => {
         const entry = resources[type];
         const net = entry.income - entry.upkeep;
         const deltaClass = net > 0 ? "is-positive" : net < 0 ? "is-negative" : "is-zero";
+        const deltaSign = net > 0 ? "+" : net < 0 ? "-" : "0";
         return (
           <div
             className="resource-chip"
@@ -45,7 +48,7 @@ export const ResourceBar = () => {
               <div className="resource-chip__values">
                 <span className="resource-chip__value">{entry.amount.toFixed(0)}</span>
                 <span className={`resource-chip__delta ${deltaClass}`}>
-                  {net > 0 ? "+" : net < 0 ? "-" : "±"}
+                  {deltaSign}
                   {Math.abs(net).toFixed(1)}
                 </span>
               </div>

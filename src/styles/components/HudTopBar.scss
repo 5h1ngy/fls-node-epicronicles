@@ -1,4 +1,5 @@
-﻿@use '../_tokens';
+@use '../_tokens';
+@use './ResourceBar';
 
 .hud-top-bar {
   position: absolute;
@@ -66,104 +67,6 @@
   font-size: 0.78rem;
   color: #f4f4f4;
   font-weight: 600;
-}
-
-.resource-bar {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: nowrap;
-  align-items: center;
-  overflow: visible;
-  justify-content: flex-start;
-}
-
-.resource-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.45rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  position: relative;
-}
-
-@media (max-width: 1100px) {
-  .resource-bar {
-    flex-wrap: wrap;
-  }
-}
-
-.resource-chip__icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.resource-chip__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.resource-chip__label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.resource-chip__values {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
-}
-
-.resource-chip__value {
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.resource-chip__delta {
-  font-size: 0.78rem;
-}
-
-.resource-chip__delta.is-positive {
-  color: #7fe38f;
-}
-
-.resource-chip__delta.is-negative {
-  color: #ff9b8a;
-}
-
-.resource-chip__delta.is-zero {
-  color: #ffc857;
-}
-
-.resource-chip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  bottom: 115%;
-  transform: translateX(-50%);
-  padding: 0.35rem 0.55rem;
-  background: rgba(6, 10, 20, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  color: #f4f4f4;
-  font-size: 0.78rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.1s ease, transform 0.1s ease;
-}
-
-.resource-chip:hover::after {
-  opacity: 1;
-  transform: translate(-50%, -2px);
 }
 
 .speed-options {
