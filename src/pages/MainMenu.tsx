@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useGameStore } from '@store/gameStore';
 
+import '../styles/components/MainMenu.scss';
+
 export const MainMenu = () => {
   const startNewSession = useGameStore((state) => state.startNewSession);
   const loadSession = useGameStore((state) => state.loadSession);
@@ -24,8 +26,9 @@ export const MainMenu = () => {
   };
 
   return (
-    <div className="panel">
-      <h1>FLS Node Epicrnoicles</h1>
+    <div className="main-menu">
+      <div className="panel main-menu__panel">
+        <h1 className="main-menu__title">FLS Node Epicrnoicles</h1>
       <p className="panel__subtitle">Prototype build &ndash; Phase 0</p>
 
       <label className="panel__field">
@@ -67,6 +70,7 @@ export const MainMenu = () => {
         Load save
       </button>
       {message ? <p className="panel-message">{message}</p> : null}
+      </div>
     </div>
   );
 };
