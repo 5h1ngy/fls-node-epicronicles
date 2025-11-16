@@ -23,6 +23,7 @@ const toMapPosition = (system: StarSystem) => ({
 interface GalaxyMapProps {
   focusSystemId?: string | null;
   focusPlanetId?: string | null;
+  focusTrigger?: number;
   onSystemSelect?: (
     systemId: string,
     anchor: { x: number; y: number },
@@ -33,6 +34,7 @@ interface GalaxyMapProps {
 export const GalaxyMap = ({
   focusSystemId,
   focusPlanetId,
+  focusTrigger = 0,
   onSystemSelect,
   onClearFocus,
 }: GalaxyMapProps) => {
@@ -327,9 +329,6 @@ export const GalaxyMap = ({
       }
       return;
     }
-    if (lastFocusSystemRef.current === focusSystemId) {
-      return;
-    }
     const target = systems.find((system) => system.id === focusSystemId);
     if (!target) {
       return;
@@ -355,7 +354,7 @@ export const GalaxyMap = ({
       cameraRef.current.position.z = zoomTargetRef.current;
     }
     lastFocusSystemRef.current = focusSystemId;
-  }, [focusSystemId, focusPlanetId, systems, onClearRef]);
+  }, [focusSystemId, focusPlanetId, systems, onClearRef, focusTrigger]);
 
   useEffect(() => {
     if (!focusPlanetId) {

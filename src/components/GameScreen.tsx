@@ -60,6 +60,7 @@ export const GameScreen = () => {
     (state) => state.demotePopulation,
   );
   const [focusSystemId, setFocusSystemId] = useState<string | null>(null);
+  const [focusTrigger, setFocusTrigger] = useState(0);
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
@@ -279,6 +280,7 @@ export const GameScreen = () => {
           variant="colonies"
           onCenter={(systemId, planetId) => {
             setFocusSystemId(systemId);
+            setFocusTrigger((value) => value + 1);
             setFocusPlanetId(planetId ?? null);
             setDockSelection(null);
           }}
@@ -293,6 +295,7 @@ export const GameScreen = () => {
           variant="fleets"
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
+            setFocusTrigger((value) => value + 1);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -304,6 +307,7 @@ export const GameScreen = () => {
           variant="science"
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
+            setFocusTrigger((value) => value + 1);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -315,6 +319,7 @@ export const GameScreen = () => {
       <MapLayer
         focusSystemId={focusSystemId}
         focusPlanetId={focusPlanetId}
+        focusTrigger={focusTrigger}
         mapMessage={mapMessage}
         onSelectSystem={(systemId) => {
           const targetSystem = systems.find(

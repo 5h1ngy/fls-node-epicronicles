@@ -5,6 +5,7 @@ import '../styles/components/MapLayer.scss';
 interface MapLayerProps {
   focusSystemId: string | null;
   focusPlanetId: string | null;
+  focusTrigger?: number;
   mapMessage: string | null;
   onSelectSystem: (
     systemId: string,
@@ -16,6 +17,7 @@ interface MapLayerProps {
 export const MapLayer = ({
   focusSystemId,
   focusPlanetId,
+  focusTrigger = 0,
   mapMessage,
   onSelectSystem,
   onClearFocus,
@@ -24,6 +26,7 @@ export const MapLayer = ({
     <GalaxyMap
       focusSystemId={focusSystemId}
       focusPlanetId={focusPlanetId}
+      focusTrigger={focusTrigger}
       onSystemSelect={onSelectSystem}
       onClearFocus={onClearFocus}
     />
