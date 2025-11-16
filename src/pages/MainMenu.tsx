@@ -62,9 +62,6 @@ export const MainMenu = () => {
           alt="FLS Node Epicrnoicles logo"
           className="main-menu__logo"
         />
-        <p className="main-menu__tagline">
-          Deep Space Simulation Protocol · NASApunk Edition
-        </p>
       </header>
 
       <div className="main-menu__dock">

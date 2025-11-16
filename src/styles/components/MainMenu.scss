@@ -43,22 +43,9 @@
 }
 
 .main-menu__logo {
-  width: min(320px, 60vw);
+  width: min(520px, 90vw);
   height: auto;
   filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.6));
-}
-
-.main-menu__tagline {
-  margin: 0;
-  padding: 0.3rem 0.7rem;
-  background: rgba(14, 28, 52, 0.78);
-  border: 1px solid rgba(90, 200, 255, 0.35);
-  border-radius: 6px;
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(233, 246, 255, 0.85);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .main-menu__dock {
@@ -150,10 +137,12 @@
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
   width: min(520px, 90vw);
-  background: rgba(6, 10, 18, 0.9);
-  border: 1px solid rgba(90, 200, 255, 0.32);
-  border-radius: 8px;
-  padding: 1.6rem;
+  background: radial-gradient(circle at 20% 20%, rgba(99, 214, 255, 0.08), transparent 55%),
+    radial-gradient(circle at 80% 10%, rgba(255, 184, 94, 0.08), transparent 50%),
+    rgba(6, 12, 22, 0.92);
+  border: 1px solid rgba(99, 214, 255, 0.4);
+  border-radius: 6px;
+  padding: 1.8rem 1.5rem 1.4rem;
   z-index: 3;
   box-shadow:
     0 25px 60px rgba(0, 0, 0, 0.45),
@@ -167,7 +156,7 @@
     position: absolute;
     inset: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
+    border-radius: 4px;
     pointer-events: none;
   }
 
@@ -180,7 +169,7 @@
     height: 10px;
     background: linear-gradient(90deg, rgba(99, 214, 255, 0.42), rgba(255, 184, 94, 0.32));
     border-bottom: 1px solid rgba(99, 214, 255, 0.42);
-    border-radius: 8px 8px 0 0;
+    border-radius: 6px 6px 0 0;
   }
 }
 
@@ -196,8 +185,8 @@
   background: rgba(255, 255, 255, 0.06);
   color: #f6f7ff;
   border-radius: 6px;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
