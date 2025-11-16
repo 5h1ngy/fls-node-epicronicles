@@ -151,6 +151,7 @@ export const createSystemNode = (
   planetLookup: Map<string, Object3D>,
   recentCombatSystems: Set<string>,
   activeBattles: Set<string>,
+  colonizedPlanetId?: string | null,
 ): Group => {
   const node = new Group();
   node.name = system.id;
@@ -259,6 +260,22 @@ export const createSystemNode = (
       angleStore,
       planetLookup,
     );
+    if (colonizedPlanetId) {
+      const colonizedRing = new Mesh(
+        new RingGeometry(baseSize * 2.4, baseSize * 2.9, 40),
+        new MeshBasicMaterial({
+          color: '#6fe6a5',
+          transparent: true,
+          opacity: 0.8,
+          side: DoubleSide,
+        }),
+      );
+      colonizedRing.position.set(baseSize * 4.8, 0, 0.2);
+      colonizedRing.userData.systemId = system.id;
+      colonizedRing.userData.planetId = colonizedPlanetId;
+      planetLookup.set(colonizedPlanetId, colonizedRing);
+      orbitGroup.add(colonizedRing);
+    }
     node.add(orbitGroup);
   }
 

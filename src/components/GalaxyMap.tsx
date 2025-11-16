@@ -45,6 +45,7 @@ export const GalaxyMap = ({
     onClearRef.current = onClearFocus;
   }, [onClearFocus, onSystemSelect]);
   const systems = useGameStore((state) => state.session?.galaxy.systems ?? []);
+  const colonies = useGameStore((state) => state.session?.economy.planets ?? []);
   const scienceShips = useGameStore(
     (state) => state.session?.scienceShips ?? [],
   );
@@ -131,6 +132,16 @@ export const GalaxyMap = ({
         .join('|'),
     [systems],
   );
+
+  const colonizedLookup = useMemo(() => {
+    const map = new Map<string, string>();
+    colonies.forEach((planet) => {
+      if (planet.systemId) {
+        map.set(planet.systemId, planet.id);
+      }
+    });
+    return map;
+  }, [colonies]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -441,6 +452,7 @@ export const GalaxyMap = ({
     const positions = new Map<string, THREE.Vector3>();
 
     systems.forEach((system) => {
+      const colonizedPlanetId = colonizedLookup.get(system.id);
       const node = createSystemNode(
         system,
         orbitBaseSpeed,
@@ -448,6 +460,7 @@ export const GalaxyMap = ({
         planetLookupRef.current,
         recentCombatSystems,
         activeBattles,
+        colonizedPlanetId,
       );
       group.add(node);
       positions.set(system.id, node.position.clone());
