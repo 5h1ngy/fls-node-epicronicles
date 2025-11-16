@@ -43,7 +43,7 @@
 }
 
 .main-menu__logo {
-  width: min(520px, 90vw);
+  width: min(680px, 95vw);
   height: auto;
   filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.6));
 }
@@ -194,6 +194,12 @@
 
 .main-menu__title {
   margin: 0.25rem 0 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(90, 200, 255, 0.95);
+  border-left: 3px solid rgba(90, 200, 255, 0.92);
+  padding-left: 0.6rem;
+  text-shadow: 0 0 12px rgba(90, 200, 255, 0.4);
 }
 
 .main-menu__subtitle {
