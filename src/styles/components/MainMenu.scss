@@ -71,7 +71,7 @@
 
 .main-menu__action {
   padding: 1.1rem 1.15rem;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid rgba(90, 200, 255, 0.38);
   background: linear-gradient(135deg, rgba(10, 22, 42, 0.96), rgba(16, 54, 96, 0.98));
   color: #e6f7ff;
@@ -141,7 +141,7 @@
     radial-gradient(circle at 80% 10%, rgba(255, 184, 94, 0.08), transparent 50%),
     rgba(6, 12, 22, 0.92);
   border: 1px solid rgba(99, 214, 255, 0.4);
-  border-radius: 6px;
+  border-radius: 0;
   padding: 1.8rem 1.5rem 1.4rem;
   z-index: 3;
   box-shadow:
@@ -160,7 +160,7 @@
     height: 10px;
     background: linear-gradient(90deg, rgba(99, 214, 255, 0.42), rgba(255, 184, 94, 0.32));
     border-bottom: 1px solid rgba(99, 214, 255, 0.42);
-    border-radius: 6px 6px 0 0;
+    border-radius: 0;
   }
 }
 
@@ -176,7 +176,7 @@
   border: none;
   background: transparent;
   color: #f6f7ff;
-  border-radius: 6px;
+  border-radius: 0;
   width: 40px;
   height: 40px;
   cursor: pointer;
@@ -214,7 +214,7 @@
   select {
     background: rgba(6, 9, 20, 0.9);
     border: 1px solid rgba(99, 214, 255, 0.4);
-    border-radius: 6px;
+    border-radius: 0;
     padding: 0.7rem 0.8rem;
     color: #e9efff;
     font-weight: 600;
@@ -231,7 +231,7 @@
 .main-menu__primary,
 .main-menu__ghost {
   padding: 0.82rem 1.05rem;
-  border-radius: 8px;
+  border-radius: 0;
   font-weight: 700;
   cursor: pointer;
   border: 1px solid transparent;
