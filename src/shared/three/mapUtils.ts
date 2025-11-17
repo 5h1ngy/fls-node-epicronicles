@@ -147,8 +147,8 @@ export const createOrbitingPlanets = (
       kind: 'ring',
       systemId,
     };
-    group.add(orbitRing);
-  });
+  group.add(orbitRing);
+});
 
   if (colonizedPlanet) {
     const colonizedOrbitRadius =
@@ -168,34 +168,17 @@ export const createOrbitingPlanets = (
       orbitAngle: colonizedAngle,
     };
 
-    const planetGeom =
-      planetGeometryCache.get(1.1) ??
-      (() => {
-        const geom = new SphereGeometry(1.1, 16, 16);
-        planetGeometryCache.set(1.1, geom);
-        return geom;
-      })();
-    const planetMesh = new Mesh(
-      planetGeom,
-      new MeshStandardMaterial({
-        color: '#6fe6a5',
-        emissive: '#1d8f5a',
-        emissiveIntensity: 0.4,
-      }),
-    );
-    planetMesh.raycast = () => null;
-    colonyGroup.add(planetMesh);
-
     const ring = new Mesh(
-      new RingGeometry(1.35, 1.65, 32),
+      new RingGeometry(1.25, 1.75, 40),
       new MeshBasicMaterial({
         color: '#6fe6a5',
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.9,
         side: DoubleSide,
       }),
     );
-    ring.rotation.x = 0;
+    ring.raycast = () => null;
+    ring.rotation.x = Math.PI / 2;
     ring.userData = {
       planetId: colonizedPlanet.id,
       systemId,
@@ -205,7 +188,7 @@ export const createOrbitingPlanets = (
     const label = createLabelSprite(colonizedPlanet.name);
     if (label) {
       label.name = 'planetLabel';
-      label.position.set(0, 3.2, 0.2);
+      label.position.set(0, 2.6, 0.2);
       colonyGroup.add(label);
     }
 
