@@ -111,11 +111,32 @@ export const createOrbitingPlanets = (
     );
     planetLookup.set(planet.id, planetMesh);
 
-    const label = createLabelSprite(planet.name);
+    const isColonized = colonizedPlanet?.id === planet.id;
+    const displayName = isColonized ? colonizedPlanet.name : planet.name;
+    const label = createLabelSprite(displayName);
     if (label) {
       label.name = 'planetLabel';
       label.position.set(0, planet.size + 2.5, 0.2);
       planetMesh.add(label);
+    }
+
+    if (isColonized) {
+      const ring = new Mesh(
+        new RingGeometry(planet.size * 1.3, planet.size * 1.6, 40),
+        new MeshBasicMaterial({
+          color: '#6fe6a5',
+          transparent: true,
+          opacity: 0.9,
+          side: DoubleSide,
+        }),
+      );
+      ring.raycast = () => null;
+      ring.rotation.x = Math.PI / 2;
+      ring.userData = {
+        planetId: planet.id,
+        systemId,
+      };
+      planetMesh.add(ring);
     }
 
     group.add(planetMesh);
@@ -151,52 +172,16 @@ export const createOrbitingPlanets = (
 });
 
   if (colonizedPlanet) {
-    const colonizedOrbitRadius =
-      planets[0]?.orbitRadius ?? (baseSpeed + seed % 7) * 3 + 8;
-    const colonizedAngle =
-      angleStore.get(`colonized-${systemId}`) ?? Math.random() * Math.PI * 2;
-    angleStore.set(`colonized-${systemId}`, colonizedAngle);
-    const colonizedOrbitSpeed = base * 0.6;
-
-    const colonyGroup = new Group();
-    colonyGroup.name = 'colonizedPlanet';
-    colonyGroup.userData = {
-      kind: 'colonized',
-      planetId: colonizedPlanet.id,
-      orbitRadius: colonizedOrbitRadius,
-      orbitSpeed: colonizedOrbitSpeed,
-      orbitAngle: colonizedAngle,
-    };
-
-    const ring = new Mesh(
-      new RingGeometry(1.25, 1.75, 40),
-      new MeshBasicMaterial({
-        color: '#6fe6a5',
-        transparent: true,
-        opacity: 0.9,
-        side: DoubleSide,
-      }),
-    );
-    ring.raycast = () => null;
-    ring.rotation.x = Math.PI / 2;
-    ring.userData = {
-      planetId: colonizedPlanet.id,
-      systemId,
-    };
-    colonyGroup.add(ring);
-
-    const label = createLabelSprite(colonizedPlanet.name);
-    if (label) {
-      label.name = 'planetLabel';
-      label.position.set(0, 2.6, 0.2);
-      colonyGroup.add(label);
+    const marker = planetLookup.get(colonizedPlanet.id);
+    if (!marker) {
+      // ensure lookup maps colonized id to the attached mesh
+      const attached = group.children.find(
+        (child) => child.userData?.planetId === colonizedPlanet.id,
+      );
+      if (attached) {
+        planetLookup.set(colonizedPlanet.id, attached as Object3D);
+      }
     }
-
-    const x = Math.cos(colonizedAngle) * colonizedOrbitRadius;
-    const y = Math.sin(colonizedAngle) * colonizedOrbitRadius;
-    colonyGroup.position.set(x, y, 0);
-    planetLookup.set(colonizedPlanet.id, colonyGroup);
-    group.add(colonyGroup);
   }
 
   return group;
@@ -310,8 +295,20 @@ export const createSystemNode = (
   }
 
   if (isSurveyed && system.orbitingPlanets.length > 0) {
+    const planets = [...system.orbitingPlanets];
+    if (colonizedPlanet && !planets.find((p) => p.id === colonizedPlanet.id)) {
+      planets.unshift({
+        id: colonizedPlanet.id,
+        name: colonizedPlanet.name,
+        orbitRadius: planets[0]?.orbitRadius ?? 10,
+        size: Math.max(0.9, Math.min(2.4, (system.habitableWorld?.size ?? 10) / 8)),
+        color: '#6fe6a5',
+        orbitSpeed: planets[0]?.orbitSpeed ?? 0.7,
+      });
+    }
+
     const orbitGroup = createOrbitingPlanets(
-      system.orbitingPlanets,
+      planets,
       system.id.charCodeAt(0),
       orbitBaseSpeed,
       system.id,
