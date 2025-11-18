@@ -63,7 +63,7 @@ export const PlanetDetail = ({
             </h3>
           </div>
           <div className="planet-detail__pill">
-            Stabilit�� {Math.round(planet.stability)} | Felicit�� {Math.round(planet.happiness)}
+            Stabilita {Math.round(planet.stability)} | Felicita {Math.round(planet.happiness)}
           </div>
         </div>
         {planetProductionSummary ? (
@@ -115,7 +115,7 @@ export const PlanetDetail = ({
           <h4>Ruoli popolazione</h4>
           {automationConfig?.enabled ? (
             <p className="text-muted">
-              Bilanciamento automatico attivo (priorit��: {automationConfig.priorities.join(' > ')})
+              Bilanciamento automatico attivo (priorita: {automationConfig.priorities.join(' > ')})
             </p>
           ) : null}
           {populationMessage ? (
