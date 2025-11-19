@@ -150,19 +150,34 @@ export const PlanetDetail = ({
 
         <div className="planet-districts">
           <h4>Distretti</h4>
-          <ul>
+          <ul className="district-card-list">
             {districtDefinitions.map((definition) => {
               const owned = planet.districts[definition.id] ?? 0;
+              const capacityHint = Math.min(owned, 12);
+              const fillWidth = `${(capacityHint / 12) * 100}%`;
               return (
-                <li key={definition.id}>
-                  <div>
-                    <strong>{definition.label}</strong>
-                    <span className="text-muted">{definition.description}</span>
+                <li key={definition.id} className="district-card">
+                  <div className="district-card__header">
+                    <div>
+                      <strong>{definition.label}</strong>
+                      <span className="text-muted">{definition.description}</span>
+                    </div>
+                    <div className="district-card__count">
+                      <span className="pill">{owned} costruiti</span>
+                      <div className="district-bar">
+                        <div className="district-bar__fill" style={{ width: fillWidth }} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="planet-district__meta">
-                    <span>Costruiti: {owned}</span>
-                    <span>Costo: {formatCost(definition.cost)}</span>
-                    <span>Produzione: {formatCost(definition.production)}</span>
+                  <div className="district-card__meta">
+                    <div>
+                      <span className="text-muted">Costo</span>
+                      <div className="district-card__chip">{formatCost(definition.cost)}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted">Produzione</span>
+                      <div className="district-card__chip">{formatCost(definition.production)}</div>
+                    </div>
                     <button
                       className="panel__action panel__action--compact"
                       onClick={() => onQueueDistrict(definition.id)}
