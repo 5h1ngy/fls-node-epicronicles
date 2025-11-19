@@ -181,15 +181,12 @@
 }
 
 .planet-detail__roles .planet-population {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  height: auto;
 }
 
 .planet-detail__roles .planet-population ul {
-  flex: 1 1 auto;
   max-height: none;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .planet-detail__body {
