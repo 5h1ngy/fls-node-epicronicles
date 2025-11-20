@@ -8,8 +8,10 @@ interface MainMenuSetupProps {
   seed: string;
   presetId: string;
   presets: GameConfig['galaxyPresets'];
+  galaxyShape: 'circle' | 'spiral';
   onSeedChange: (value: string) => void;
   onPresetChange: (value: string) => void;
+  onShapeChange: (value: 'circle' | 'spiral') => void;
   onConfirm: () => void;
   onBack: () => void;
 }
@@ -19,8 +21,10 @@ export const MainMenuSetup = ({
   seed,
   presetId,
   presets,
+  galaxyShape,
   onSeedChange,
   onPresetChange,
+  onShapeChange,
   onConfirm,
   onBack,
 }: MainMenuSetupProps) => (
@@ -67,6 +71,18 @@ export const MainMenuSetup = ({
                   {preset.label} ({preset.systemCount} sistemi)
                 </option>
               ))}
+            </select>
+          </label>
+
+          <label className="setup-card__field">
+            <span>Forma galassia</span>
+            <select
+              value={galaxyShape}
+              onChange={(event) => onShapeChange(event.target.value as 'circle' | 'spiral')}
+              aria-label="Forma galassia"
+            >
+              <option value="circle">Tonda</option>
+              <option value="spiral">Spirale</option>
             </select>
           </label>
         </div>

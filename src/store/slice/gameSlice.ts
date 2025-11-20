@@ -6,6 +6,7 @@ export interface StartSessionArgs {
   seed?: string;
   label?: string;
   presetId?: string;
+  galaxyShape?: 'circle' | 'spiral';
 }
 
 const initialState: { view: 'mainMenu' | 'simulation'; config: GameConfig; session: GameSession | null } =

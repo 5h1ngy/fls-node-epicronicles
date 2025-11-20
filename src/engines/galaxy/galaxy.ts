@@ -14,7 +14,10 @@ export interface GalaxyGenerationParams {
   seed: string;
   systemCount?: number;
   galaxyRadius?: number;
+  galaxyShape?: GalaxyShape;
 }
+
+export type GalaxyShape = 'circle' | 'spiral';
 
 const starClasses: StarClass[] = ['mainSequence', 'giant', 'dwarf'];
 const planetKinds: PlanetKind[] = ['terrestrial', 'desert', 'tundra'];
@@ -111,9 +114,23 @@ const createStarSystem = (
   random: () => number,
   index: number,
   maxRadius: number,
+  shape: GalaxyShape,
+  total: number,
 ): StarSystem => {
-  const angle = random() * Math.PI * 2;
+  const arms = 3;
   const radius = Math.sqrt(random()) * maxRadius;
+  let angle: number;
+
+  if (shape === 'spiral') {
+    const armIndex = index % arms;
+    const armAngle = (armIndex / arms) * Math.PI * 2;
+    const twist = (radius / maxRadius) * Math.PI * 2.5;
+    const jitter = (random() - 0.5) * 0.5;
+    angle = armAngle + twist + jitter;
+  } else {
+    angle = random() * Math.PI * 2;
+  }
+
   const starClass = starClasses[Math.floor(random() * starClasses.length)];
   const name = `SYS-${(index + 1).toString().padStart(3, '0')}`;
 
@@ -127,11 +144,7 @@ const createStarSystem = (
       x: Math.cos(angle) * radius,
       y: Math.sin(angle) * radius,
     },
-    mapPosition: createMapPosition(
-      Math.cos(angle) * radius,
-      Math.sin(angle) * radius,
-      random,
-    ),
+    mapPosition: createMapPosition(Math.cos(angle) * radius, Math.sin(angle) * radius, random),
     visibility,
     habitableWorld: createHabitableWorld(random, name),
     orbitingPlanets: createOrbitingPlanets(random, name),
@@ -144,13 +157,15 @@ export const createTestGalaxy = ({
   seed,
   systemCount = 12,
   galaxyRadius = 200,
+  galaxyShape = 'circle',
 }: GalaxyGenerationParams): GalaxyState => {
   const random = createRandom(seed);
   const systems = Array.from({ length: systemCount }, (_, index) =>
-    createStarSystem(random, index, galaxyRadius),
+    createStarSystem(random, index, galaxyRadius, galaxyShape, systemCount),
   );
   return {
     seed,
+    galaxyShape,
     systems,
   };
 };

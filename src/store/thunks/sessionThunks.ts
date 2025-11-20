@@ -98,6 +98,7 @@ export const startNewSession =
       galaxyOverrides: {
         systemCount: preset?.systemCount ?? cfg.defaultGalaxy.systemCount,
         galaxyRadius: preset?.galaxyRadius ?? cfg.defaultGalaxy.galaxyRadius,
+        galaxyShape: args?.galaxyShape ?? preset?.galaxyShape ?? cfg.defaultGalaxy.galaxyShape,
       },
       economyConfig: cfg.economy,
       researchConfig: cfg.research,

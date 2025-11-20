@@ -127,6 +127,7 @@ export const gameConfig: GameConfig = {
     seed: 'debug-seed',
     systemCount: 18,
     galaxyRadius: 260,
+    galaxyShape: 'circle',
   },
   events: {
     narrativeIntervalTicks: 12,
@@ -255,9 +256,30 @@ export const gameConfig: GameConfig = {
     ],
   },
   galaxyPresets: [
-    { id: 'test', label: 'Test (piccola)', seed: 'debug-seed', systemCount: 8, galaxyRadius: 140 },
-    { id: 'standard', label: 'Standard', seed: 'debug-seed', systemCount: 18, galaxyRadius: 260 },
-    { id: 'large', label: 'Grande', seed: 'debug-seed', systemCount: 28, galaxyRadius: 320 },
+    {
+      id: 'test',
+      label: 'Test (piccola)',
+      seed: 'debug-seed',
+      systemCount: 8,
+      galaxyRadius: 140,
+      galaxyShape: 'circle',
+    },
+    {
+      id: 'standard',
+      label: 'Standard',
+      seed: 'debug-seed',
+      systemCount: 18,
+      galaxyRadius: 260,
+      galaxyShape: 'circle',
+    },
+    {
+      id: 'large',
+      label: 'Grande',
+      seed: 'debug-seed',
+      systemCount: 28,
+      galaxyRadius: 320,
+      galaxyShape: 'circle',
+    },
   ],
   debug: {
     autoStart: false,

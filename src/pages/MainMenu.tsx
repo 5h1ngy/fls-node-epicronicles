@@ -24,6 +24,9 @@ export const MainMenu = () => {
   const hasSavedSession = useGameStore((state) => state.hasSavedSession);
   const config = useGameStore((state) => state.config);
   const [seed, setSeed] = useState(config.defaultGalaxy.seed);
+  const [galaxyShape, setGalaxyShape] = useState(
+    config.defaultGalaxy.galaxyShape ?? 'circle',
+  );
   const defaultPresetId =
     config.galaxyPresets.find((preset) => preset.id === 'standard')?.id ??
     config.galaxyPresets[0]?.id ??
@@ -48,7 +51,7 @@ export const MainMenu = () => {
   };
 
   const handleStart = () => {
-    startNewSession({ seed, presetId });
+    startNewSession({ seed, presetId, galaxyShape });
     setMessage(null);
   };
 
@@ -69,8 +72,10 @@ export const MainMenu = () => {
       seed={seed}
       presetId={presetId}
       presets={config.galaxyPresets}
+      galaxyShape={galaxyShape}
       onSeedChange={setSeed}
       onPresetChange={setPresetId}
+      onShapeChange={setGalaxyShape}
       onConfirm={handleStart}
       onBack={() => setStage('landing')}
     />

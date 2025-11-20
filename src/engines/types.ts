@@ -360,6 +360,7 @@ export type FleetSplitResult =
 
 export interface GalaxyState {
   seed: string;
+  galaxyShape?: 'circle' | 'spiral';
   systems: StarSystem[];
 }
 
