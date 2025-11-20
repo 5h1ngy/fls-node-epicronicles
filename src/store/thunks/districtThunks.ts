@@ -6,6 +6,7 @@ import { setSessionState } from '../slice/gameSlice';
 import type {
   DistrictQueueManageResult,
   QueueDistrictBuildResult,
+  RemoveDistrictResult,
 } from '../slice/gameSlice';
 import { appendNotification, refundResourceCost } from '../utils';
 
@@ -60,6 +61,59 @@ export const queueDistrictConstruction =
           ...session.districtConstructionQueue,
           task,
         ],
+      }),
+    );
+
+    return { success: true };
+  };
+
+export const removeBuiltDistrict =
+  (
+    planetId: string,
+    districtId: string,
+  ): ThunkAction<RemoveDistrictResult, RootState, unknown, AnyAction> =>
+  (dispatch, getState) => {
+    const state = getState().game;
+    const session = state.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    const planetIndex = session.economy.planets.findIndex(
+      (entry) => entry.id === planetId,
+    );
+    if (planetIndex < 0) {
+      return { success: false, reason: 'PLANET_NOT_FOUND' };
+    }
+    const definition = state.config.economy.districts.find(
+      (entry) => entry.id === districtId,
+    );
+    if (!definition) {
+      return { success: false, reason: 'INVALID_DISTRICT' };
+    }
+    const planet = session.economy.planets[planetIndex];
+    const currentCount = planet.districts[districtId] ?? 0;
+    if (currentCount <= 0) {
+      return { success: false, reason: 'NONE_BUILT' };
+    }
+    const updatedPlanets = session.economy.planets.map((entry, idx) =>
+      idx === planetIndex
+        ? {
+            ...entry,
+            districts: {
+              ...entry.districts,
+              [districtId]: Math.max(0, currentCount - 1),
+            },
+          }
+        : entry,
+    );
+
+    dispatch(
+      setSessionState({
+        ...session,
+        economy: {
+          ...session.economy,
+          planets: updatedPlanets,
+        },
       }),
     );
 

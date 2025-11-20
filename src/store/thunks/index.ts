@@ -21,6 +21,7 @@ export type {
   QueueDistrictBuildResult,
   PopulationAdjustResult,
   DistrictQueueManageResult,
+  RemoveDistrictResult,
   DiplomacyActionResult,
   SaveGameResult,
   LoadGameResult,

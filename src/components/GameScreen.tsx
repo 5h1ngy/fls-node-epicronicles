@@ -53,6 +53,7 @@ export const GameScreen = () => {
   const queueDistrictConstruction = useGameStore(
     (state) => state.queueDistrictConstruction,
   );
+  const removeDistrict = useGameStore((state) => state.removeDistrict);
   const promotePopulationJob = useGameStore(
     (state) => state.promotePopulation,
   );
@@ -559,16 +560,17 @@ export const GameScreen = () => {
             initialHeight={wide.height}
             onClose={closePlanetPanel}
           >
-            <PlanetDetail
-              planet={selectedPlanet}
-              systemName={selectedPlanetSystem.name}
-              onPromote={handlePromotePopulation}
-              onDemote={handleDemotePopulation}
-              automationConfig={automationConfig}
-              populationJobs={populationJobs}
-              districtDefinitions={districtDefinitions}
-              planetDistrictQueue={planetDistrictQueue}
-              districtMessage={districtMessage}
+          <PlanetDetail
+            planet={selectedPlanet}
+            systemName={selectedPlanetSystem.name}
+            onPromote={handlePromotePopulation}
+            onDemote={handleDemotePopulation}
+            onRemoveDistrict={(districtId) => removeDistrict(selectedPlanet.id, districtId)}
+            automationConfig={automationConfig}
+            populationJobs={populationJobs}
+            districtDefinitions={districtDefinitions}
+            planetDistrictQueue={planetDistrictQueue}
+            districtMessage={districtMessage}
               populationMessage={populationMessage}
               onQueueDistrict={handleQueueDistrict}
             />

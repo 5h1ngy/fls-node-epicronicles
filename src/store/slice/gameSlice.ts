@@ -144,6 +144,16 @@ export type PopulationAdjustResult =
   | { success: true }
   | { success: false; reason: PopulationAdjustReason };
 
+export type RemoveDistrictReason =
+  | 'NO_SESSION'
+  | 'PLANET_NOT_FOUND'
+  | 'INVALID_DISTRICT'
+  | 'NONE_BUILT';
+
+export type RemoveDistrictResult =
+  | { success: true }
+  | { success: false; reason: RemoveDistrictReason };
+
 export type DiplomacyActionResult =
   | { success: true }
   | { success: false; reason: DiplomacyReason };

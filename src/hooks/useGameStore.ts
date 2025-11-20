@@ -22,6 +22,7 @@ import {
   orderScienceShip,
   setScienceAutoExplore,
   queueDistrictConstruction,
+  removeBuiltDistrict,
   promotePopulation,
   demotePopulation,
   cancelDistrictTask,
@@ -48,6 +49,7 @@ import type {
   QueueDistrictBuildResult,
   PopulationAdjustResult,
   DistrictQueueManageResult,
+  RemoveDistrictResult,
   DiplomacyActionResult,
   FleetMergeResult,
   FleetSplitResult,
@@ -100,6 +102,8 @@ interface HookState {
     planetId: string,
     jobId: PopulationJobId,
   ) => PopulationAdjustResult;
+  removeDistrict: (planetId: string, districtId: string) => RemoveDistrictResult;
+  removeDistrict: (planetId: string, districtId: string) => RemoveDistrictResult;
   cancelDistrictTask: (
     taskId: string,
   ) => DistrictQueueManageResult;
@@ -162,6 +166,8 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
         dispatch(promotePopulation(planetId, jobId)),
       demotePopulation: (planetId: string, jobId: PopulationJobId) =>
         dispatch(demotePopulation(planetId, jobId)),
+      removeDistrict: (planetId: string, districtId: string) =>
+        dispatch(removeBuiltDistrict(planetId, districtId)),
       cancelDistrictTask: (taskId: string) =>
         dispatch(cancelDistrictTask(taskId)),
       prioritizeDistrictTask: (taskId: string) =>
@@ -190,4 +196,3 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
 
   return selector({ ...state, ...actions });
 };
-

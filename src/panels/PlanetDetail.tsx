@@ -23,6 +23,7 @@ interface PlanetDetailProps {
   districtMessage: string | null;
   populationMessage: string | null;
   onQueueDistrict: (districtId: string) => void;
+  onRemoveDistrict: (districtId: string) => void;
 }
 
 export const PlanetDetail = ({
@@ -37,6 +38,7 @@ export const PlanetDetail = ({
   districtMessage,
   populationMessage,
   onQueueDistrict,
+  onRemoveDistrict,
 }: PlanetDetailProps) => {
   const planetProductionSummary = computePlanetProduction(planet, {
     startingResources: {},
@@ -178,12 +180,21 @@ export const PlanetDetail = ({
                       <span className="text-muted">Produzione</span>
                       <div className="district-card__chip">{formatCost(definition.production)}</div>
                     </div>
-                    <button
-                      className="panel__action panel__action--compact"
-                      onClick={() => onQueueDistrict(definition.id)}
-                    >
-                      Costruisci
-                    </button>
+                    <div className="district-card__actions">
+                      <button
+                        className="panel__action panel__action--compact"
+                        onClick={() => onQueueDistrict(definition.id)}
+                      >
+                        Costruisci
+                      </button>
+                      <button
+                        className="panel__action panel__action--compact panel__action--danger"
+                        disabled={owned <= 0}
+                        onClick={() => onRemoveDistrict(definition.id)}
+                      >
+                        Rimuovi
+                      </button>
+                    </div>
                   </div>
                 </li>
               );

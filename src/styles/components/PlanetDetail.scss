@@ -114,6 +114,18 @@
   align-items: flex-start;
 }
 
+.district-card__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.panel__action--danger {
+  background: rgba(255, 155, 138, 0.08);
+  border: 1px solid rgba(255, 155, 138, 0.4);
+  color: #ff9b8a;
+}
+
 .district-card__chip {
   display: inline-block;
   padding: 0.2rem 0.45rem;
