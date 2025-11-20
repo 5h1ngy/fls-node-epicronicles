@@ -10,6 +10,7 @@ import {
 import { createScene } from '@three/scene';
 import '../styles/components/GalaxyMap.scss';
 import { createSystemNode } from '@three/mapUtils';
+import type { Group } from 'three';
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -101,6 +102,7 @@ export const GalaxyMap = ({
   const vectorPoolRef = useRef<THREE.Vector3[]>([]);
   const matrixPoolRef = useRef<THREE.Matrix4[]>([]);
   const systemsSignatureRef = useRef<string>('');
+  const blackHoleRef = useRef<Group | null>(null);
 
   const getVector = () => {
     const pool = vectorPoolRef.current;
@@ -155,6 +157,73 @@ export const GalaxyMap = ({
 
     const systemGroup = new THREE.Group();
     systemGroupRef.current = systemGroup;
+    const createBlackHole = () => {
+      const group = new THREE.Group();
+      group.name = 'blackHole';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const gradient = ctx.createRadialGradient(
+          128,
+          128,
+          10,
+          128,
+          128,
+          128,
+        );
+        gradient.addColorStop(0, 'rgba(0,0,0,1)');
+        gradient.addColorStop(0.4, 'rgba(10,10,20,0.8)');
+        gradient.addColorStop(0.7, 'rgba(30,40,80,0.35)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 256, 256);
+      }
+      const coreTexture = new THREE.CanvasTexture(canvas);
+      const coreMaterial = new THREE.SpriteMaterial({
+        map: coreTexture,
+        transparent: true,
+        depthWrite: false,
+        opacity: 0.95,
+      });
+      const core = new THREE.Sprite(coreMaterial);
+      core.scale.set(42, 42, 1);
+      group.add(core);
+
+      const accretion = new THREE.Mesh(
+        new THREE.RingGeometry(18, 28, 64),
+        new THREE.MeshBasicMaterial({
+          color: 0x6f7cff,
+          transparent: true,
+          opacity: 0.35,
+          side: THREE.DoubleSide,
+        }),
+      );
+      accretion.rotation.x = Math.PI / 2;
+      accretion.position.set(0, 0, -0.5);
+      group.add(accretion);
+
+      const innerRing = new THREE.Mesh(
+        new THREE.RingGeometry(10, 16, 64),
+        new THREE.MeshBasicMaterial({
+          color: 0x2d2f48,
+          transparent: true,
+          opacity: 0.6,
+          side: THREE.DoubleSide,
+        }),
+      );
+      innerRing.rotation.x = Math.PI / 2;
+      innerRing.position.set(0, 0, -0.3);
+      group.add(innerRing);
+
+      return group;
+    };
+
+    const blackHole = createBlackHole();
+    blackHoleRef.current = blackHole;
+    systemGroup.add(blackHole);
     scene.add(systemGroup);
 
     let isPanning = false;
