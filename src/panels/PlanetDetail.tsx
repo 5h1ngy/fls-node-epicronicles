@@ -180,7 +180,7 @@ export const PlanetDetail = ({
                       <span className="text-muted">Produzione</span>
                       <div className="district-card__chip">{formatCost(definition.production)}</div>
                     </div>
-                    <div className="district-card__actions">
+                   <div className="district-card__actions">
                       <button
                         className="panel__action panel__action--compact"
                         onClick={() => onQueueDistrict(definition.id)}
@@ -194,7 +194,7 @@ export const PlanetDetail = ({
                       >
                         Rimuovi
                       </button>
-                    </div>
+                   </div>
                   </div>
                 </li>
               );
