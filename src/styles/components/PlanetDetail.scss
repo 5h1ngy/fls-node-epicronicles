@@ -335,8 +335,8 @@
 }
 
 .planet-districts ul {
-  max-height: 280px;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 @media (max-width: 1024px) {

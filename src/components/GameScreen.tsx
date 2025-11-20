@@ -169,7 +169,7 @@ export const GameScreen = () => {
 
   const large = sizeFor(1000, 700);
   const medium = sizeFor(840, 620);
-  const wide = sizeFor(1080, 720);
+  const wide = sizeFor(1260, 760);
   if (!session) {
     return (
       <div className="game-layout">
