@@ -117,15 +117,15 @@ const createStarSystem = (
   shape: GalaxyShape,
   total: number,
 ): StarSystem => {
-  const arms = 3;
+  const arms = 2;
   const radius = Math.sqrt(random()) * maxRadius;
   let angle: number;
 
   if (shape === 'spiral') {
     const armIndex = index % arms;
     const armAngle = (armIndex / arms) * Math.PI * 2;
-    const twist = (radius / maxRadius) * Math.PI * 2.5;
-    const jitter = (random() - 0.5) * 0.5;
+    const twist = (radius / maxRadius) * Math.PI * 3;
+    const jitter = (random() - 0.5) * 0.35;
     angle = armAngle + twist + jitter;
   } else {
     angle = random() * Math.PI * 2;
