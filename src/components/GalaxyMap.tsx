@@ -194,7 +194,7 @@ export const GalaxyMap = ({
           side: THREE.DoubleSide,
         }),
       );
-      accretion.rotation.x = Math.PI / 2;
+      accretion.rotation.set(0, 0, 0);
       accretion.position.set(0, 0, -0.4);
       group.add(accretion);
 
@@ -207,7 +207,7 @@ export const GalaxyMap = ({
           side: THREE.DoubleSide,
         }),
       );
-      innerRing.rotation.x = Math.PI / 2;
+      innerRing.rotation.set(0, 0, 0);
       innerRing.position.set(0, 0, -0.2);
       group.add(innerRing);
 

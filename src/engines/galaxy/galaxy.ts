@@ -118,17 +118,21 @@ const createStarSystem = (
   total: number,
 ): StarSystem => {
   const arms = 2;
-  const radius = Math.sqrt(random()) * maxRadius;
+  const radius = maxRadius * 0.9; // keep all systems far from the core
   let angle: number;
 
   if (shape === 'spiral') {
+    const perArm = Math.ceil(total / arms);
     const armIndex = index % arms;
+    const idxInArm = Math.floor(index / arms);
     const armAngle = (armIndex / arms) * Math.PI * 2;
-    const twist = (radius / maxRadius) * Math.PI * 3;
-    const jitter = (random() - 0.5) * 0.35;
-    angle = armAngle + twist + jitter;
+    const angleStep = (Math.PI * 2) / arms / perArm;
+    const twist = idxInArm * 0.35;
+    const jitter = (random() - 0.5) * 0.08;
+    angle = armAngle + idxInArm * angleStep + twist + jitter;
   } else {
-    angle = random() * Math.PI * 2;
+    const angleStep = (Math.PI * 2) / Math.max(1, total);
+    angle = index * angleStep;
   }
 
   const starClass = starClasses[Math.floor(random() * starClasses.length)];
