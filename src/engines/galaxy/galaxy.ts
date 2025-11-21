@@ -118,19 +118,22 @@ const createStarSystem = (
   total: number,
 ): StarSystem => {
   const arms = 2;
-  const minRadius = maxRadius * 0.3;
-  const radius = minRadius + Math.pow(random(), 0.65) * (maxRadius - minRadius);
+  const minRadius = maxRadius * 0.18;
+  const t = total > 1 ? index / (total - 1) : 0;
+  const radius = minRadius + Math.pow(t, 0.6) * (maxRadius - minRadius);
   let angle: number;
 
   if (shape === 'spiral') {
     const armIndex = index % arms;
     const baseArmAngle = (armIndex / arms) * Math.PI * 2;
-    const twist = (radius / maxRadius) * Math.PI * 3.2;
-    const jitter = (random() - 0.5) * 0.25;
-    angle = baseArmAngle + twist + jitter;
+    const turns = 2.6;
+    const golden = Math.PI * (3 - Math.sqrt(5)); // golden angle
+    const twist = turns * Math.PI * 2 * t;
+    const jitter = (random() - 0.5) * 0.18;
+    angle = baseArmAngle + twist + armIndex * golden * 0.15 + jitter;
   } else {
-    const angleStep = (Math.PI * 2) / Math.max(1, total);
-    angle = index * angleStep + (random() - 0.5) * 0.25;
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    angle = index * golden;
   }
 
   const starClass = starClasses[Math.floor(random() * starClasses.length)];

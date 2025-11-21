@@ -136,12 +136,31 @@ export const GalaxyMap = ({
     [systems],
   );
   const galaxyShape = useGameStore((state) => state.session?.galaxy.galaxyShape ?? 'circle');
+  const maxSystemRadius = useMemo(() => {
+    if (!systems.length) {
+      return 400;
+    }
+    return systems.reduce((max, system) => {
+      const pos = system.mapPosition ?? system.position;
+      const r = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
+      return Math.max(max, r);
+    }, 0);
+  }, [systems]);
+  const minZoom = useMemo(
+    () => Math.max(35, Math.min(90, maxSystemRadius * 0.25)),
+    [maxSystemRadius],
+  );
+  const maxZoom = useMemo(
+    () => Math.max(220, maxSystemRadius * 1.5),
+    [maxSystemRadius],
+  );
   const createSpiralFog = useMemo(() => {
     return () => {
       const fogMaterial = new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
         uniforms: {
           uTime: { value: 0 },
           uShape: { value: galaxyShape === 'spiral' ? 1.0 : 0.0 },
@@ -172,27 +191,33 @@ export const GalaxyMap = ({
             float r = length(uv);
             float angle = atan(uv.y, uv.x);
             float arms = 2.0;
-            float swirl = sin(angle * arms - r * 6.0);
-            float spiral = mix(1.0, smoothstep(-0.4, 0.4, swirl), uShape);
-            float falloff = smoothstep(0.95, 0.35, r);
-            float n = noise(uv * 6.0 + uTime * 0.05);
-            float density = spiral * falloff * (0.4 + 0.6 * n);
-            vec3 col = vec3(0.6, 0.7, 0.9) * density * 0.35;
-            gl_FragColor = vec4(col, density * 0.28);
+            float armWave = sin(angle * arms - r * 7.0);
+            float armMask = mix(1.0, smoothstep(-0.25, 0.35, armWave), uShape);
+            float falloff = smoothstep(0.95, 0.32, r);
+            float n = noise(uv * 7.0 + uTime * 0.04);
+            float density = armMask * falloff * (0.35 + 0.65 * n);
+
+            vec3 warm = vec3(0.95, 0.75, 0.55);
+            vec3 cool = vec3(0.55, 0.7, 0.95);
+            float mixCol = smoothstep(0.15, 0.85, r) * 0.6 + 0.4 * noise(uv * 3.0);
+            vec3 col = mix(cool, warm, mixCol) * density * 0.6;
+
+            gl_FragColor = vec4(col, density * 0.55);
           }
         `,
       });
+      const fogSize = Math.max(1200, maxSystemRadius * 2.6);
       const fogMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(1400, 1400, 1, 1),
+        new THREE.PlaneGeometry(fogSize, fogSize, 1, 1),
         fogMaterial,
       );
       fogMesh.name = 'galaxyFog';
-      fogMesh.rotation.set(Math.PI / 2, 0, 0);
-      fogMesh.position.set(0, 0, -5);
+      fogMesh.rotation.set(0, 0, 0);
+      fogMesh.position.set(0, 0, -1);
       fogRef.current = fogMesh;
       return fogMesh;
     };
-  }, [galaxyShape]);
+  }, [galaxyShape, maxSystemRadius]);
 
   const colonizedLookup = useMemo(() => {
     const map = new Map<string, { id: string; name: string }>();
@@ -355,8 +380,8 @@ export const GalaxyMap = ({
       event.preventDefault();
       zoomTargetRef.current = clamp(
         zoomTargetRef.current + event.deltaY * 0.1,
-        35,
-        320,
+        minZoom,
+        maxZoom,
       );
     };
 
@@ -595,7 +620,7 @@ export const GalaxyMap = ({
     if (group) {
       group.position.copy(offsetTargetRef.current);
     }
-    zoomTargetRef.current = 60;
+    zoomTargetRef.current = clamp(60, minZoom, maxZoom);
     if (cameraRef.current) {
       cameraRef.current.position.z = zoomTargetRef.current;
     }
@@ -624,7 +649,7 @@ export const GalaxyMap = ({
         if (group) {
           group.position.copy(offsetTargetRef.current);
         }
-        zoomTargetRef.current = 60;
+        zoomTargetRef.current = clamp(60, minZoom, maxZoom);
         if (cameraRef.current) {
           cameraRef.current.position.z = zoomTargetRef.current;
         }
@@ -642,7 +667,7 @@ export const GalaxyMap = ({
     } else {
       offsetTargetRef.current.set(-worldPos.x, -worldPos.y, 0);
     }
-    zoomTargetRef.current = 70;
+    zoomTargetRef.current = clamp(70, minZoom, maxZoom);
     if (cameraRef.current) {
       cameraRef.current.position.z = zoomTargetRef.current;
     }
