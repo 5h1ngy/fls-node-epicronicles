@@ -103,6 +103,7 @@ export const GalaxyMap = ({
   const matrixPoolRef = useRef<THREE.Matrix4[]>([]);
   const systemsSignatureRef = useRef<string>('');
   const blackHoleRef = useRef<Group | null>(null);
+  const fogRef = useRef<THREE.Mesh | null>(null);
 
   const getVector = () => {
     const pool = vectorPoolRef.current;
@@ -134,6 +135,64 @@ export const GalaxyMap = ({
         .join('|'),
     [systems],
   );
+  const galaxyShape = useGameStore((state) => state.session?.galaxy.galaxyShape ?? 'circle');
+  const createSpiralFog = useMemo(() => {
+    return () => {
+      const fogMaterial = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uShape: { value: galaxyShape === 'spiral' ? 1.0 : 0.0 },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying vec2 vUv;
+          uniform float uTime;
+          uniform float uShape;
+          float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
+          float noise(vec2 p){
+            vec2 i=floor(p);vec2 f=fract(p);
+            float a=hash(i);
+            float b=hash(i+vec2(1.0,0.0));
+            float c=hash(i+vec2(0.0,1.0));
+            float d=hash(i+vec2(1.0,1.0));
+            vec2 u=f*f*(3.0-2.0*f);
+            return mix(a,b,u.x)+ (c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+          }
+          void main(){
+            vec2 uv = (vUv - 0.5) * 2.0;
+            float r = length(uv);
+            float angle = atan(uv.y, uv.x);
+            float arms = 2.0;
+            float swirl = sin(angle * arms - r * 6.0);
+            float spiral = mix(1.0, smoothstep(-0.4, 0.4, swirl), uShape);
+            float falloff = smoothstep(0.95, 0.35, r);
+            float n = noise(uv * 6.0 + uTime * 0.05);
+            float density = spiral * falloff * (0.4 + 0.6 * n);
+            vec3 col = vec3(0.6, 0.7, 0.9) * density * 0.35;
+            gl_FragColor = vec4(col, density * 0.28);
+          }
+        `,
+      });
+      const fogMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(1400, 1400, 1, 1),
+        fogMaterial,
+      );
+      fogMesh.name = 'galaxyFog';
+      fogMesh.rotation.set(Math.PI / 2, 0, 0);
+      fogMesh.position.set(0, 0, -5);
+      fogRef.current = fogMesh;
+      return fogMesh;
+    };
+  }, [galaxyShape]);
 
   const colonizedLookup = useMemo(() => {
     const map = new Map<string, { id: string; name: string }>();
@@ -276,6 +335,10 @@ export const GalaxyMap = ({
     const blackHole = createBlackHole();
     blackHoleRef.current = blackHole;
     systemGroup.add(blackHole);
+
+    const initialFog = createSpiralFog();
+    systemGroup.add(initialFog);
+
     scene.add(systemGroup);
 
     let isPanning = false;
@@ -475,6 +538,13 @@ export const GalaxyMap = ({
           glow.rotation.z -= delta * 0.25;
         }
       }
+      if (fogRef.current) {
+        const fogMat = fogRef.current.material as THREE.ShaderMaterial;
+        if (fogMat.uniforms.uTime) {
+          fogMat.uniforms.uTime.value = time;
+        }
+        fogRef.current.rotation.z += delta * 0.02;
+      }
 
       renderer.render(scene, camera);
       animationRef.current = requestAnimationFrame(renderLoop);
@@ -612,6 +682,13 @@ export const GalaxyMap = ({
     if (blackHoleRef.current) {
       blackHoleRef.current.position.set(0, 0, 0);
       group.add(blackHoleRef.current);
+    }
+    if (fogRef.current) {
+      fogRef.current.userData = fogRef.current.userData ?? {};
+      group.add(fogRef.current);
+    } else {
+      const fog = createSpiralFog();
+      group.add(fog);
     }
 
     const positions = new Map<string, THREE.Vector3>();

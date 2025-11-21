@@ -280,6 +280,14 @@ export const gameConfig: GameConfig = {
       galaxyRadius: 320,
       galaxyShape: 'circle',
     },
+    {
+      id: 'mega',
+      label: 'Colossale (1200)',
+      seed: 'debug-seed',
+      systemCount: 1200,
+      galaxyRadius: 1400,
+      galaxyShape: 'spiral',
+    },
   ],
   debug: {
     autoStart: false,
