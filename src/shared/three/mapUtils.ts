@@ -335,6 +335,7 @@ export const createSystemNode = (
 
   const isRevealed = system.visibility !== 'unknown';
   const isSurveyed = system.visibility === 'surveyed';
+  const baseRadius = starClassVisuals[system.starClass]?.coreRadius ?? 2.1;
   const starVisual = createStarVisual(
     system.starClass,
     system.visibility,
@@ -352,8 +353,8 @@ export const createSystemNode = (
     const ownerKey = system.ownerId === 'player' ? 'player' : 'ai';
     const ring = new Mesh(
       new RingGeometry(
-        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 3.6,
-        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 5.2,
+        baseRadius + 3.6,
+        baseRadius + 5.2,
         32,
       ),
       ownerMaterials[ownerKey] ?? ownerMaterials.player,
@@ -366,8 +367,8 @@ export const createSystemNode = (
   if (system.hostilePower && system.hostilePower > 0) {
     const ring = new Mesh(
       new RingGeometry(
-        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 1.2,
-        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 2.1,
+        baseRadius + 1.2,
+        baseRadius + 2.1,
         24,
       ),
       hostileIndicatorMaterial,
@@ -380,8 +381,8 @@ export const createSystemNode = (
   if (recentCombatSystems.has(system.id)) {
     const ring = new Mesh(
       new RingGeometry(
-        starMesh.geometry.parameters.radius + 2.2,
-        starMesh.geometry.parameters.radius + 3.6,
+        baseRadius + 2.2,
+        baseRadius + 3.6,
         24,
       ),
       combatIndicatorMaterial,
@@ -394,8 +395,8 @@ export const createSystemNode = (
   if (activeBattles.has(system.id)) {
     const cross = new Mesh(
       new PlaneGeometry(
-        (starMesh.geometry.parameters.radius + 3) * 1.6,
-        (starMesh.geometry.parameters.radius + 3) * 1.6,
+        (baseRadius + 3) * 1.6,
+        (baseRadius + 3) * 1.6,
       ),
       battleIconMaterial,
     );
