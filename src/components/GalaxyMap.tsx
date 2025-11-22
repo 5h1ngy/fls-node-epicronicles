@@ -388,6 +388,52 @@ const createNebulaLayer = ({
   fog.renderOrder = -20;
   group.add(fog);
 
+  const starTexture = getNebulaTexture();
+  if (starTexture) {
+    const starCount = Math.min(
+      6000,
+      Math.max(1500, Math.floor(radius * 2.5)),
+    );
+    const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i += 1) {
+      const { x, y, z, falloff } = samplePosition();
+      const stride = i * 3;
+      positions[stride] = x * 1.05 + (random() - 0.5) * radius * 0.04;
+      positions[stride + 1] = y * 1.05 + (random() - 0.5) * radius * 0.04;
+      positions[stride + 2] = z * 0.35;
+      const tint = baseColors[1].clone().lerp(baseColors[2], falloff * 0.6);
+      colors[stride] = tint.r;
+      colors[stride + 1] = tint.g;
+      colors[stride + 2] = tint.b;
+    }
+    const starGeometry = new THREE.BufferGeometry();
+    starGeometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(positions, 3),
+    );
+    starGeometry.setAttribute(
+      'color',
+      new THREE.Float32BufferAttribute(colors, 3),
+    );
+    const stars = new THREE.Points(
+      starGeometry,
+      new THREE.PointsMaterial({
+        size: Math.max(1.4, radius * 0.006),
+        map: starTexture,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true,
+        opacity: 0.85,
+        sizeAttenuation: true,
+      }),
+    );
+    stars.name = 'starfield';
+    stars.renderOrder = -15;
+    group.add(stars);
+  }
+
   return group;
 };
 
