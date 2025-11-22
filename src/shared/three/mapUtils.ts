@@ -12,6 +12,8 @@ import {
   Object3D,
   PlaneGeometry,
   AdditiveBlending,
+  LinearFilter,
+  ClampToEdgeWrapping,
 } from 'three';
 import type { OrbitingPlanet, StarSystem } from '@domain/types';
 import {
@@ -54,10 +56,10 @@ const starGlowTexture = (() => {
     ctx.fillRect(0, 0, size, size);
     cache = new CanvasTexture(canvas);
     cache.needsUpdate = true;
-    cache.minFilter = THREE.LinearFilter;
-    cache.magFilter = THREE.LinearFilter;
-    cache.wrapS = THREE.ClampToEdgeWrapping;
-    cache.wrapT = THREE.ClampToEdgeWrapping;
+    cache.minFilter = LinearFilter;
+    cache.magFilter = LinearFilter;
+    cache.wrapS = ClampToEdgeWrapping;
+    cache.wrapT = ClampToEdgeWrapping;
     return cache;
   };
 })();
