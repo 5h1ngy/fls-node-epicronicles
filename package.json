@@ -16,7 +16,9 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.3.0",
     "@types/three": "^0.181.0",
+    "fast-simplex-noise": "^4.0.0",
     "lucide-react": "^0.555.0",
+    "poisson-disk-sampling": "^2.3.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-redux": "^9.2.0",

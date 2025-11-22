@@ -1,9 +1,9 @@
 # Roadmap refactor galassia
 
 ## Fase 1 – Fondamenta generazione
-- Integra `poisson-disk-sampling` per distribuire sistemi (circle/spiral mapping).
-- Aggiorna `galaxy.ts` a usare Poisson + golden-angle fallback e salva `maxSystemRadius`.
-- Verifica preset esistenti e “mega” (1200 sistemi).
+- Integra `poisson-disk-sampling` per distribuire sistemi (circle/spiral mapping). **In corso (poisson aggiunto).**
+- Aggiorna `galaxy.ts` a usare Poisson + golden-angle fallback e salva `maxSystemRadius`. **In corso (Poisson attivo).**
+- Verifica preset esistenti e “mega” (1200 sistemi). *(da verificare dopo render update)*
 
 ## Fase 2 – Rendering & camera
 - Sostituisci fog con shader simplex multicolore (no canvas) scalato su `maxSystemRadius`.

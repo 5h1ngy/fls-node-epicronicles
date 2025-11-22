@@ -9,6 +9,7 @@
   SystemVisibility,
   Vector3,
 } from '@domain/types';
+import PoissonDiskSampling from 'poisson-disk-sampling';
 
 export interface GalaxyGenerationParams {
   seed: string;
@@ -57,6 +58,52 @@ const createRandom = (seed: string) => {
     x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
     return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
   };
+};
+
+const generatePoissonPositions = (
+  random: () => number,
+  count: number,
+  shape: GalaxyShape,
+  maxRadius: number,
+): Array<{ radius: number; angle: number }> => {
+  const minDistance = Math.max(0.05, Math.min(0.18, 1 / Math.sqrt(count + 1)));
+  const sampler = new PoissonDiskSampling(
+    {
+      shape: [2, 2], // mapped to [-1,1]^2
+      minDistance,
+      maxDistance: minDistance * 1.6,
+      tries: 30,
+    },
+    random,
+  );
+  const raw = sampler.fill();
+  const points = raw
+    .map(([x, y]) => [x - 1, y - 1] as [number, number])
+    .filter(([x, y]) => x * x + y * y <= 1.05);
+
+  while (points.length < count) {
+    const i = points.length;
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    const r = Math.pow((i + 1) / (count + 1), 0.6);
+    const theta = i * golden;
+    points.push([Math.cos(theta) * r, Math.sin(theta) * r]);
+  }
+
+  return points.slice(0, count).map(([x, y], idx) => {
+    const rNorm = Math.max(0.02, Math.sqrt(x * x + y * y));
+    const baseAngle = Math.atan2(y, x);
+    const arms = 2;
+    if (shape === 'spiral') {
+      const arm = idx % arms;
+      const armOffset = (arm / arms) * Math.PI * 2;
+      const twist = rNorm * Math.PI * 3;
+      return {
+        radius: rNorm * maxRadius,
+        angle: baseAngle + twist + armOffset,
+      };
+    }
+    return { radius: rNorm * maxRadius, angle: baseAngle };
+  });
 };
 
 const createHabitableWorld = (
@@ -116,25 +163,11 @@ const createStarSystem = (
   maxRadius: number,
   shape: GalaxyShape,
   total: number,
+  basePositions: Array<{ radius: number; angle: number }>,
 ): StarSystem => {
-  const arms = 2;
-  const minRadius = maxRadius * 0.18;
-  const t = total > 1 ? index / (total - 1) : 0;
-  const radius = minRadius + Math.pow(t, 0.6) * (maxRadius - minRadius);
-  let angle: number;
-
-  if (shape === 'spiral') {
-    const armIndex = index % arms;
-    const baseArmAngle = (armIndex / arms) * Math.PI * 2;
-    const turns = 2.6;
-    const golden = Math.PI * (3 - Math.sqrt(5)); // golden angle
-    const twist = turns * Math.PI * 2 * t;
-    const jitter = (random() - 0.5) * 0.18;
-    angle = baseArmAngle + twist + armIndex * golden * 0.15 + jitter;
-  } else {
-    const golden = Math.PI * (3 - Math.sqrt(5));
-    angle = index * golden;
-  }
+  const pos = basePositions[index] ?? { radius: maxRadius * 0.5, angle: 0 };
+  const radius = pos.radius;
+  const angle = pos.angle;
 
   const starClass = starClasses[Math.floor(random() * starClasses.length)];
   const name = `SYS-${(index + 1).toString().padStart(3, '0')}`;
@@ -165,8 +198,21 @@ export const createTestGalaxy = ({
   galaxyShape = 'circle',
 }: GalaxyGenerationParams): GalaxyState => {
   const random = createRandom(seed);
+  const basePositions = generatePoissonPositions(
+    random,
+    systemCount,
+    galaxyShape,
+    galaxyRadius,
+  );
   const systems = Array.from({ length: systemCount }, (_, index) =>
-    createStarSystem(random, index, galaxyRadius, galaxyShape, systemCount),
+    createStarSystem(
+      random,
+      index,
+      galaxyRadius,
+      galaxyShape,
+      systemCount,
+      basePositions,
+    ),
   );
   return {
     seed,
