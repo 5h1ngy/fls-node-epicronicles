@@ -109,6 +109,7 @@ export const GalaxyMap = ({
   const fogRef = useRef<THREE.Mesh | null>(null);
   const fogNoiseRef = useRef<THREE.DataTexture | null>(null);
   const starfieldRef = useRef<THREE.InstancedMesh | null>(null);
+  const nebulaRef = useRef<THREE.InstancedMesh | null>(null);
 
   const getVector = () => {
     const pool = vectorPoolRef.current;
@@ -163,6 +164,7 @@ export const GalaxyMap = ({
     () => Math.max(1000, maxSystemRadius * 3),
     [maxSystemRadius],
   );
+  const nebulaCount = useMemo(() => Math.min(800, Math.max(120, systems.length * 2)), [systems.length]);
   const createSpiralFog = useMemo(() => {
     return () => {
       const noise2D = createNoise2D();
@@ -297,6 +299,44 @@ export const GalaxyMap = ({
       starfieldRef.current = mesh;
       scene.add(mesh);
     };
+
+    const createNebulaParticles = () => {
+      const geometry = new THREE.PlaneGeometry(3, 3);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x7fc7ff,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      const mesh = new THREE.InstancedMesh(geometry, material, nebulaCount);
+      const dummy = new THREE.Object3D();
+
+      const basePositions = systems.map((system) => {
+        const pos = system.mapPosition ?? system.position;
+        return new THREE.Vector3(pos.x, pos.y, pos.z ?? 0);
+      });
+
+      for (let i = 0; i < nebulaCount; i += 1) {
+        const base = basePositions[i % basePositions.length] ?? new THREE.Vector3();
+        const jitter = new THREE.Vector3(
+          (Math.random() - 0.5) * 25,
+          (Math.random() - 0.5) * 25,
+          (Math.random() - 0.5) * 8,
+        );
+        dummy.position.copy(base).add(jitter);
+        const s = 1 + Math.random() * 2.5;
+        dummy.scale.set(s, s, s);
+        dummy.lookAt(camera.position);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i, dummy.matrix);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.name = 'nebula';
+      nebulaRef.current = mesh;
+      scene.add(mesh);
+    };
     const createBlackHole = () => {
       const group = new THREE.Group();
       group.name = 'blackHole';
@@ -422,6 +462,7 @@ export const GalaxyMap = ({
 
     scene.add(systemGroup);
     createStarfield();
+    createNebulaParticles();
 
     let isPanning = false;
     let lastPointer = { x: 0, y: 0 };
@@ -624,6 +665,17 @@ export const GalaxyMap = ({
           fogMat.uniforms.uTime.value = time;
         }
         fogRef.current.rotation.z += delta * 0.02;
+      }
+      if (nebulaRef.current) {
+        const dummy = new THREE.Object3D();
+        for (let i = 0; i < nebulaCount; i += 1) {
+          nebulaRef.current.getMatrixAt(i, dummy.matrix);
+          const s = 0.98 + Math.sin(time * 0.6 + i * 0.15) * 0.04;
+          dummy.scale.setScalar(s);
+          dummy.updateMatrix();
+          nebulaRef.current.setMatrixAt(i, dummy.matrix);
+        }
+        nebulaRef.current.instanceMatrix.needsUpdate = true;
       }
 
       renderer.render(scene, camera);

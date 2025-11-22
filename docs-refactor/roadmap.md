@@ -7,7 +7,7 @@
 
 ## Fase 2 – Rendering & camera
 - Sostituisci fog con shader simplex multicolore (no canvas) scalato su `maxSystemRadius`. **In corso (shader con texture da fast-simplex-noise).**
-- Istanzia starfield via InstancedMesh; mantieni black hole shader allineato al piano. **In corso (InstancedMesh starfield aggiunto)**
+- Istanzia starfield via InstancedMesh; mantieni black hole shader allineato al piano. **Completato (InstancedMesh starfield + nebula particles)**
 - Adotta `OrbitControls` con min/max zoom dinamici e pan limitato al raggio. **In corso (OrbitControls + clamp zoom dinamici)**
 
 ## Fase 3 – Finishing
