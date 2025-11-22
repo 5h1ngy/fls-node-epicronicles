@@ -18,6 +18,11 @@ import { createSystemNode } from '@three/mapUtils';
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
+const BASE_TILT = Math.PI / 2;
+const MAX_TILT_DOWN = BASE_TILT + Math.PI / 6;
+const TILT_LERP_FACTOR = 0.18;
+const TILT_EPSILON = 0.0005;
+
 const toMapPosition = (system: StarSystem) => ({
   x: system.mapPosition?.x ?? system.position.x,
   y: system.mapPosition?.y ?? system.position.y,
@@ -94,6 +99,12 @@ export const GalaxyMap = ({
   const offsetTargetRef = useRef(new THREE.Vector3(0, 0, 0));
   const zoomTargetRef = useRef(170);
   const controlsRef = useRef<OrbitControls | null>(null);
+  const tiltStateRef = useRef<{ current: number; target: number }>({
+    current: BASE_TILT,
+    target: BASE_TILT,
+  });
+  const tempSphericalRef = useRef(new THREE.Spherical());
+  const tempOffsetRef = useRef(new THREE.Vector3());
   const lastFocusSystemRef = useRef<string | null>(null);
   const lastFocusPlanetRef = useRef<string | null>(null);
   const lastFocusAppliedRef = useRef<{ id: string | null; trigger: number }>({
@@ -181,7 +192,7 @@ export const GalaxyMap = ({
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.enablePan = false;
-    controls.enableRotate = true;
+    controls.enableRotate = false;
     controls.minDistance = minZoom;
     controls.maxDistance = maxZoom;
     controls.mouseButtons = {
@@ -191,12 +202,13 @@ export const GalaxyMap = ({
     };
     controls.minAzimuthAngle = 0;
     controls.maxAzimuthAngle = 0;
-    controls.minPolarAngle = Math.PI / 2;
-    controls.maxPolarAngle = Math.PI / 2;
+    controls.minPolarAngle = BASE_TILT;
+    controls.maxPolarAngle = MAX_TILT_DOWN;
     camera.position.set(0, 0, maxZoom);
     controls.target.set(0, 0, 0);
     controls.update();
     controlsRef.current = controls;
+    tiltStateRef.current = { current: BASE_TILT, target: BASE_TILT };
 
     const systemGroup = new THREE.Group();
     systemGroupRef.current = systemGroup;
@@ -400,6 +412,14 @@ export const GalaxyMap = ({
     };
 
     const handleMouseDown = (event: MouseEvent) => {
+      if (event.button === 1) {
+        event.preventDefault();
+        event.stopPropagation();
+        const isAtMax =
+          Math.abs(tiltStateRef.current.target - MAX_TILT_DOWN) < 0.01;
+        tiltStateRef.current.target = isAtMax ? BASE_TILT : MAX_TILT_DOWN;
+        return;
+      }
       if (event.button === 2) {
         isPanning = true;
         lastPointer = { x: event.clientX, y: event.clientY };
@@ -489,9 +509,29 @@ export const GalaxyMap = ({
       systemGroup.rotation.y = 0;
       systemGroup.rotation.x = 0;
       systemGroup.position.lerp(offsetTargetRef.current, 0.08);
-      controls.minDistance = minZoom;
-      controls.maxDistance = maxZoom;
-      controls.update();
+      const controls = controlsRef.current;
+      if (controls) {
+        controls.minDistance = minZoom;
+        controls.maxDistance = maxZoom;
+        controls.minPolarAngle = BASE_TILT;
+        controls.maxPolarAngle = MAX_TILT_DOWN;
+        const tilt = tiltStateRef.current;
+        const deltaTilt = tilt.target - tilt.current;
+        if (Math.abs(deltaTilt) > TILT_EPSILON) {
+          tilt.current += deltaTilt * TILT_LERP_FACTOR;
+        }
+        const appliedTilt = clamp(tilt.current, BASE_TILT, MAX_TILT_DOWN);
+        const target = controls.target;
+        const tempOffset = tempOffsetRef.current;
+        const tempSpherical = tempSphericalRef.current;
+        tempOffset.copy(camera.position).sub(target);
+        tempSpherical.setFromVector3(tempOffset);
+        tempSpherical.phi = appliedTilt;
+        tempOffset.setFromSpherical(tempSpherical).add(target);
+        camera.position.copy(tempOffset);
+        camera.lookAt(target);
+        controls.update();
+      }
 
       const showOrbits = camera.position.z < 105;
       const showLabels = camera.position.z < 240;
