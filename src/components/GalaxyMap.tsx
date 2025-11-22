@@ -9,6 +9,9 @@ import {
 } from '@three/materials';
 import { createScene } from '@three/scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import '../styles/components/GalaxyMap.scss';
 import { createSystemNode } from '@three/mapUtils';
 
@@ -104,6 +107,7 @@ export const GalaxyMap = ({
   const matrixPoolRef = useRef<THREE.Matrix4[]>([]);
   const systemsSignatureRef = useRef<string>('');
   const blackHoleRef = useRef<THREE.Group | null>(null);
+  const composerRef = useRef<EffectComposer | null>(null);
 
   const getVector = () => {
     const pool = vectorPoolRef.current;
@@ -176,31 +180,95 @@ export const GalaxyMap = ({
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.enablePan = true;
-    controls.enableRotate = false;
+    controls.enablePan = false;
+    controls.enableRotate = true;
     controls.minDistance = minZoom;
     controls.maxDistance = maxZoom;
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.PAN,
+      MIDDLE: THREE.MOUSE.ROTATE,
+      RIGHT: THREE.MOUSE.PAN,
+    };
+    controls.minAzimuthAngle = 0;
+    controls.maxAzimuthAngle = 0;
+    controls.minPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI / 2;
+    camera.position.set(0, 0, maxZoom);
+    controls.target.set(0, 0, 0);
+    controls.update();
     controlsRef.current = controls;
 
     const systemGroup = new THREE.Group();
     systemGroupRef.current = systemGroup;
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(container.clientWidth, container.clientHeight),
+      0.3,
+      0.5,
+      0.2,
+    );
+    composer.addPass(bloomPass);
+    composerRef.current = composer;
     const createBlackHole = () => {
       const group = new THREE.Group();
       group.name = 'blackHole';
 
       const shaderMaterials: THREE.ShaderMaterial[] = [];
 
-      const diskTilt = 0.08;
+      const diskTilt = 0;
 
       // Event horizon (dark sphere)
       const horizon = new THREE.Mesh(
-        new THREE.SphereGeometry(6, 48, 48),
+        new THREE.SphereGeometry(10, 64, 64),
         new THREE.MeshBasicMaterial({
           color: 0x000000,
           depthWrite: true,
         }),
       );
-      group.add(horizon);
+    group.add(horizon);
+
+      const diskShader = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying vec2 vUv;
+          uniform float uTime;
+          void main() {
+            vec2 uv = vUv - 0.5;
+            float r = length(uv);
+            float angle = atan(uv.y, uv.x);
+
+            float inner = smoothstep(0.12, 0.16, r);
+            float outer = 1.0 - smoothstep(0.56, 0.62, r);
+            float disc = inner * outer;
+
+            float beaming = 0.6 + 0.4 * cos(angle - uTime * 0.9);
+            float swirl = sin(r * 32.0 - uTime * 2.5 + sin(angle * 6.0) * 0.4) * 0.03;
+            float band = exp(-pow((r - 0.24 + swirl) * 16.0, 2.0));
+
+            vec3 warm = vec3(1.15, 0.95, 0.8);
+            vec3 cool = vec3(0.45, 0.65, 1.0);
+            vec3 color = mix(cool, warm, 0.55 + 0.45 * beaming);
+            color *= band * disc * 0.6;
+
+            float alpha = clamp(disc * (0.2 + 0.2 * band), 0.0, 0.6);
+            gl_FragColor = vec4(color, alpha);
+          }
+        `,
+      });
+      shaderMaterials.push(diskShader);
 
       const accretionMaterial = new THREE.ShaderMaterial({
         transparent: true,
@@ -237,13 +305,13 @@ export const GalaxyMap = ({
             vec3 warm = vec3(1.2, 1.0, 0.85);
             vec3 cool = vec3(0.4, 0.6, 1.0);
             vec3 color = mix(cool, warm, 0.65 + 0.35 * beaming);
-            color *= band * disc * 2.2;
+            color *= band * disc * 0.55;
 
             // subtle lensing glow
             float glow = 1.0 - smoothstep(0.5, 0.9, r);
             color += vec3(0.1, 0.15, 0.25) * glow * 0.4;
 
-            float alpha = clamp(disc * 2.0, 0.0, 1.0) * (0.4 + 0.6 * band);
+            float alpha = clamp(disc * 0.8, 0.0, 0.5) * (0.25 + 0.35 * band);
             gl_FragColor = vec4(color, alpha);
           }
         `,
@@ -251,12 +319,21 @@ export const GalaxyMap = ({
       shaderMaterials.push(accretionMaterial);
 
       const accretionDisk = new THREE.Mesh(
-        new THREE.PlaneGeometry(120, 120, 1, 1),
-        accretionMaterial,
+        new THREE.PlaneGeometry(200, 200, 1, 1),
+        diskShader,
       );
       accretionDisk.name = 'accretionOuter';
       accretionDisk.rotation.set(diskTilt, 0, 0);
       group.add(accretionDisk);
+
+      const hotDisk = new THREE.Mesh(
+        new THREE.PlaneGeometry(170, 170, 1, 1),
+        accretionMaterial,
+      );
+      hotDisk.name = 'accretionInner';
+      hotDisk.rotation.set(diskTilt, 0, 0);
+      hotDisk.position.set(0, 0, 0.15);
+      group.add(hotDisk);
 
       const lensMaterial = new THREE.ShaderMaterial({
         transparent: true,
@@ -278,19 +355,19 @@ export const GalaxyMap = ({
           void main() {
             vec2 uv = vUv - 0.5;
             float r = length(uv);
-            float ring = smoothstep(0.34, 0.36, r) * (1.0 - smoothstep(0.38, 0.4, r));
-            float pulse = 0.8 + 0.2 * sin(uTime * 1.5 + r * 10.0);
-            vec3 color = vec3(1.0, 0.92, 0.85) * ring * pulse;
-            gl_FragColor = vec4(color, ring * 0.8);
+            float ring = smoothstep(0.32, 0.34, r) * (1.0 - smoothstep(0.38, 0.42, r));
+            float pulse = 0.75 + 0.25 * sin(uTime * 1.2 + r * 8.0);
+            vec3 color = mix(vec3(0.85, 0.9, 1.0), vec3(1.0, 0.9, 0.8), ring) * pulse;
+            gl_FragColor = vec4(color, ring * 0.6);
           }
         `,
       });
       shaderMaterials.push(lensMaterial);
 
-      const lensRing = new THREE.Mesh(
-        new THREE.PlaneGeometry(130, 130, 1, 1),
-        lensMaterial,
-      );
+    const lensRing = new THREE.Mesh(
+      new THREE.PlaneGeometry(220, 220, 1, 1),
+      lensMaterial,
+    );
       lensRing.name = 'glow';
       lensRing.rotation.set(diskTilt, 0, 0);
       lensRing.position.set(0, 0, 0.2);
@@ -313,6 +390,7 @@ export const GalaxyMap = ({
       renderer.setSize(container.clientWidth, container.clientHeight);
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
+      composer.setSize(container.clientWidth, container.clientHeight);
     };
 
     const handleContextMenu = (event: MouseEvent) => event.preventDefault();
@@ -499,7 +577,11 @@ export const GalaxyMap = ({
         glow.rotation.z -= delta * 0.25;
       }
 
-      renderer.render(scene, camera);
+      if (composerRef.current) {
+        composerRef.current.render();
+      } else {
+        renderer.render(scene, camera);
+      }
       animationRef.current = requestAnimationFrame(renderLoop);
     };
 
@@ -517,6 +599,7 @@ export const GalaxyMap = ({
       window.removeEventListener('mouseup', handleMouseUp);
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
       controls.dispose();
+      if (composerRef.current) { composerRef.current.dispose(); composerRef.current = null; }
       dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -633,6 +716,11 @@ export const GalaxyMap = ({
     });
     group.clear();
     planetLookupRef.current.clear();
+
+    if (blackHoleRef.current) {
+      blackHoleRef.current.position.set(0, 0, 0);
+      group.add(blackHoleRef.current);
+    }
 
     const positions = new Map<string, THREE.Vector3>();
 
@@ -768,3 +856,4 @@ export const GalaxyMap = ({
 
   return <div className="galaxy-map" ref={containerRef} />;
 };
+
