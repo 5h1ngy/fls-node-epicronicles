@@ -11,6 +11,7 @@ import {
   DoubleSide,
   Object3D,
   PlaneGeometry,
+  AdditiveBlending,
 } from 'three';
 import type { OrbitingPlanet, StarSystem } from '@domain/types';
 import {
@@ -24,6 +25,65 @@ import {
 const orbitPalette = ['#72fcd5', '#f9d976', '#f58ef6', '#8ec5ff', '#c7ddff'];
 const planetGeometryCache = new Map<number, SphereGeometry>();
 const ringGeometryCache = new Map<string, RingGeometry>();
+const starGlowTexture = (() => {
+  let cache: CanvasTexture | null = null;
+  return () => {
+    if (cache) {
+      return cache;
+    }
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return null;
+    }
+    const gradient = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      size * 0.08,
+      size / 2,
+      size / 2,
+      size * 0.5,
+    );
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.4, 'rgba(255,255,255,0.65)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+    cache = new CanvasTexture(canvas);
+    cache.needsUpdate = true;
+    cache.minFilter = THREE.LinearFilter;
+    cache.magFilter = THREE.LinearFilter;
+    cache.wrapS = THREE.ClampToEdgeWrapping;
+    cache.wrapT = THREE.ClampToEdgeWrapping;
+    return cache;
+  };
+})();
+const starClassVisuals: Record<
+  string,
+  { coreColor: string; glowColor: string; coreRadius: number; glowScale: number }
+> = {
+  mainSequence: {
+    coreColor: '#9fc4ff',
+    glowColor: '#7ac8ff',
+    coreRadius: 2.1,
+    glowScale: 5.8,
+  },
+  giant: {
+    coreColor: '#ffb36b',
+    glowColor: '#ff8f5f',
+    coreRadius: 3.1,
+    glowScale: 6.6,
+  },
+  dwarf: {
+    coreColor: '#b0b5ff',
+    glowColor: '#98b0ff',
+    coreRadius: 1.4,
+    glowScale: 4.4,
+  },
+};
 
 export const createLabelSprite = (text: string) => {
   const canvas = document.createElement('canvas');
@@ -184,6 +244,77 @@ export const createOrbitingPlanets = (
   return group;
 };
 
+const createStarVisual = (
+  starClass: StarSystem['starClass'],
+  visibility: StarSystem['visibility'],
+  pulseSeed: number,
+) => {
+  const preset = starClassVisuals[starClass] ?? starClassVisuals.mainSequence;
+  const group = new Group();
+  group.name = 'starVisual';
+  group.userData = {
+    ...group.userData,
+    pulseSeed,
+    baseGlow: preset.glowScale,
+  };
+
+  const coreMaterial =
+    visibility === 'unknown'
+      ? materialCache.fogged
+      : new MeshStandardMaterial({
+          color: preset.coreColor,
+          emissive: preset.coreColor,
+          emissiveIntensity: 1.8,
+          roughness: 0.2,
+          metalness: 0.1,
+        });
+
+  const core = new Mesh(
+    new SphereGeometry(preset.coreRadius, 28, 28),
+    coreMaterial,
+  );
+  core.userData.systemId = null;
+  core.name = 'starCore';
+  group.add(core);
+
+  if (visibility !== 'unknown') {
+    const glowTexture = starGlowTexture();
+    if (glowTexture) {
+      const glow = new Sprite(
+        new SpriteMaterial({
+          map: glowTexture,
+          color: preset.glowColor,
+          transparent: true,
+          depthWrite: false,
+          blending: AdditiveBlending,
+          opacity: 0.9,
+        }),
+      );
+      glow.name = 'starGlow';
+      glow.userData.systemId = null;
+      glow.scale.set(preset.glowScale, preset.glowScale, 1);
+      group.add(glow);
+
+      const flare = new Mesh(
+        new PlaneGeometry(preset.glowScale * 1.15, preset.glowScale * 0.36),
+        new MeshBasicMaterial({
+          color: preset.glowColor,
+          transparent: true,
+          opacity: 0.4,
+          depthWrite: false,
+          blending: AdditiveBlending,
+        }),
+      );
+      flare.name = 'starFlare';
+      flare.userData.systemId = null;
+      flare.rotation.z = Math.PI / 4;
+      group.add(flare);
+    }
+  }
+
+  return group;
+};
+
 export const createSystemNode = (
   system: StarSystem,
   orbitBaseSpeed: number,
@@ -200,32 +331,15 @@ export const createSystemNode = (
   const pos = system.mapPosition ?? system.position;
   node.position.set(pos.x, pos.y, 0);
 
-  const starSizes: Record<string, number> = {
-    mainSequence: 2.1,
-    dwarf: 1.2,
-    giant: 3.1,
-  };
-  const baseSize = starSizes[system.starClass] ?? 1.8;
-  const sizeMultiplier = system.visibility === 'unknown' ? 0.55 : 1;
-  const geometry = new SphereGeometry(
-    baseSize * sizeMultiplier,
-    20,
-    20,
-  );
-
   const isRevealed = system.visibility !== 'unknown';
   const isSurveyed = system.visibility === 'surveyed';
-  const starMaterial = !isRevealed
-    ? materialCache.fogged
-    : system.hostilePower && system.hostilePower > 0
-      ? materialCache.hostile
-      : isSurveyed
-        ? materialCache.friendly
-        : materialCache.revealed;
-
-  const starMesh = new Mesh(geometry, starMaterial);
-  starMesh.userData.systemId = system.id;
-  node.add(starMesh);
+  const starVisual = createStarVisual(
+    system.starClass,
+    system.visibility,
+    system.id.charCodeAt(0),
+  );
+  starVisual.userData.systemId = system.id;
+  node.add(starVisual);
 
   const label = isRevealed ? createLabelSprite(system.name) : null;
   if (label) {
@@ -236,8 +350,8 @@ export const createSystemNode = (
     const ownerKey = system.ownerId === 'player' ? 'player' : 'ai';
     const ring = new Mesh(
       new RingGeometry(
-        starMesh.geometry.parameters.radius + 3.6,
-        starMesh.geometry.parameters.radius + 5.2,
+        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 3.6,
+        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 5.2,
         32,
       ),
       ownerMaterials[ownerKey] ?? ownerMaterials.player,
@@ -250,8 +364,8 @@ export const createSystemNode = (
   if (system.hostilePower && system.hostilePower > 0) {
     const ring = new Mesh(
       new RingGeometry(
-        starMesh.geometry.parameters.radius + 1.2,
-        starMesh.geometry.parameters.radius + 2.1,
+        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 1.2,
+        (starClassVisuals[system.starClass]?.coreRadius ?? 2) + 2.1,
         24,
       ),
       hostileIndicatorMaterial,

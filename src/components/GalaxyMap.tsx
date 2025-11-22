@@ -1100,6 +1100,27 @@ export const GalaxyMap = ({
             });
           }
         }
+
+        const starGlow = node.getObjectByName('starGlow') as THREE.Sprite | null;
+        const starFlare = node.getObjectByName('starFlare') as THREE.Mesh | null;
+        const pulseSeed = (node.getObjectByName('starVisual')?.userData?.pulseSeed as number) ?? 0;
+        const baseGlow =
+          (node.getObjectByName('starVisual')?.userData?.baseGlow as number) ?? 1;
+        if (starGlow) {
+          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.1;
+          const pulse = 1 + Math.sin(t * 1.3) * 0.06;
+          starGlow.scale.set(baseGlow * pulse, baseGlow * pulse, 1);
+          starGlow.material.opacity = 0.7 + Math.sin(t * 1.1) * 0.12;
+        }
+        if (starFlare) {
+          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.08;
+          const pulse = 1 + Math.sin(t * 0.9) * 0.08;
+          starFlare.scale.setScalar(pulse);
+          const mat = starFlare.material as THREE.Material & { opacity?: number };
+          if (mat.opacity !== undefined) {
+            mat.opacity = 0.28 + Math.sin(t * 1.4) * 0.06;
+          }
+        }
       });
 
       const outer = blackHoleRef.current?.getObjectByName('accretionOuter') as THREE.Mesh | null;
