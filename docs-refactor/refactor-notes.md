@@ -13,6 +13,6 @@ Librerie proposte
 
 Step tecnici
 1) Generazione galassia: Poisson per punti base, mapping raggio/angolo (circle) o bracci (spiral); fallback golden-angle per preset piccoli. Salva max radius per camera/fog. **In corso (Poisson inserito in galaxy.ts).**
-2) Rendering: fog shader su simplex (2 layer colori caldo/freddo), starfield instanziato, black hole shader allineato al piano, aggiunta OrbitControls. **Fog simplex in corso (fast-simplex-noise); starfield/OrbitControls da fare.**
+2) Rendering: fog shader su simplex (2 layer colori caldo/freddo), starfield instanziato, black hole shader allineato al piano, aggiunta OrbitControls. **Fog simplex in corso (fast-simplex-noise); starfield via InstancedMesh aggiunto; OrbitControls attivi.**
 3) Preset: supporto preset “mega” e auto-calcolo min/max zoom, fog size e starfield bounds dal raggio. *(in corso parziale, min/max zoom dinamici già presenti)*
 4) Documentazione: note su nuovi parametri e librerie. **In corso.**

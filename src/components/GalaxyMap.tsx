@@ -108,6 +108,7 @@ export const GalaxyMap = ({
   const blackHoleRef = useRef<Group | null>(null);
   const fogRef = useRef<THREE.Mesh | null>(null);
   const fogNoiseRef = useRef<THREE.DataTexture | null>(null);
+  const starfieldRef = useRef<THREE.InstancedMesh | null>(null);
 
   const getVector = () => {
     const pool = vectorPoolRef.current;
@@ -156,6 +157,10 @@ export const GalaxyMap = ({
   );
   const maxZoom = useMemo(
     () => Math.max(220, maxSystemRadius * 1.5),
+    [maxSystemRadius],
+  );
+  const starfieldRadius = useMemo(
+    () => Math.max(1000, maxSystemRadius * 3),
     [maxSystemRadius],
   );
   const createSpiralFog = useMemo(() => {
@@ -264,6 +269,34 @@ export const GalaxyMap = ({
 
     const systemGroup = new THREE.Group();
     systemGroupRef.current = systemGroup;
+    const createStarfield = () => {
+      const count = 1400;
+      const geometry = new THREE.SphereGeometry(0.65, 6, 6);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xaac8ff,
+        transparent: true,
+        opacity: 0.85,
+        depthWrite: false,
+      });
+      const mesh = new THREE.InstancedMesh(geometry, material, count);
+      const dummy = new THREE.Object3D();
+      for (let i = 0; i < count; i += 1) {
+        const r = starfieldRadius * (0.4 + Math.random() * 0.6);
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        dummy.position.set(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.sin(phi) * Math.sin(theta),
+          r * Math.cos(phi) * 0.25, // flatten a bit on Z
+        );
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i, dummy.matrix);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.name = 'starfield';
+      starfieldRef.current = mesh;
+      scene.add(mesh);
+    };
     const createBlackHole = () => {
       const group = new THREE.Group();
       group.name = 'blackHole';
@@ -388,6 +421,7 @@ export const GalaxyMap = ({
     systemGroup.add(initialFog);
 
     scene.add(systemGroup);
+    createStarfield();
 
     let isPanning = false;
     let lastPointer = { x: 0, y: 0 };
@@ -610,6 +644,16 @@ export const GalaxyMap = ({
       window.removeEventListener('mouseup', handleMouseUp);
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
       controls.dispose();
+      if (starfieldRef.current) {
+        starfieldRef.current.geometry.dispose();
+        (starfieldRef.current.material as THREE.Material).dispose();
+        scene.remove(starfieldRef.current);
+        starfieldRef.current = null;
+      }
+      if (fogNoiseRef.current) {
+        fogNoiseRef.current.dispose();
+        fogNoiseRef.current = null;
+      }
       dispose();
     };
   }, []);
