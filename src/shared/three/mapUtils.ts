@@ -70,20 +70,20 @@ const starClassVisuals: Record<
   mainSequence: {
     coreColor: '#9fc4ff',
     glowColor: '#7ac8ff',
-    coreRadius: 2.1,
-    glowScale: 5.8,
+    coreRadius: 1.4,
+    glowScale: 5.2,
   },
   giant: {
     coreColor: '#ffb36b',
     glowColor: '#ff8f5f',
-    coreRadius: 3.1,
-    glowScale: 6.6,
+    coreRadius: 2.2,
+    glowScale: 6.4,
   },
   dwarf: {
     coreColor: '#b0b5ff',
     glowColor: '#98b0ff',
-    coreRadius: 1.4,
-    glowScale: 4.4,
+    coreRadius: 1,
+    glowScale: 4.2,
   },
 };
 
@@ -272,7 +272,7 @@ const createStarVisual = (
         });
 
   const core = new Mesh(
-    new SphereGeometry(preset.coreRadius, 28, 28),
+    new SphereGeometry(preset.coreRadius, 32, 32),
     coreMaterial,
   );
   core.userData.systemId = null;
@@ -289,7 +289,7 @@ const createStarVisual = (
           transparent: true,
           depthWrite: false,
           blending: AdditiveBlending,
-          opacity: 0.9,
+          opacity: 0.7,
         }),
       );
       glow.name = 'starGlow';
@@ -297,20 +297,21 @@ const createStarVisual = (
       glow.scale.set(preset.glowScale, preset.glowScale, 1);
       group.add(glow);
 
-      const flare = new Mesh(
-        new PlaneGeometry(preset.glowScale * 1.15, preset.glowScale * 0.36),
-        new MeshBasicMaterial({
+      const outerGlow = new Sprite(
+        new SpriteMaterial({
+          map: glowTexture,
           color: preset.glowColor,
           transparent: true,
-          opacity: 0.4,
           depthWrite: false,
           blending: AdditiveBlending,
+          opacity: 0.28,
         }),
       );
-      flare.name = 'starFlare';
-      flare.userData.systemId = null;
-      flare.rotation.z = Math.PI / 4;
-      group.add(flare);
+      outerGlow.name = 'starGlowOuter';
+      outerGlow.userData.systemId = null;
+      const outerScale = preset.glowScale * 1.6;
+      outerGlow.scale.set(outerScale, outerScale, 1);
+      group.add(outerGlow);
     }
   }
 
@@ -346,6 +347,7 @@ export const createSystemNode = (
 
   const label = isRevealed ? createLabelSprite(system.name) : null;
   if (label) {
+    label.position.y = baseRadius + 6;
     node.add(label);
   }
 
