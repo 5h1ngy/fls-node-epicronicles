@@ -22,6 +22,53 @@ const BASE_TILT = Math.PI / 2;
 const MAX_TILT_DOWN = BASE_TILT + Math.PI / 6;
 const TILT_LERP_FACTOR = 0.18;
 const TILT_EPSILON = 0.0005;
+const devicePixelRatio =
+  typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+const createGalaxyMaskTexture = (
+  systems: StarSystem[],
+  radius: number,
+): THREE.Texture | null => {
+  if (systems.length === 0) {
+    return null;
+  }
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return null;
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0)';
+  ctx.fillRect(0, 0, size, size);
+  ctx.globalCompositeOperation = 'lighter';
+  const baseRadius = size * 0.022;
+  systems.forEach((system) => {
+    const pos = toMapPosition(system);
+    const nx = pos.x / Math.max(1, radius * 1.05);
+    const ny = pos.y / Math.max(1, radius * 1.05);
+    const px = size * 0.5 + nx * size * 0.45;
+    const py = size * 0.5 + ny * size * 0.45;
+    const r = baseRadius * (0.6 + Math.random() * 0.9);
+    const grad = ctx.createRadialGradient(px, py, 0, px, py, r);
+    grad.addColorStop(0, 'rgba(255,255,255,0.4)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.filter = 'blur(3px)';
+  const blurred = ctx.getImageData(0, 0, size, size);
+  ctx.putImageData(blurred, 0, 0);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
 const makeSeededRandom = (seed: string) => {
   let t =
     seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) +
@@ -73,18 +120,39 @@ const getNebulaTexture = (() => {
   };
 })();
 
+const createFallbackMask = (() => {
+  let cache: THREE.DataTexture | null = null;
+  return () => {
+    if (cache) {
+      return cache;
+    }
+    const data = new Uint8Array([255, 255, 255, 255]);
+    const tex = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
+    tex.needsUpdate = true;
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    cache = tex;
+    return tex;
+  };
+})();
+
 const createNebulaLayer = ({
   radius,
   shape,
   seed,
+  mask,
 }: {
   radius: number;
   shape: 'circle' | 'spiral';
   seed: string;
+  mask: THREE.Texture | null;
 }): THREE.Group => {
   const random = makeSeededRandom(`${seed}-nebula`);
   const group = new THREE.Group();
   group.name = 'nebula';
+  const maskTexture = mask ?? createFallbackMask();
+  group.userData.maskTexture = maskTexture;
+  group.userData.maskOwned = Boolean(mask);
 
   const baseColors = [
     new THREE.Color('#3b6fcf'),
@@ -115,13 +183,15 @@ const createNebulaLayer = ({
 
   const buildLayer = (
     count: number,
-    size: number,
+    sizeBase: number,
     opacity: number,
     colorA: THREE.Color,
     colorB: THREE.Color,
   ) => {
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
+    const alphas = new Float32Array(count);
+    const sizes = new Float32Array(count);
     for (let i = 0; i < count; i += 1) {
       const { x, y, z, falloff } = samplePosition();
       const stride = i * 3;
@@ -133,6 +203,11 @@ const createNebulaLayer = ({
       colors[stride] = color.r;
       colors[stride + 1] = color.g;
       colors[stride + 2] = color.b;
+      alphas[i] = Math.min(
+        1,
+        opacity * 1.6 * (0.6 + random() * 0.8) * (0.45 + falloff),
+      );
+      sizes[i] = sizeBase * (0.5 + random() * 0.9);
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
@@ -140,18 +215,57 @@ const createNebulaLayer = ({
       new THREE.Float32BufferAttribute(positions, 3),
     );
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    const nebulaTexture = getNebulaTexture();
-    const material = new THREE.PointsMaterial({
-      size,
+    geometry.setAttribute('aAlpha', new THREE.Float32BufferAttribute(alphas, 1));
+    geometry.setAttribute('aSize', new THREE.Float32BufferAttribute(sizes, 1));
+    const material = new THREE.ShaderMaterial({
       transparent: true,
-      opacity,
       depthWrite: false,
+      depthTest: false,
       blending: THREE.AdditiveBlending,
-      vertexColors: true,
-      sizeAttenuation: true,
-      map: nebulaTexture ?? undefined,
-      alphaMap: nebulaTexture ?? undefined,
-      alphaTest: 0.01,
+      uniforms: {
+        uGlobalOpacity: { value: 1 },
+        uPixelRatio: { value: devicePixelRatio },
+        uMask: { value: maskTexture },
+        uMaskScale: { value: 1 / Math.max(1, radius * 1.6) },
+      },
+      vertexShader: `
+        attribute float aAlpha;
+        attribute float aSize;
+        attribute vec3 color;
+        varying vec3 vColor;
+        varying float vAlpha;
+        varying vec2 vMaskUv;
+        uniform float uMaskScale;
+        void main() {
+          vColor = color;
+          vAlpha = aAlpha;
+          vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+          vMaskUv = worldPos.xy * uMaskScale + 0.5;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          float dist = -mvPosition.z;
+          float sizeAtten = aSize * uPixelRatio * clamp(300.0 / max(1.0, dist), 0.5, 4.0);
+          gl_PointSize = sizeAtten;
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vAlpha;
+        varying vec2 vMaskUv;
+        uniform float uGlobalOpacity;
+        uniform sampler2D uMask;
+        void main() {
+          vec2 uv = gl_PointCoord - 0.5;
+          float d = length(uv) * 2.0;
+          float falloff = smoothstep(1.0, 0.2, d);
+          vec2 mUv = clamp(vMaskUv, 0.0, 1.0);
+          float mask = clamp(texture2D(uMask, mUv).r, 0.0, 1.0);
+          float maskAlpha = mix(0.65, 1.0, mask);
+          float alpha = vAlpha * falloff * uGlobalOpacity * maskAlpha;
+          if (alpha <= 0.001) discard;
+          gl_FragColor = vec4(vColor * falloff, alpha);
+        }
+      `,
     });
     const mesh = new THREE.Points(geometry, material);
     mesh.userData.baseOpacity = opacity;
@@ -160,24 +274,119 @@ const createNebulaLayer = ({
   };
 
   const primaryCount = Math.min(
-    2400,
-    Math.max(700, Math.floor(radius * 5.4)),
+    18000,
+    Math.max(6000, Math.floor(radius * 32)),
   );
-  const glowCount = Math.min(1200, Math.max(400, Math.floor(radius * 2.8)));
+  const midCount = Math.min(14000, Math.max(4000, Math.floor(radius * 22)));
+  const glowCount = Math.min(9000, Math.max(2200, Math.floor(radius * 12)));
   buildLayer(
     primaryCount,
-    Math.max(6, radius * 0.028),
-    0.32,
+    Math.max(1.6, radius * 0.008),
+    0.48,
+    baseColors[0],
+    baseColors[1],
+  );
+  buildLayer(
+    midCount,
+    Math.max(3.4, radius * 0.014),
+    0.38,
     baseColors[0],
     baseColors[1],
   );
   buildLayer(
     glowCount,
-    Math.max(12, radius * 0.048),
-    0.22,
+    Math.max(7.5, radius * 0.03),
+    0.28,
     baseColors[1],
     baseColors[2],
   );
+
+  const fogSeed = makeSeededRandom(`${seed}-fog`);
+  const fogMat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending,
+    uniforms: {
+      uColorA: { value: baseColors[0].clone() },
+      uColorB: { value: baseColors[2].clone() },
+      uOpacity: { value: 0.04 },
+      uScale: { value: shape === 'spiral' ? 2.4 : 1.9 },
+      uOffset: {
+        value: new THREE.Vector2(
+          fogSeed() * 500.0,
+          fogSeed() * 500.0,
+        ),
+      },
+      uRotation: { value: fogSeed() * Math.PI * 2 },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec2 vUv;
+      uniform vec3 uColorA;
+      uniform vec3 uColorB;
+      uniform float uOpacity;
+      uniform float uScale;
+      uniform vec2 uOffset;
+      uniform float uRotation;
+
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+      }
+      float fbm(vec2 p) {
+        float sum = 0.0;
+        float amp = 0.5;
+        float freq = 1.0;
+        for (int i = 0; i < 4; i++) {
+          sum += amp * noise(p * freq);
+          freq *= 2.2;
+          amp *= 0.55;
+        }
+        return sum;
+      }
+
+      void main() {
+        vec2 centered = vUv - 0.5;
+        float r = length(centered) * 2.0;
+        float mask = smoothstep(1.0, 0.4, r);
+        float angle = uRotation;
+        float cs = cos(angle);
+        float sn = sin(angle);
+        mat2 rot = mat2(cs, -sn, sn, cs);
+        vec2 p = (rot * centered) * uScale + uOffset;
+        float n = fbm(p);
+        float d = smoothstep(0.25, 0.75, n);
+        vec3 col = mix(uColorA, uColorB, d);
+        float alpha = mask * d * uOpacity;
+        if (alpha <= 0.001) discard;
+        gl_FragColor = vec4(col, alpha);
+      }
+    `,
+  });
+  const fog = new THREE.Mesh(
+    new THREE.PlaneGeometry(radius * 2.1, radius * 2.1, 1, 1),
+    fogMat,
+  );
+  fog.name = 'nebulaFog';
+  fog.userData.baseOpacity = 0.12;
+  fog.position.set(0, 0, -6);
+  fog.rotation.z = shape === 'spiral' ? fogSeed() * 0.6 : 0;
+  fog.renderOrder = -20;
+  group.add(fog);
 
   return group;
 };
@@ -186,13 +395,18 @@ const disposeNebula = (nebula: THREE.Group | null) => {
   if (!nebula) {
     return;
   }
+  const maskTex = nebula.userData.maskTexture as THREE.Texture | undefined;
+  const ownsMask = nebula.userData.maskOwned as boolean | undefined;
+  if (maskTex && ownsMask) {
+    maskTex.dispose();
+  }
   nebula.children.forEach((child) => {
-    if (child instanceof THREE.Points) {
+    if (child instanceof THREE.Points || child instanceof THREE.Mesh) {
       child.geometry.dispose();
       const mat = child.material;
       if (Array.isArray(mat)) {
         mat.forEach((entry) => entry.dispose());
-      } else {
+      } else if (mat) {
         mat.dispose();
       }
     }
@@ -727,9 +941,25 @@ export const GalaxyMap = ({
         );
         nebulaGroup.children.forEach((child) => {
           if (child instanceof THREE.Points) {
-            const mat = child.material as THREE.PointsMaterial;
-            const base = child.userData.baseOpacity ?? mat.opacity ?? 0.2;
-            mat.opacity = base * (0.45 + zoomFactor * 0.8);
+            const mat = child.material as THREE.ShaderMaterial | THREE.PointsMaterial;
+            const base = child.userData.baseOpacity ?? 0.2;
+            if ('uniforms' in mat && mat.uniforms.uGlobalOpacity) {
+              const uniform = mat.uniforms.uGlobalOpacity;
+              if (uniform) {
+                uniform.value = base * (0.85 + zoomFactor * 1.1);
+              }
+            } else if ('opacity' in mat) {
+              mat.opacity = base * (0.85 + zoomFactor * 1.1);
+            }
+          } else if (child instanceof THREE.Mesh) {
+            const mat = child.material as THREE.ShaderMaterial;
+            if (mat.uniforms?.uOpacity) {
+              const base =
+                (child.userData.baseOpacity as number | undefined) ??
+                (mat.uniforms.uOpacity.value as number) ??
+                0.4;
+              mat.uniforms.uOpacity.value = base * (0.55 + zoomFactor * 0.7);
+            }
           }
         });
       }
@@ -965,10 +1195,13 @@ export const GalaxyMap = ({
     group.clear();
     planetLookupRef.current.clear();
 
+    const nebulaRadius = Math.max(maxSystemRadius * 1.08, 140);
+    const maskTexture = createGalaxyMaskTexture(systems, nebulaRadius);
     const nebula = createNebulaLayer({
-      radius: Math.max(maxSystemRadius * 1.08, 140),
+      radius: nebulaRadius,
       shape: galaxyShape,
       seed: galaxySeed,
+      mask: maskTexture,
     });
     nebulaRef.current = nebula;
     group.add(nebula);
