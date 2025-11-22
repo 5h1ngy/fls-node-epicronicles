@@ -22,6 +22,183 @@ const BASE_TILT = Math.PI / 2;
 const MAX_TILT_DOWN = BASE_TILT + Math.PI / 6;
 const TILT_LERP_FACTOR = 0.18;
 const TILT_EPSILON = 0.0005;
+const makeSeededRandom = (seed: string) => {
+  let t =
+    seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) +
+    0x6d2b79f5;
+  return () => {
+    t += 0x6d2b79f5;
+    let x = Math.imul(t ^ (t >>> 15), 1 | t);
+    x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const getNebulaTexture = (() => {
+  let cache: THREE.Texture | null = null;
+  return () => {
+    if (cache) {
+      return cache;
+    }
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      cache = null;
+      return null;
+    }
+    const gradient = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      size * 0.08,
+      size / 2,
+      size / 2,
+      size * 0.5,
+    );
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.4, 'rgba(255,255,255,0.45)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    cache = texture;
+    return cache;
+  };
+})();
+
+const createNebulaLayer = ({
+  radius,
+  shape,
+  seed,
+}: {
+  radius: number;
+  shape: 'circle' | 'spiral';
+  seed: string;
+}): THREE.Group => {
+  const random = makeSeededRandom(`${seed}-nebula`);
+  const group = new THREE.Group();
+  group.name = 'nebula';
+
+  const baseColors = [
+    new THREE.Color('#3b6fcf'),
+    new THREE.Color('#72e3ff'),
+    new THREE.Color('#c39bff'),
+  ];
+
+  const samplePosition = () => {
+    const rNorm = Math.pow(random(), shape === 'spiral' ? 0.92 : 1.1);
+    const r = (0.35 + rNorm * 0.7) * radius;
+    const armCount = 3;
+    let angle = random() * Math.PI * 2;
+    if (shape === 'spiral') {
+      const arm = Math.floor(random() * armCount);
+      const armOffset = (arm / armCount) * Math.PI * 2;
+      const twist = (r / radius) * Math.PI * 3.6;
+      angle = armOffset + twist + (random() - 0.5) * 0.6;
+    } else {
+      angle += (random() - 0.5) * 0.4;
+    }
+    const wobble = (random() - 0.5) * radius * 0.12 * (1 - r / radius);
+    const x = Math.cos(angle) * r + wobble;
+    const y = Math.sin(angle) * r + wobble;
+    const z = (random() - 0.5) * Math.max(18, radius * 0.05);
+    const falloff = 1 - Math.min(1, r / radius);
+    return { x, y, z, falloff };
+  };
+
+  const buildLayer = (
+    count: number,
+    size: number,
+    opacity: number,
+    colorA: THREE.Color,
+    colorB: THREE.Color,
+  ) => {
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    for (let i = 0; i < count; i += 1) {
+      const { x, y, z, falloff } = samplePosition();
+      const stride = i * 3;
+      positions[stride] = x + (random() - 0.5) * radius * 0.08;
+      positions[stride + 1] = y + (random() - 0.5) * radius * 0.08;
+      positions[stride + 2] = z;
+      const colorMix = Math.min(1, Math.max(0, falloff * 0.7 + random() * 0.4));
+      const color = colorA.clone().lerp(colorB, colorMix);
+      colors[stride] = color.r;
+      colors[stride + 1] = color.g;
+      colors[stride + 2] = color.b;
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(positions, 3),
+    );
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    const nebulaTexture = getNebulaTexture();
+    const material = new THREE.PointsMaterial({
+      size,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexColors: true,
+      sizeAttenuation: true,
+      map: nebulaTexture ?? undefined,
+      alphaMap: nebulaTexture ?? undefined,
+      alphaTest: 0.01,
+    });
+    const mesh = new THREE.Points(geometry, material);
+    mesh.userData.baseOpacity = opacity;
+    mesh.renderOrder = -10;
+    group.add(mesh);
+  };
+
+  const primaryCount = Math.min(
+    2400,
+    Math.max(700, Math.floor(radius * 5.4)),
+  );
+  const glowCount = Math.min(1200, Math.max(400, Math.floor(radius * 2.8)));
+  buildLayer(
+    primaryCount,
+    Math.max(6, radius * 0.028),
+    0.32,
+    baseColors[0],
+    baseColors[1],
+  );
+  buildLayer(
+    glowCount,
+    Math.max(12, radius * 0.048),
+    0.22,
+    baseColors[1],
+    baseColors[2],
+  );
+
+  return group;
+};
+
+const disposeNebula = (nebula: THREE.Group | null) => {
+  if (!nebula) {
+    return;
+  }
+  nebula.children.forEach((child) => {
+    if (child instanceof THREE.Points) {
+      child.geometry.dispose();
+      const mat = child.material;
+      if (Array.isArray(mat)) {
+        mat.forEach((entry) => entry.dispose());
+      } else {
+        mat.dispose();
+      }
+    }
+  });
+  nebula.clear();
+};
 
 const toMapPosition = (system: StarSystem) => ({
   x: system.mapPosition?.x ?? system.position.x,
@@ -59,6 +236,12 @@ export const GalaxyMap = ({
     (state) => state.session?.scienceShips ?? [],
   );
   const fleets = useGameStore((state) => state.session?.fleets ?? []);
+  const galaxyShape = useGameStore(
+    (state) => state.session?.galaxy.galaxyShape ?? 'circle',
+  );
+  const galaxySeed = useGameStore(
+    (state) => state.session?.galaxy.seed ?? 'default',
+  );
   const empireWar = useGameStore(
     (state) =>
       state.session?.empires.some(
@@ -118,6 +301,7 @@ export const GalaxyMap = ({
   const matrixPoolRef = useRef<THREE.Matrix4[]>([]);
   const systemsSignatureRef = useRef<string>('');
   const blackHoleRef = useRef<THREE.Group | null>(null);
+  const nebulaRef = useRef<THREE.Group | null>(null);
   const composerRef = useRef<EffectComposer | null>(null);
 
   const getVector = () => {
@@ -142,13 +326,14 @@ export const GalaxyMap = ({
 
   const systemsSignature = useMemo(
     () =>
+      `${galaxyShape}:${galaxySeed}|` +
       systems
         .map(
           (system) =>
             `${system.id}:${system.visibility}:${system.ownerId ?? ''}:${system.hostilePower ?? 0}:${system.orbitingPlanets.length}`,
         )
         .join('|'),
-    [systems],
+    [systems, galaxyShape, galaxySeed],
   );
   const maxSystemRadius = useMemo(() => {
     if (!systems.length) {
@@ -533,6 +718,22 @@ export const GalaxyMap = ({
         controls.update();
       }
 
+      const nebulaGroup = nebulaRef.current;
+      if (nebulaGroup) {
+        const zoomFactor = THREE.MathUtils.clamp(
+          (camera.position.z - minZoom) / Math.max(1, maxZoom - minZoom),
+          0,
+          1,
+        );
+        nebulaGroup.children.forEach((child) => {
+          if (child instanceof THREE.Points) {
+            const mat = child.material as THREE.PointsMaterial;
+            const base = child.userData.baseOpacity ?? mat.opacity ?? 0.2;
+            mat.opacity = base * (0.45 + zoomFactor * 0.8);
+          }
+        });
+      }
+
       const showOrbits = camera.position.z < 105;
       const showLabels = camera.position.z < 240;
       const labelScale = showLabels
@@ -639,6 +840,8 @@ export const GalaxyMap = ({
       window.removeEventListener('mouseup', handleMouseUp);
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
       controls.dispose();
+      disposeNebula(nebulaRef.current);
+      nebulaRef.current = null;
       if (composerRef.current) { composerRef.current.dispose(); composerRef.current = null; }
       dispose();
     };
@@ -739,6 +942,11 @@ export const GalaxyMap = ({
     }
     systemsSignatureRef.current = signature;
 
+    if (nebulaRef.current) {
+      disposeNebula(nebulaRef.current);
+      nebulaRef.current = null;
+    }
+
     group.children.forEach((child) => {
       const orbit = child.getObjectByName('orbits') as THREE.Group | null;
       if (!orbit) {
@@ -756,6 +964,14 @@ export const GalaxyMap = ({
     });
     group.clear();
     planetLookupRef.current.clear();
+
+    const nebula = createNebulaLayer({
+      radius: Math.max(maxSystemRadius * 1.08, 140),
+      shape: galaxyShape,
+      seed: galaxySeed,
+    });
+    nebulaRef.current = nebula;
+    group.add(nebula);
 
     if (blackHoleRef.current) {
       blackHoleRef.current.position.set(0, 0, 0);
@@ -892,6 +1108,9 @@ export const GalaxyMap = ({
     activeBattles,
     systemsSignature,
     colonizedLookup,
+    galaxyShape,
+    galaxySeed,
+    maxSystemRadius,
   ]);
 
   return <div className="galaxy-map" ref={containerRef} />;
