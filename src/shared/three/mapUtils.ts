@@ -209,23 +209,27 @@ const createStarCoreMaterial = ({
 
       float fbm(vec2 p) {
         float value = 0.0;
-        float amp = 0.6;
+        float amp = 0.7;
         float freq = 1.6;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
           value += amp * noise(p * freq);
-          freq *= 2.0;
-          amp *= 0.55;
+          freq *= 2.05;
+          amp *= 0.52;
         }
         return value;
       }
 
       void main() {
         vec3 tex = texture2D(uTexture, vUv).rrr;
-        float plasma = fbm(vUv * 6.0 + uTime * 0.15) * 0.8 + fbm((vUv + vec2(0.3, -0.2)) * 3.2 - uTime * 0.1) * 0.6;
+        vec2 uvCentered = vUv - 0.5;
+        float plasma = fbm(uvCentered * 8.0 + uTime * 0.22) * 0.9 + fbm((uvCentered + vec2(0.28, -0.18)) * 4.6 - uTime * 0.16) * 0.7;
+        float angle = atan(uvCentered.y, uvCentered.x);
+        float jets = max(0.0, sin(angle * 5.5 + uTime * 0.8)) * smoothstep(0.2, 0.65, length(uvCentered));
+        plasma += jets * 0.35;
         float fresnel = pow(1.0 - max(dot(normalize(vNormal), normalize(vViewDir)), 0.0), uFresnelPower);
         float plasmaMask = clamp(plasma, 0.0, 1.0);
-        vec3 color = (tex * 0.9 + plasmaMask * 0.4) * uTint * (0.8 + uGlow * 0.5) + fresnel * vec3(1.0, 1.0, 1.0);
-        float alpha = clamp(max(max(tex.r, plasmaMask), fresnel), 0.0, 1.0);
+        vec3 color = (tex * 0.9 + plasmaMask * 0.55 + jets * 0.25) * uTint * (0.85 + uGlow * 0.6) + fresnel * vec3(1.0, 1.0, 1.0);
+        float alpha = clamp(max(max(tex.r, plasmaMask), fresnel) + jets * 0.25, 0.0, 1.0);
         gl_FragColor = vec4(color, alpha);
       }
     `,

@@ -1132,7 +1132,7 @@ export const GalaxyMap = ({
         if (starCore) {
           const mat = starCore.material as THREE.ShaderMaterial;
           if (mat.uniforms?.uTime) {
-            mat.uniforms.uTime.value = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.35;
+            mat.uniforms.uTime.value = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.5;
           }
         }
         if (starGlow) {
