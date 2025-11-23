@@ -37,9 +37,10 @@ export const MainMenu = () => {
 
   const background = useMemo(() => {
     const seedValue = seed || 'default';
-    const index = seedValue
-      .split('')
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+    const index =
+      seedValue
+        .split('')
+        .reduce((acc, char) => acc + char.charCodeAt(0), 0) %
       BACKGROUNDS.length;
     return BACKGROUNDS[index];
   }, [seed]);

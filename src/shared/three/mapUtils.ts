@@ -19,6 +19,8 @@ import {
   ShaderMaterial,
   Vector3,
   Color,
+  DataTexture,
+  RGBFormat,
 } from 'three';
 import type { Texture } from 'three';
 import type { OrbitingPlanet, StarSystem } from '@domain/types';
@@ -134,7 +136,7 @@ const getStarCoreTexture = (() => {
     // fallback flat texture
     const size = 8;
     const data = new Uint8Array(size * size * 3).fill(255);
-    const tex = new THREE.DataTexture(data, size, size, THREE.RGBFormat);
+    const tex = new DataTexture(data, size, size, RGBFormat);
     tex.needsUpdate = true;
     tex.minFilter = LinearFilter;
     tex.magFilter = LinearFilter;
