@@ -164,6 +164,7 @@ const createStarCoreMaterial = ({
       uTint: { value: tintVec },
       uGlow: { value: 1.2 },
       uFresnelPower: { value: 2.8 },
+      uTime: { value: 0 },
     },
     vertexShader: `
       precision mediump float;
@@ -189,11 +190,42 @@ const createStarCoreMaterial = ({
       uniform vec3 uTint;
       uniform float uGlow;
       uniform float uFresnelPower;
+      uniform float uTime;
+
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+      }
+
+      float fbm(vec2 p) {
+        float value = 0.0;
+        float amp = 0.6;
+        float freq = 1.6;
+        for (int i = 0; i < 4; i++) {
+          value += amp * noise(p * freq);
+          freq *= 2.0;
+          amp *= 0.55;
+        }
+        return value;
+      }
+
       void main() {
         vec3 tex = texture2D(uTexture, vUv).rrr;
+        float plasma = fbm(vUv * 6.0 + uTime * 0.15) * 0.8 + fbm((vUv + vec2(0.3, -0.2)) * 3.2 - uTime * 0.1) * 0.6;
         float fresnel = pow(1.0 - max(dot(normalize(vNormal), normalize(vViewDir)), 0.0), uFresnelPower);
-        vec3 color = tex * uTint * (0.8 + uGlow * 0.4) + fresnel * vec3(1.0);
-        float alpha = clamp(max(tex.r, fresnel), 0.0, 1.0);
+        float plasmaMask = clamp(plasma, 0.0, 1.0);
+        vec3 color = (tex * 0.9 + plasmaMask * 0.4) * uTint * (0.8 + uGlow * 0.5) + fresnel * vec3(1.0, 1.0, 1.0);
+        float alpha = clamp(max(max(tex.r, plasmaMask), fresnel), 0.0, 1.0);
         gl_FragColor = vec4(color, alpha);
       }
     `,

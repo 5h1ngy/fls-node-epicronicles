@@ -1125,9 +1125,16 @@ export const GalaxyMap = ({
         const starGlowOuter = node.getObjectByName('starGlowOuter') as THREE.Sprite | null;
         const starStreak = node.getObjectByName('starStreak') as THREE.Sprite | null;
         const starSparkle = node.getObjectByName('starSparkle') as THREE.Sprite | null;
+        const starCore = node.getObjectByName('starCore') as THREE.Mesh | null;
         const pulseSeed = (node.getObjectByName('starVisual')?.userData?.pulseSeed as number) ?? 0;
         const baseGlow =
           (node.getObjectByName('starVisual')?.userData?.baseGlow as number) ?? 1;
+        if (starCore) {
+          const mat = starCore.material as THREE.ShaderMaterial;
+          if (mat.uniforms?.uTime) {
+            mat.uniforms.uTime.value = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.35;
+          }
+        }
         if (starGlow) {
           const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.1;
           const pulse = 1 + Math.sin(t * 1.3) * 0.06;
