@@ -1128,6 +1128,7 @@ export const GalaxyMap = ({
         const starStreakCross = node.getObjectByName('starStreakCross') as THREE.Sprite | null;
         const starSparkle = node.getObjectByName('starSparkle') as THREE.Sprite | null;
         const starCore = node.getObjectByName('starCore') as THREE.Mesh | null;
+        const starBurst = node.getObjectByName('starBurst') as THREE.Sprite | null;
         const pulseSeed = (node.getObjectByName('starVisual')?.userData?.pulseSeed as number) ?? 0;
         const baseGlow =
           (node.getObjectByName('starVisual')?.userData?.baseGlow as number) ?? 1;
@@ -1200,6 +1201,18 @@ export const GalaxyMap = ({
           const mat = starSparkle.material as THREE.Material & { opacity?: number };
           if (mat.opacity !== undefined) {
             mat.opacity = (0.3 + Math.sin(t * 2.1) * 0.08) * opacityAtten;
+          }
+        }
+        if (starBurst) {
+          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.08;
+          const farBoost = Math.max(0, zoomFactor - 0.4) / 0.6;
+          const pulse = 1 + Math.sin(t * 0.4) * 0.05;
+          const scale = baseGlow * 2.4 * (0.6 + farBoost * 0.8) * pulse;
+          starBurst.scale.set(scale, scale, 1);
+          const mat = starBurst.material as THREE.Material & { opacity?: number };
+          if (mat.opacity !== undefined) {
+            const targetOpacity = 0.08 + farBoost * 0.4;
+            mat.opacity = targetOpacity;
           }
         }
       });

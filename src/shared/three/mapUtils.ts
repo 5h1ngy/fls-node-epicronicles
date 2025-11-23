@@ -133,7 +133,6 @@ const getStarCoreTexture = (() => {
     if (cache) {
       return cache;
     }
-    // fallback flat texture
     const size = 8;
     const data = new Uint8Array(size * size * 3).fill(255);
     const tex = new DataTexture(data, size, size, RGBFormat);
@@ -144,6 +143,55 @@ const getStarCoreTexture = (() => {
     tex.wrapT = ClampToEdgeWrapping;
     cache = tex;
     return tex;
+  };
+})();
+
+const createStarBurstTexture = (() => {
+  let cache: ThreeCanvasTexture | null = null;
+  return () => {
+    if (cache) {
+      return cache;
+    }
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return null;
+    }
+    ctx.translate(size / 2, size / 2);
+    const radial = ctx.createRadialGradient(0, 0, size * 0.04, 0, 0, size * 0.5);
+    radial.addColorStop(0, 'rgba(255,255,255,1)');
+    radial.addColorStop(0.25, 'rgba(255,255,255,0.65)');
+    radial.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = radial;
+    ctx.beginPath();
+    ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    const drawSpike = (width: number, opacity: number, angle: number) => {
+      ctx.save();
+      ctx.rotate(angle);
+      const grad = ctx.createLinearGradient(-size / 2, 0, size / 2, 0);
+      grad.addColorStop(0, `rgba(255,255,255,0)`);
+      grad.addColorStop(0.5, `rgba(255,255,255,${opacity})`);
+      grad.addColorStop(1, `rgba(255,255,255,0)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(-size / 2, -width / 2, size, width);
+      ctx.restore();
+    };
+
+    drawSpike(size * 0.08, 0.6, 0);
+    drawSpike(size * 0.05, 0.4, Math.PI / 4);
+
+    cache = new ThreeCanvasTexture(canvas);
+    cache.needsUpdate = true;
+    cache.minFilter = LinearFilter;
+    cache.magFilter = LinearFilter;
+    cache.wrapS = ClampToEdgeWrapping;
+    cache.wrapT = ClampToEdgeWrapping;
+    return cache;
   };
 })();
 
@@ -522,6 +570,24 @@ const createStarVisual = (
       sparkle.userData.systemId = null;
       sparkle.scale.set(preset.glowScale * 0.8, preset.glowScale * 0.8, 1);
       group.add(sparkle);
+
+      const burstTex = createStarBurstTexture();
+      if (burstTex) {
+        const burst = new Sprite(
+          new SpriteMaterial({
+            map: burstTex,
+            color: preset.glowColor,
+            transparent: true,
+            depthWrite: false,
+            blending: AdditiveBlending,
+            opacity: 0.12,
+          }),
+        );
+        burst.name = 'starBurst';
+        burst.userData.systemId = null;
+        burst.scale.set(preset.glowScale * 2, preset.glowScale * 2, 1);
+        group.add(burst);
+      }
     }
   }
 
