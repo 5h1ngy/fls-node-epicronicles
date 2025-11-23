@@ -16,6 +16,9 @@ import {
   TextureLoader,
   MeshBasicMaterial,
   CanvasTexture as ThreeCanvasTexture,
+  ShaderMaterial,
+  Vector3,
+  Color,
 } from 'three';
 import type { Texture } from 'three';
 import type { OrbitingPlanet, StarSystem } from '@domain/types';
@@ -138,6 +141,65 @@ const getStarCoreTexture = (() => {
     return cache;
   };
 })();
+
+const createStarCoreMaterial = ({
+  preset,
+  visibility,
+}: {
+  preset: (typeof starClassVisuals)[string];
+  visibility: StarSystem['visibility'];
+}) => {
+  if (visibility === 'unknown') {
+    return materialCache.fogged;
+  }
+  const texture = getStarCoreTexture();
+  const tint = new Color(preset.coreColor);
+  const tintVec = new Vector3(tint.r, tint.g, tint.b);
+  return new ShaderMaterial({
+    transparent: true,
+    depthWrite: true,
+    blending: AdditiveBlending,
+    uniforms: {
+      uTexture: { value: texture },
+      uTint: { value: tintVec },
+      uGlow: { value: 1.2 },
+      uFresnelPower: { value: 2.8 },
+    },
+    vertexShader: `
+      precision mediump float;
+      precision mediump int;
+      varying vec2 vUv;
+      varying vec3 vNormal;
+      varying vec3 vViewDir;
+      void main() {
+        vUv = uv;
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vNormal = normalize(normalMatrix * normal);
+        vViewDir = normalize(cameraPosition - worldPos.xyz);
+        gl_Position = projectionMatrix * viewMatrix * worldPos;
+      }
+    `,
+    fragmentShader: `
+      precision mediump float;
+      precision mediump int;
+      varying vec2 vUv;
+      varying vec3 vNormal;
+      varying vec3 vViewDir;
+      uniform sampler2D uTexture;
+      uniform vec3 uTint;
+      uniform float uGlow;
+      uniform float uFresnelPower;
+      void main() {
+        vec3 tex = texture2D(uTexture, vUv).rrr;
+        float fresnel = pow(1.0 - max(dot(normalize(vNormal), normalize(vViewDir)), 0.0), uFresnelPower);
+        vec3 color = tex * uTint * (0.8 + uGlow * 0.4) + fresnel * vec3(1.0);
+        float alpha = clamp(max(tex.r, fresnel), 0.0, 1.0);
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+    name: 'starCoreMaterial',
+  });
+};
 
 export const createLabelSprite = (text: string) => {
   const canvas = document.createElement('canvas');
@@ -312,20 +374,7 @@ const createStarVisual = (
     baseGlow: preset.glowScale,
   };
 
-  const coreMaterial =
-    visibility === 'unknown'
-      ? materialCache.fogged
-      : new MeshStandardMaterial({
-          color: preset.coreColor,
-          emissive: preset.glowColor,
-          emissiveIntensity: 1.2,
-          map: getStarCoreTexture(),
-          emissiveMap: getStarCoreTexture(),
-          metalness: 0.05,
-          roughness: 0.25,
-          depthWrite: true,
-          name: 'starCoreMaterial',
-        });
+  const coreMaterial = createStarCoreMaterial({ preset, visibility });
 
   const core = new Mesh(
     new SphereGeometry(preset.coreRadius, 32, 32),
