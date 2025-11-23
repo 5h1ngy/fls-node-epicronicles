@@ -229,6 +229,8 @@ const createNebulaLayer = ({
         uMaskScale: { value: 1 / Math.max(1, radius * 1.6) },
       },
       vertexShader: `
+        precision mediump float;
+        precision mediump int;
         attribute float aAlpha;
         attribute float aSize;
         attribute vec3 color;
@@ -249,6 +251,8 @@ const createNebulaLayer = ({
         }
       `,
       fragmentShader: `
+        precision mediump float;
+        precision mediump int;
         varying vec3 vColor;
         varying float vAlpha;
         varying vec2 vMaskUv;
@@ -321,6 +325,8 @@ const createNebulaLayer = ({
       uRotation: { value: fogSeed() * Math.PI * 2 },
     },
     vertexShader: `
+      precision mediump float;
+      precision mediump int;
       varying vec2 vUv;
       void main() {
         vUv = uv;
@@ -328,6 +334,8 @@ const createNebulaLayer = ({
       }
     `,
     fragmentShader: `
+      precision mediump float;
+      precision mediump int;
       varying vec2 vUv;
       uniform vec3 uColorA;
       uniform vec3 uColorB;
@@ -717,6 +725,8 @@ export const GalaxyMap = ({
           uTime: { value: 0 },
         },
         vertexShader: `
+          precision mediump float;
+          precision mediump int;
           varying vec2 vUv;
           void main() {
             vUv = uv;
@@ -724,6 +734,8 @@ export const GalaxyMap = ({
           }
         `,
         fragmentShader: `
+          precision mediump float;
+          precision mediump int;
           varying vec2 vUv;
           uniform float uTime;
           void main() {
@@ -759,6 +771,8 @@ export const GalaxyMap = ({
           uTime: { value: 0 },
         },
         vertexShader: `
+          precision mediump float;
+          precision mediump int;
           varying vec2 vUv;
           void main() {
             vUv = uv;
@@ -766,6 +780,8 @@ export const GalaxyMap = ({
           }
         `,
         fragmentShader: `
+          precision mediump float;
+          precision mediump int;
           varying vec2 vUv;
           uniform float uTime;
           void main() {
@@ -824,6 +840,8 @@ export const GalaxyMap = ({
           uTime: { value: 0 },
         },
         vertexShader: `
+          precision mediump float;
+          precision mediump int;
           varying vec2 vUv;
           void main() {
             vUv = uv;
@@ -831,6 +849,8 @@ export const GalaxyMap = ({
           }
         `,
         fragmentShader: `
+          precision mediump float;
+          precision mediump int;
           varying vec2 vUv;
           uniform float uTime;
           void main() {
@@ -1439,4 +1459,3 @@ export const GalaxyMap = ({
 
   return <div className="galaxy-map" ref={containerRef} />;
 };
-

@@ -96,12 +96,13 @@ const getStarCoreTexture = (() => {
     if (cache) {
       return cache;
     }
-    cache = textureLoader.load('/galaxy-map/star-basic-texture.jpg');
-    cache.minFilter = LinearFilter;
-    cache.magFilter = LinearFilter;
-    cache.wrapS = ClampToEdgeWrapping;
-    cache.wrapT = ClampToEdgeWrapping;
-    cache.needsUpdate = true;
+    const tex = textureLoader.load('/galaxy-map/star-basic-texture.jpg');
+    tex.minFilter = LinearFilter;
+    tex.magFilter = LinearFilter;
+    tex.wrapS = ClampToEdgeWrapping;
+    tex.wrapT = ClampToEdgeWrapping;
+    tex.needsUpdate = true;
+    cache = tex;
     return cache;
   };
 })();
