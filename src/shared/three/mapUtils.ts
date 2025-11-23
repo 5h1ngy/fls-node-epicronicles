@@ -315,12 +315,15 @@ const createStarVisual = (
   const coreMaterial =
     visibility === 'unknown'
       ? materialCache.fogged
-      : new MeshBasicMaterial({
+      : new MeshStandardMaterial({
           color: preset.coreColor,
+          emissive: preset.glowColor,
+          emissiveIntensity: 1.2,
           map: getStarCoreTexture(),
-          transparent: true,
-          depthWrite: false,
-          blending: AdditiveBlending,
+          emissiveMap: getStarCoreTexture(),
+          metalness: 0.05,
+          roughness: 0.25,
+          depthWrite: true,
           name: 'starCoreMaterial',
         });
 
