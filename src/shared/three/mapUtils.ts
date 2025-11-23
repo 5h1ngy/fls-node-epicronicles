@@ -15,6 +15,7 @@ import {
   ClampToEdgeWrapping,
   TextureLoader,
   MeshBasicMaterial,
+  CanvasTexture as ThreeCanvasTexture,
 } from 'three';
 import type { Texture } from 'three';
 import type { OrbitingPlanet, StarSystem } from '@domain/types';
@@ -58,6 +59,37 @@ const starGlowTexture = (() => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, size, size);
     cache = new CanvasTexture(canvas);
+    cache.needsUpdate = true;
+    cache.minFilter = LinearFilter;
+    cache.magFilter = LinearFilter;
+    cache.wrapS = ClampToEdgeWrapping;
+    cache.wrapT = ClampToEdgeWrapping;
+    return cache;
+  };
+})();
+const starStreakTexture = (() => {
+  let cache: ThreeCanvasTexture | null = null;
+  return () => {
+    if (cache) {
+      return cache;
+    }
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return null;
+    }
+    const gradient = ctx.createLinearGradient(0, size / 2, size, size / 2);
+    gradient.addColorStop(0, 'rgba(255,255,255,0)');
+    gradient.addColorStop(0.2, 'rgba(255,255,255,0.55)');
+    gradient.addColorStop(0.5, 'rgba(255,255,255,0.9)');
+    gradient.addColorStop(0.8, 'rgba(255,255,255,0.55)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, size / 2 - size * 0.08, size, size * 0.16);
+    cache = new ThreeCanvasTexture(canvas);
     cache.needsUpdate = true;
     cache.minFilter = LinearFilter;
     cache.magFilter = LinearFilter;
@@ -335,6 +367,39 @@ const createStarVisual = (
       const outerScale = preset.glowScale * 1.6;
       outerGlow.scale.set(outerScale, outerScale, 1);
       group.add(outerGlow);
+
+      const streakTex = starStreakTexture();
+      if (streakTex) {
+        const streak = new Sprite(
+          new SpriteMaterial({
+            map: streakTex,
+            color: preset.glowColor,
+            transparent: true,
+            depthWrite: false,
+            blending: AdditiveBlending,
+            opacity: 0.25,
+          }),
+        );
+        streak.name = 'starStreak';
+        streak.userData.systemId = null;
+        streak.scale.set(preset.glowScale * 1.8, preset.glowScale * 0.65, 1);
+        group.add(streak);
+      }
+
+      const sparkle = new Sprite(
+        new SpriteMaterial({
+          map: glowTexture,
+          color: '#ffffff',
+          transparent: true,
+          depthWrite: false,
+          blending: AdditiveBlending,
+          opacity: 0.4,
+        }),
+      );
+      sparkle.name = 'starSparkle';
+      sparkle.userData.systemId = null;
+      sparkle.scale.set(preset.glowScale * 0.8, preset.glowScale * 0.8, 1);
+      group.add(sparkle);
     }
   }
 

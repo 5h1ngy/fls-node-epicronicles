@@ -1122,7 +1122,9 @@ export const GalaxyMap = ({
         }
 
         const starGlow = node.getObjectByName('starGlow') as THREE.Sprite | null;
-        const starFlare = node.getObjectByName('starFlare') as THREE.Mesh | null;
+        const starGlowOuter = node.getObjectByName('starGlowOuter') as THREE.Sprite | null;
+        const starStreak = node.getObjectByName('starStreak') as THREE.Sprite | null;
+        const starSparkle = node.getObjectByName('starSparkle') as THREE.Sprite | null;
         const pulseSeed = (node.getObjectByName('starVisual')?.userData?.pulseSeed as number) ?? 0;
         const baseGlow =
           (node.getObjectByName('starVisual')?.userData?.baseGlow as number) ?? 1;
@@ -1132,13 +1134,35 @@ export const GalaxyMap = ({
           starGlow.scale.set(baseGlow * pulse, baseGlow * pulse, 1);
           starGlow.material.opacity = 0.7 + Math.sin(t * 1.1) * 0.12;
         }
-        if (starFlare) {
-          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.08;
-          const pulse = 1 + Math.sin(t * 0.9) * 0.08;
-          starFlare.scale.setScalar(pulse);
-          const mat = starFlare.material as THREE.Material & { opacity?: number };
+        if (starGlowOuter) {
+          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.06;
+          const pulse = 1 + Math.sin(t * 0.7) * 0.04;
+          starGlowOuter.scale.set(baseGlow * 1.6 * pulse, baseGlow * 1.6 * pulse, 1);
+          const mat = starGlowOuter.material as THREE.Material & { opacity?: number };
           if (mat.opacity !== undefined) {
-            mat.opacity = 0.28 + Math.sin(t * 1.4) * 0.06;
+            mat.opacity = 0.22 + Math.sin(t * 0.9) * 0.05;
+          }
+        }
+        if (starStreak) {
+          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.12;
+          const pulse = 1 + Math.sin(t * 0.6) * 0.05;
+          starStreak.scale.set(
+            (baseGlow * 1.8) * pulse,
+            (baseGlow * 0.65) * (1 + Math.sin(t * 0.8) * 0.04),
+            1,
+          );
+          const mat = starStreak.material as THREE.Material & { opacity?: number };
+          if (mat.opacity !== undefined) {
+            mat.opacity = 0.2 + Math.sin(t * 1.1) * 0.05;
+          }
+        }
+        if (starSparkle) {
+          const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.14;
+          const pulse = 1 + Math.sin(t * 1.5) * 0.1;
+          starSparkle.scale.set(baseGlow * 0.8 * pulse, baseGlow * 0.8 * pulse, 1);
+          const mat = starSparkle.material as THREE.Material & { opacity?: number };
+          if (mat.opacity !== undefined) {
+            mat.opacity = 0.3 + Math.sin(t * 2.1) * 0.08;
           }
         }
       });
