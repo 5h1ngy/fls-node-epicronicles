@@ -5,10 +5,14 @@ import "../styles/components/GalaxyOverview.scss";
 
 const MAP_SIZE = 360;
 
-const systemClassColor: Record<StarClass, string> = {
-  mainSequence: "#70c1ff",
-  giant: "#ffa94d",
-  dwarf: "#d8b4ff",
+const fallbackClassColor: Record<StarClass, string> = {
+  O: "#b9d8ff",
+  B: "#9fc4ff",
+  A: "#c7d6ff",
+  F: "#f7f2d0",
+  G: "#ffd27a",
+  K: "#ffb36b",
+  M: "#ff8a5c",
 };
 
 const visibilityOpacity: Record<SystemVisibility, number> = {
@@ -39,6 +43,7 @@ export const GalaxyOverview = ({ onFocusSystem }: GalaxyOverviewProps) => {
     (state) => state.session?.scienceShips ?? [],
   );
   const planets = useGameStore((state) => state.session?.economy.planets ?? []);
+  const starVisuals = useGameStore((state) => state.config.starVisuals);
 
   const mappedSystems = useMemo(() => {
     if (systems.length === 0) {
@@ -125,45 +130,49 @@ export const GalaxyOverview = ({ onFocusSystem }: GalaxyOverviewProps) => {
               fill="rgba(255,255,255,0.02)"
               stroke="rgba(255,255,255,0.1)"
             />
-            {mappedSystems.map((system) => (
-              <g key={system.id} className="galaxy-modal__system">
-                {system.hostilePower && system.hostilePower > 0 ? (
+            {mappedSystems.map((system) => {
+              const visual = starVisuals[system.starClass];
+              const fill = visual?.coreColor ?? fallbackClassColor[system.starClass];
+              return (
+                <g key={system.id} className="galaxy-modal__system">
+                  {system.hostilePower && system.hostilePower > 0 ? (
+                    <circle
+                      cx={system.screenX}
+                      cy={system.screenY}
+                      r={visibilityRadius[system.visibility] + 5}
+                      className="galaxy-modal__hostile"
+                    />
+                  ) : null}
                   <circle
                     cx={system.screenX}
                     cy={system.screenY}
-                    r={visibilityRadius[system.visibility] + 5}
-                    className="galaxy-modal__hostile"
+                    r={visibilityRadius[system.visibility]}
+                    fill={fill}
+                    opacity={visibilityOpacity[system.visibility]}
                   />
-                ) : null}
-                <circle
-                  cx={system.screenX}
-                  cy={system.screenY}
-                  r={visibilityRadius[system.visibility]}
-                  fill={systemClassColor[system.starClass]}
-                  opacity={visibilityOpacity[system.visibility]}
-                />
-                <text
-                  x={system.screenX + 8}
-                  y={system.screenY + 4}
-                  className="galaxy-modal__label"
-                >
-                  {system.name}
-                </text>
-                {onFocusSystem ? (
-                  <circle
-                    cx={system.screenX}
-                    cy={system.screenY}
-                    r={visibilityRadius[system.visibility] + 8}
-                    className="galaxy-modal__focus"
-                    onClick={() =>
-                      system.visibility !== "unknown"
-                        ? onFocusSystem(system.id)
-                        : null
-                    }
-                  />
-                ) : null}
-              </g>
-            ))}
+                  <text
+                    x={system.screenX + 8}
+                    y={system.screenY + 4}
+                    className="galaxy-modal__label"
+                  >
+                    {system.name}
+                  </text>
+                  {onFocusSystem ? (
+                    <circle
+                      cx={system.screenX}
+                      cy={system.screenY}
+                      r={visibilityRadius[system.visibility] + 8}
+                      className="galaxy-modal__focus"
+                      onClick={() =>
+                        system.visibility !== "unknown"
+                          ? onFocusSystem(system.id)
+                          : null
+                      }
+                    />
+                  ) : null}
+                </g>
+              );
+            })}
             {shipCards.map(({ ship, currentSystem }) => {
               if (!currentSystem) return null;
               return (

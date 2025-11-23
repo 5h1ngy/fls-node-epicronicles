@@ -21,6 +21,7 @@ export interface SessionParams {
   seed: string;
   label?: string;
   galaxyOverrides?: Partial<GalaxyGenerationParams>;
+  starClasses?: GalaxyGenerationParams['starClasses'];
   economyConfig: EconomyConfig;
   militaryConfig: MilitaryConfig;
   diplomacyConfig: DiplomacyConfig;
@@ -91,13 +92,18 @@ export const createSession = ({
   seed,
   label,
   galaxyOverrides,
+  starClasses,
   economyConfig,
   militaryConfig,
   diplomacyConfig,
   researchConfig,
   traditionConfig,
 }: SessionParams): GameSession => {
-  const baseGalaxy = createTestGalaxy({ seed, ...galaxyOverrides });
+  const baseGalaxy = createTestGalaxy({
+    seed,
+    starClasses,
+    ...galaxyOverrides,
+  });
   const systems = baseGalaxy.systems.map((system, index) => {
     if (index === 0) {
       return { ...system, ownerId: 'player' };

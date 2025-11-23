@@ -16,11 +16,11 @@ export interface GalaxyGenerationParams {
   systemCount?: number;
   galaxyRadius?: number;
   galaxyShape?: GalaxyShape;
+  starClasses?: Array<{ id: StarClass; weight: number }>;
 }
 
 export type GalaxyShape = 'circle' | 'spiral';
 
-const starClasses: StarClass[] = ['mainSequence', 'giant', 'dwarf'];
 const planetKinds: PlanetKind[] = ['terrestrial', 'desert', 'tundra'];
 
 const baseProductionByKind: Record<
@@ -161,12 +161,12 @@ const createStarSystem = (
   random: () => number,
   index: number,
   basePositions: Array<{ radius: number; angle: number }>,
+  starClass: StarClass,
 ): StarSystem => {
   const pos = basePositions[index] ?? { radius: 0, angle: 0 };
   const radius = pos.radius;
   const angle = pos.angle;
 
-  const starClass = starClasses[Math.floor(random() * starClasses.length)];
   const name = `SYS-${(index + 1).toString().padStart(3, '0')}`;
 
   const visibility: SystemVisibility = index === 0 ? 'surveyed' : 'unknown';
@@ -193,8 +193,33 @@ export const createTestGalaxy = ({
   systemCount = 12,
   galaxyRadius = 200,
   galaxyShape = 'circle',
+  starClasses,
 }: GalaxyGenerationParams): GalaxyState => {
   const random = createRandom(seed);
+  const starPool =
+    starClasses && starClasses.length > 0
+      ? starClasses
+      : [
+          { id: 'G' as StarClass, weight: 6 },
+          { id: 'K' as StarClass, weight: 5 },
+          { id: 'M' as StarClass, weight: 7 },
+          { id: 'F' as StarClass, weight: 3 },
+          { id: 'A' as StarClass, weight: 2 },
+          { id: 'B' as StarClass, weight: 1 },
+          { id: 'O' as StarClass, weight: 1 },
+        ];
+  const totalWeight = starPool.reduce((sum, entry) => sum + (entry.weight ?? 1), 0);
+  const pickStarClass = () => {
+    const roll = random() * totalWeight;
+    let acc = 0;
+    for (const entry of starPool) {
+      acc += entry.weight ?? 1;
+      if (roll <= acc) {
+        return entry.id;
+      }
+    }
+    return starPool[starPool.length - 1]?.id ?? 'G';
+  };
   const basePositions = generatePoissonPositions(
     random,
     systemCount,
@@ -202,7 +227,7 @@ export const createTestGalaxy = ({
     galaxyRadius,
   );
   const systems = Array.from({ length: systemCount }, (_, index) =>
-    createStarSystem(random, index, basePositions),
+    createStarSystem(random, index, basePositions, pickStarClass()),
   );
   return {
     seed,

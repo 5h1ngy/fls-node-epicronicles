@@ -534,6 +534,7 @@ export const GalaxyMap = ({
   const galaxySeed = useGameStore(
     (state) => state.session?.galaxy.seed ?? 'default',
   );
+  const starVisuals = useGameStore((state) => state.config.starVisuals);
   const empireWar = useGameStore(
     (state) =>
       state.session?.empires.some(
@@ -1458,6 +1459,7 @@ export const GalaxyMap = ({
         recentCombatSystems,
         activeBattles,
         colonizedPlanet,
+        starVisuals,
       );
       group.add(node);
       positions.set(system.id, node.position.clone());

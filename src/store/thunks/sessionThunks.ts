@@ -94,6 +94,7 @@ export const startNewSession =
     const seed = args?.seed ?? preset?.seed ?? cfg.defaultGalaxy.seed;
     const session = createSession({
       seed,
+      starClasses: cfg.starClasses,
       label: args?.label,
       galaxyOverrides: {
         systemCount: preset?.systemCount ?? cfg.defaultGalaxy.systemCount,

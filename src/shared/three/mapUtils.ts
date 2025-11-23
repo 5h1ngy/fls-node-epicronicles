@@ -13,7 +13,6 @@ import {
   AdditiveBlending,
   LinearFilter,
   ClampToEdgeWrapping,
-  TextureLoader,
   MeshBasicMaterial,
   ShaderMaterial,
   Vector3,
@@ -22,7 +21,7 @@ import {
   RGBFormat,
 } from 'three';
 import type { Texture } from 'three';
-import type { OrbitingPlanet, StarSystem } from '@domain/types';
+import type { OrbitingPlanet, StarClass, StarSystem } from '@domain/types';
 import {
   materialCache,
   hostileIndicatorMaterial,
@@ -34,7 +33,6 @@ import {
 const orbitPalette = ['#72fcd5', '#f9d976', '#f58ef6', '#8ec5ff', '#c7ddff'];
 const planetGeometryCache = new Map<number, SphereGeometry>();
 const ringGeometryCache = new Map<string, RingGeometry>();
-const textureLoader = new TextureLoader();
 const starGlowTexture = (() => {
   let cache: CanvasTexture | null = null;
   return () => {
@@ -102,27 +100,79 @@ const starStreakTexture = (() => {
     return cache;
   };
 })();
-const starClassVisuals: Record<
-  string,
-  { coreColor: string; glowColor: string; coreRadius: number; glowScale: number }
-> = {
-  mainSequence: {
+type StarVisual = {
+  coreColor: string;
+  glowColor: string;
+  coreRadius: number;
+  glowScale: number;
+  plasmaSpeed: number;
+  jetIntensity: number;
+  streakOpacity: number;
+};
+
+const fallbackStarVisuals: Record<StarClass, StarVisual> = {
+  O: {
+    coreColor: '#b9d8ff',
+    glowColor: '#7ecbff',
+    coreRadius: 1.6,
+    glowScale: 5.6,
+    plasmaSpeed: 1.4,
+    jetIntensity: 0.32,
+    streakOpacity: 0.2,
+  },
+  B: {
     coreColor: '#9fc4ff',
     glowColor: '#7ac8ff',
+    coreRadius: 1.5,
+    glowScale: 5.4,
+    plasmaSpeed: 1.25,
+    jetIntensity: 0.28,
+    streakOpacity: 0.18,
+  },
+  A: {
+    coreColor: '#c7d6ff',
+    glowColor: '#9cc5ff',
     coreRadius: 1.4,
-    glowScale: 5.2,
+    glowScale: 5.0,
+    plasmaSpeed: 1.1,
+    jetIntensity: 0.22,
+    streakOpacity: 0.16,
   },
-  giant: {
+  F: {
+    coreColor: '#f7f2d0',
+    glowColor: '#ffd27a',
+    coreRadius: 1.3,
+    glowScale: 5.0,
+    plasmaSpeed: 1.05,
+    jetIntensity: 0.2,
+    streakOpacity: 0.15,
+  },
+  G: {
+    coreColor: '#ffd27a',
+    glowColor: '#ffbe55',
+    coreRadius: 1.2,
+    glowScale: 4.8,
+    plasmaSpeed: 1,
+    jetIntensity: 0.18,
+    streakOpacity: 0.14,
+  },
+  K: {
     coreColor: '#ffb36b',
-    glowColor: '#ff8f5f',
-    coreRadius: 2.2,
-    glowScale: 6.4,
+    glowColor: '#ff9b5f',
+    coreRadius: 1.1,
+    glowScale: 4.6,
+    plasmaSpeed: 0.95,
+    jetIntensity: 0.16,
+    streakOpacity: 0.12,
   },
-  dwarf: {
-    coreColor: '#b0b5ff',
-    glowColor: '#98b0ff',
+  M: {
+    coreColor: '#ff8a5c',
+    glowColor: '#ff6b5f',
     coreRadius: 1,
     glowScale: 4.2,
+    plasmaSpeed: 0.9,
+    jetIntensity: 0.14,
+    streakOpacity: 0.1,
   },
 };
 
@@ -233,7 +283,7 @@ const createStarCoreMaterial = ({
   visibility,
   seed,
 }: {
-  preset: (typeof starClassVisuals)[string];
+  preset: StarVisual;
   visibility: StarSystem['visibility'];
   seed: number;
 }) => {
@@ -486,8 +536,8 @@ export const createOrbitingPlanets = (
       kind: 'ring',
       systemId,
     };
-  group.add(orbitRing);
-});
+    group.add(orbitRing);
+  });
 
   return group;
 };
@@ -496,8 +546,10 @@ const createStarVisual = (
   starClass: StarSystem['starClass'],
   visibility: StarSystem['visibility'],
   pulseSeed: number,
+  visuals: Record<StarClass, StarVisual>,
 ) => {
-  const preset = starClassVisuals[starClass] ?? starClassVisuals.mainSequence;
+  const preset =
+    visuals[starClass] ?? fallbackStarVisuals[starClass] ?? fallbackStarVisuals.G;
   const group = new Group();
   group.name = 'starVisual';
   group.userData = {
@@ -648,6 +700,7 @@ export const createSystemNode = (
   recentCombatSystems: Set<string>,
   activeBattles: Set<string>,
   colonizedPlanet?: { id: string; name: string } | null,
+  starVisuals?: Record<StarClass, StarVisual>,
 ): Group => {
   const node = new Group();
   node.name = system.id;
@@ -658,11 +711,13 @@ export const createSystemNode = (
 
   const isRevealed = system.visibility !== 'unknown';
   const isSurveyed = system.visibility === 'surveyed';
-  const baseRadius = starClassVisuals[system.starClass]?.coreRadius ?? 2.1;
+  const baseRadius =
+    (starVisuals ?? fallbackStarVisuals)[system.starClass]?.coreRadius ?? 2.1;
   const starVisual = createStarVisual(
     system.starClass,
     system.visibility,
     system.id.charCodeAt(0),
+    starVisuals ?? fallbackStarVisuals,
   );
   starVisual.userData.systemId = system.id;
   node.add(starVisual);

@@ -8,7 +8,7 @@ export interface SimulationClock {
   lastUpdate: number | null;
 }
 
-export type StarClass = 'mainSequence' | 'giant' | 'dwarf';
+export type StarClass = 'O' | 'B' | 'A' | 'F' | 'G' | 'K' | 'M';
 
 export type SystemVisibility = 'unknown' | 'revealed' | 'surveyed';
 
