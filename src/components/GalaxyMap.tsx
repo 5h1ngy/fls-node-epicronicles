@@ -1058,8 +1058,12 @@ export const GalaxyMap = ({
 
       const showOrbits = camera.position.z < 105;
       const showLabels = camera.position.z < 240 && zoomFactor < 0.9;
-      const labelScale = showLabels
-        ? THREE.MathUtils.clamp(0.55 + zoomFactor * 1.8, 0.4, 2.4)
+      const baseLabelScale = showLabels
+        ? THREE.MathUtils.clamp(120 / camera.position.z, 0.45, 2.4)
+        : 1;
+      const starLabelScale = baseLabelScale;
+      const planetLabelScale = showLabels
+        ? THREE.MathUtils.clamp(baseLabelScale * 0.75, 0.35, 1.8)
         : 1;
       const ringOpacity = 0.2 + zoomFactor * 0.5;
 
@@ -1069,8 +1073,8 @@ export const GalaxyMap = ({
           label.visible = showLabels;
           if (showLabels) {
             label.scale.set(
-              label.userData.baseWidth * labelScale,
-              label.userData.baseHeight * labelScale,
+              label.userData.baseWidth * starLabelScale,
+              label.userData.baseHeight * starLabelScale,
               1,
             );
           }
@@ -1107,14 +1111,9 @@ export const GalaxyMap = ({
                 if (planetLabel) {
                   planetLabel.visible = showLabels;
                   if (showLabels) {
-                    const scale = THREE.MathUtils.clamp(
-                      120 / camera.position.z,
-                      0.35,
-                      2,
-                    );
                     planetLabel.scale.set(
-                      planetLabel.userData.baseWidth * scale,
-                      planetLabel.userData.baseHeight * scale,
+                      planetLabel.userData.baseWidth * planetLabelScale,
+                      planetLabel.userData.baseHeight * planetLabelScale,
                       1,
                     );
                   }
@@ -1132,6 +1131,7 @@ export const GalaxyMap = ({
         const starCore = node.getObjectByName('starCore') as THREE.Mesh | null;
         const starBurst = node.getObjectByName('starBurst') as THREE.Sprite | null;
         const starCorona = node.getObjectByName('starCorona') as THREE.Sprite | null;
+        const starVisualGroup = node.getObjectByName('starVisual') as THREE.Group | null;
         const pulseSeed = (node.getObjectByName('starVisual')?.userData?.pulseSeed as number) ?? 0;
         const baseGlow =
           (node.getObjectByName('starVisual')?.userData?.baseGlow as number) ?? 1;
@@ -1161,6 +1161,10 @@ export const GalaxyMap = ({
             mat.uniforms.uTime.value =
               ((clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.5) * timeSpeed;
           }
+        }
+        if (starVisualGroup) {
+          const spin = 0.15 * timeSpeed;
+          starVisualGroup.rotation.z += delta * spin;
         }
         if (starGlow) {
           const t = (clockRef.current?.elapsedTime ?? 0) + pulseSeed * 0.1;
