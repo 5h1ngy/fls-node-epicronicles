@@ -206,17 +206,37 @@ export const getResearchOffers = (
   if (available.length <= count) {
     return available;
   }
-  // Priorità: era corrente, fondazioni, poi feature/rare
   const era = state.currentEra;
-  const sorted = [...available].sort((a, b) => {
-    const eraA = a.era ?? 1;
-    const eraB = b.era ?? 1;
-    if (eraA !== eraB) {
-      return eraA - eraB;
-    }
-    return scoreKind(b.kind) - scoreKind(a.kind);
-  });
-  return sorted.slice(0, count);
+  const pool = available
+    .filter((tech) => (tech.era ?? 1) <= era)
+    .sort((a, b) => scoreKind(b.kind) - scoreKind(a.kind));
+  const foundations = pool.filter((t) => t.kind === 'foundation');
+  const features = pool.filter((t) => t.kind === 'feature');
+  const rares = pool.filter((t) => t.kind === 'rare');
+
+  const picks: ResearchTech[] = [];
+  // Prefer almeno una feature se esiste
+  if (features.length > 0) {
+    picks.push(features.shift() as ResearchTech);
+  }
+  // Riempire con fondazioni
+  while (picks.length < count && foundations.length > 0) {
+    picks.push(foundations.shift() as ResearchTech);
+  }
+  // Aggiungi altre feature se servono
+  while (picks.length < count && features.length > 0) {
+    picks.push(features.shift() as ResearchTech);
+  }
+  // Aggiungi rare solo se ancora spazio
+  while (picks.length < count && rares.length > 0) {
+    picks.push(rares.shift() as ResearchTech);
+  }
+  // Fallback con qualsiasi disponibile
+  while (picks.length < count && pool.length > 0) {
+    picks.push(pool.shift() as ResearchTech);
+  }
+
+  return picks;
 };
 
 const computeEraUnlocks = (state: ResearchState, config: ResearchConfig) => {
