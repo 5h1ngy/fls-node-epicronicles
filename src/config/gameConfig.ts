@@ -48,7 +48,15 @@ export interface ResearchBranchConfig {
   description: string;
 }
 
+export interface ResearchEra {
+  id: number;
+  label: string;
+  description: string;
+  gatewayTechs: string[];
+}
+
 export interface ResearchConfig {
+  eras: ResearchEra[];
   branches: ResearchBranchConfig[];
   techs: ResearchTech[];
   pointsPerResearchIncome: number;
@@ -432,6 +440,20 @@ export const gameConfig: GameConfig = {
     },
   },
   research: {
+    eras: [
+      {
+        id: 1,
+        label: 'Era 1 - Esodo',
+        description: 'Prime tecnologie di sopravvivenza e uscita dal sistema.',
+        gatewayTechs: ['photonics', 'bio-domes'],
+      },
+      {
+        id: 2,
+        label: 'Era 2 - Espansione locale',
+        description: 'Espansione stellare, amministrazione e primi cantieri avanzati.',
+        gatewayTechs: ['advanced-sensors', 'reinforced-alloys'],
+      },
+    ],
     branches: [
       {
         id: 'physics',
@@ -457,6 +479,9 @@ export const gameConfig: GameConfig = {
         description: '+10% produzione energia.',
         cost: 40,
         effects: ['energyIncome:+0.1'],
+        era: 1,
+        clusterId: 'energy-1',
+        kind: 'foundation',
       },
       {
         id: 'advanced-sensors',
@@ -465,6 +490,9 @@ export const gameConfig: GameConfig = {
         description: '+10% produzione ricerca.',
         cost: 30,
         effects: ['researchIncome:+0.1'],
+        era: 2,
+        clusterId: 'sensors-1',
+        kind: 'feature',
       },
       {
         id: 'bio-domes',
@@ -473,6 +501,9 @@ export const gameConfig: GameConfig = {
         description: '+10% produzione cibo.',
         cost: 35,
         effects: ['foodIncome:+0.1'],
+        era: 1,
+        clusterId: 'bio-1',
+        kind: 'foundation',
       },
       {
         id: 'bureaucracy',
@@ -481,6 +512,9 @@ export const gameConfig: GameConfig = {
         description: '+1 influenza per tick.',
         cost: 45,
         effects: ['influenceFlat:+1'],
+        era: 2,
+        clusterId: 'admin-1',
+        kind: 'feature',
       },
       {
         id: 'reinforced-alloys',
@@ -489,6 +523,9 @@ export const gameConfig: GameConfig = {
         description: '+10% produzione minerali.',
         cost: 45,
         effects: ['mineralsIncome:+0.1'],
+        era: 1,
+        clusterId: 'materials-1',
+        kind: 'foundation',
       },
       {
         id: 'modular-yards',
@@ -498,6 +535,9 @@ export const gameConfig: GameConfig = {
         cost: 55,
         effects: ['energyIncome:+0.1', 'mineralsIncome:+0.1'],
         prerequisites: ['reinforced-alloys'],
+        era: 2,
+        clusterId: 'yards-1',
+        kind: 'feature',
       },
     ],
     pointsPerResearchIncome: 1,

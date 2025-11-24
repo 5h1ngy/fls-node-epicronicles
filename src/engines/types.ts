@@ -27,6 +27,11 @@ export interface ResearchTech {
   cost: number;
   prerequisites?: string[];
   effects?: string[];
+  era?: number;
+  clusterId?: string;
+  kind?: 'foundation' | 'feature' | 'rare';
+  origin?: 'standard' | 'relic' | 'anomaly' | 'faction';
+  mutuallyExclusiveGroup?: string;
 }
 
 export interface ResearchBranchState {
@@ -50,6 +55,9 @@ export interface TraditionPerk {
   cost: number;
   prerequisites?: string[];
   effects?: string[];
+  era?: number;
+  clusterId?: string;
+  mutuallyExclusiveGroup?: string;
 }
 
 export interface TraditionState {
