@@ -86,10 +86,15 @@ export const GameScreen = () => {
     | null
   >(null);
   const orderFleetMove = useGameStore((state) => state.orderFleetMove);
+  const setFleetPosition = useGameStore((state) => state.setFleetPosition);
   const mergeFleets = useGameStore((state) => state.mergeFleets);
   const splitFleet = useGameStore((state) => state.splitFleet);
+  const stopFleet = useGameStore((state) => state.stopFleet);
   const shipDesigns = useGameStore((state) => state.config.military.shipDesigns);
   const orderScienceShip = useGameStore((state) => state.orderScienceShip);
+  const setScienceShipPosition = useGameStore(
+    (state) => state.setScienceShipPosition,
+  );
   const setScienceAutoExplore = useGameStore((state) => state.setScienceAutoExplore);
   const stopScienceShip = useGameStore((state) => state.stopScienceShip);
   const focusedSessionRef = useRef<string | null>(null);
@@ -140,6 +145,7 @@ export const GameScreen = () => {
   useEffect(() => {
     if (!session) {
       focusedSessionRef.current = null;
+      setSelectedEntity(null);
       return;
     }
     if (focusedSessionRef.current === session.id) {
@@ -317,6 +323,42 @@ export const GameScreen = () => {
           }}
         />
         <SideEntityDock
+          variant="colonization"
+          onCenter={(systemId) => {
+            setFocusSystemId(systemId);
+            setFocusTrigger((value) => value + 1);
+            setFocusPlanetId(null);
+            setDockSelection(null);
+          }}
+          onSelect={(selection) => {
+            setDockSelection(selection);
+            setFocusPlanetId(null);
+            setSelectedEntity({
+              kind: 'fleet',
+              id: selection.fleetId,
+              systemId: selection.systemId,
+            });
+          }}
+        />
+        <SideEntityDock
+          variant="construction"
+          onCenter={(systemId) => {
+            setFocusSystemId(systemId);
+            setFocusTrigger((value) => value + 1);
+            setFocusPlanetId(null);
+            setDockSelection(null);
+          }}
+          onSelect={(selection) => {
+            setDockSelection(selection);
+            setFocusPlanetId(null);
+            setSelectedEntity({
+              kind: 'fleet',
+              id: selection.fleetId,
+              systemId: selection.systemId,
+            });
+          }}
+        />
+        <SideEntityDock
           variant="science"
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
@@ -335,7 +377,7 @@ export const GameScreen = () => {
         focusPlanetId={focusPlanetId}
         focusTrigger={focusTrigger}
         mapMessage={mapMessage}
-        onSelectSystem={(systemId) => {
+        onSelectSystem={(systemId, _anchor) => {
           const targetSystem = systems.find(
             (entry) => entry.id === systemId,
           );
@@ -512,6 +554,15 @@ export const GameScreen = () => {
                 scienceShips={scienceShips}
                 designs={shipDesigns}
                 onOrder={(fleetId, systemId) => orderFleetMove(fleetId, systemId)}
+                onAnchorChange={(fleetId, planetId) =>
+                  setFleetPosition(fleetId, planetId)
+                }
+                onCenter={(systemId) => {
+                  setFocusSystemId(systemId);
+                  setFocusPlanetId(null);
+                  setFocusTrigger((value) => value + 1);
+                }}
+                onStop={(fleetId) => stopFleet(fleetId)}
                 onMerge={(sourceId, targetId) => mergeFleets(sourceId, targetId)}
                 onSplit={(fleetId) => splitFleet(fleetId)}
                 onClose={() => setDockSelection(null)}
@@ -530,6 +581,9 @@ export const GameScreen = () => {
                 ship={selectedScienceShip}
                 systems={systems}
                 onOrder={(systemId) => orderScienceShip(selectedScienceShip.id, systemId)}
+                onAnchorChange={(planetId) =>
+                  setScienceShipPosition(selectedScienceShip.id, planetId)
+                }
                 onToggleAuto={(auto) => setScienceAutoExplore(selectedScienceShip.id, auto)}
                 onStop={() => stopScienceShip(selectedScienceShip.id)}
                 onCenter={(systemId) => {

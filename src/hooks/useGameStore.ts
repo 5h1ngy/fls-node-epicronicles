@@ -32,6 +32,7 @@ import {
   requestBorderAccess,
   mergeFleets,
   splitFleet,
+  setFleetPosition,
   saveSessionToStorage,
   loadSessionFromStorage,
   hasSavedSession,
@@ -39,6 +40,7 @@ import {
   unlockTraditionPerk,
   resolveActiveEvent,
   stopScienceShip,
+  setScienceShipPosition,
 } from '../store/thunks';
 export * from '../store/selectors';
 import type {
@@ -104,6 +106,11 @@ interface HookState {
     jobId: PopulationJobId,
   ) => PopulationAdjustResult;
   removeDistrict: (planetId: string, districtId: string) => RemoveDistrictResult;
+  setFleetPosition: (
+    fleetId: string,
+    systemId: string,
+    offset: { x: number; y: number; z?: number },
+  ) => FleetMoveResult;
   cancelDistrictTask: (
     taskId: string,
   ) => DistrictQueueManageResult;
@@ -119,6 +126,7 @@ interface HookState {
   requestBorderAccess: (empireId: string) => DiplomacyActionResult;
   mergeFleets: (sourceId: string, targetId: string) => FleetMergeResult;
   splitFleet: (fleetId: string) => FleetSplitResult;
+  stopFleet: (fleetId: string) => void;
   saveSession: () => SaveGameResult;
   loadSession: () => LoadGameResult;
   hasSavedSession: () => boolean;
@@ -126,6 +134,11 @@ interface HookState {
   unlockTraditionPerk: (perkId: string) => UnlockTraditionResult;
   resolveActiveEvent: (optionId: string) => ResolveEventResult;
   stopScienceShip: (shipId: string) => void;
+  setScienceShipPosition: (
+    shipId: string,
+    planetId: string | null,
+  ) => ScienceShipOrderResult;
+  setFleetPosition: (fleetId: string, planetId: string | null) => FleetMoveResult;
 }
 
 export const useGameStore = <T>(selector: (state: HookState) => T): T => {
@@ -162,6 +175,8 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
       setScienceAutoExplore: (shipId: string, auto: boolean) =>
         dispatch(setScienceAutoExplore(shipId, auto)),
       stopScienceShip: (shipId: string) => dispatch(stopScienceShip(shipId)),
+      setScienceShipPosition: (shipId: string, planetId: string | null) =>
+        dispatch(setScienceShipPosition(shipId, planetId)),
       queueDistrictConstruction: (planetId: string, districtId: string) =>
         dispatch(queueDistrictConstruction(planetId, districtId)),
       promotePopulation: (planetId: string, jobId: PopulationJobId) =>
@@ -170,6 +185,8 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
         dispatch(demotePopulation(planetId, jobId)),
       removeDistrict: (planetId: string, districtId: string) =>
         dispatch(removeBuiltDistrict(planetId, districtId)),
+      setFleetPosition: (fleetId: string, planetId: string | null) =>
+        dispatch(setFleetPosition(fleetId, planetId)),
       cancelDistrictTask: (taskId: string) =>
         dispatch(cancelDistrictTask(taskId)),
       prioritizeDistrictTask: (taskId: string) =>
@@ -183,6 +200,7 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
       mergeFleets: (sourceId: string, targetId: string) =>
         dispatch(mergeFleets(sourceId, targetId)),
       splitFleet: (fleetId: string) => dispatch(splitFleet(fleetId)),
+      stopFleet: (fleetId: string) => dispatch(stopFleet(fleetId)),
       saveSession: () => dispatch(saveSessionToStorage()),
       loadSession: () => dispatch(loadSessionFromStorage()),
       hasSavedSession: () => hasSavedSession(),
@@ -192,6 +210,12 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
         dispatch(unlockTraditionPerk(perkId)),
       resolveActiveEvent: (optionId: string) =>
         dispatch(resolveActiveEvent(optionId)),
+      setScienceShipPosition: (
+        shipId: string,
+        planetId: string | null,
+      ) => dispatch(setScienceShipPosition(shipId, planetId)),
+      setFleetPosition: (fleetId: string, planetId: string | null) =>
+        dispatch(setFleetPosition(fleetId, planetId)),
     }),
     [dispatch],
   );

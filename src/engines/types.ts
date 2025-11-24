@@ -186,6 +186,7 @@ export interface ShipDesign {
   id: ShipClassId;
   name: string;
   description?: string;
+  role?: ShipRole;
   buildCost: ResourceCost;
   buildTime: number;
   attack: number;
@@ -240,6 +241,7 @@ export interface ScienceShip {
   name: string;
   currentSystemId: string;
   targetSystemId: string | null;
+  anchorPlanetId?: string | null;
   status: ScienceShipStatus;
   ticksRemaining: number;
   autoExplore: boolean;
@@ -279,12 +281,15 @@ export interface FleetShip {
   attackBonus?: number;
 }
 
+export type ShipRole = 'military' | 'colony' | 'construction';
+
 export interface Fleet {
   id: string;
   name: string;
   ownerId?: string;
   systemId: string;
   targetSystemId: string | null;
+  anchorPlanetId?: string | null;
   ticksToArrival: number;
   ships: FleetShip[];
   lastTargetSystemId?: string | null;

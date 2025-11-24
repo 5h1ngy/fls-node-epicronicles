@@ -60,6 +60,7 @@ export const orderFleetMove =
                 ...entry,
                 targetSystemId: systemId,
                 ticksToArrival: travelTicks,
+                anchorPlanetId: null,
               }
             : entry,
         ),
@@ -137,4 +138,55 @@ export const splitFleet =
       }),
     );
     return { success: true, newFleetId: newFleet.id };
+  };
+
+export const setFleetPosition =
+  (
+    fleetId: string,
+    planetId: string | null,
+  ): ThunkAction<FleetMoveResult, RootState, unknown, AnyAction> =>
+  (dispatch, getState) => {
+    const session = getState().game.session;
+    if (!session) {
+      return { success: false, reason: 'NO_SESSION' };
+    }
+    const fleet = session.fleets.find((entry) => entry.id === fleetId);
+    if (!fleet) {
+      return { success: false, reason: 'FLEET_NOT_FOUND' };
+    }
+    const fleets = session.fleets.map((entry) =>
+      entry.id === fleetId
+        ? {
+            ...entry,
+            anchorPlanetId: planetId,
+          }
+        : entry,
+    );
+    dispatch(
+      setSessionState({
+        ...session,
+        fleets,
+      }),
+    );
+    return { success: true };
+  };
+
+export const stopFleet =
+  (fleetId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
+  (dispatch, getState) => {
+    const session = getState().game.session;
+    if (!session) {
+      return;
+    }
+    const fleets = session.fleets.map((entry) =>
+      entry.id === fleetId
+        ? { ...entry, targetSystemId: null, ticksToArrival: 0 }
+        : entry,
+    );
+    dispatch(
+      setSessionState({
+        ...session,
+        fleets,
+      }),
+    );
   };

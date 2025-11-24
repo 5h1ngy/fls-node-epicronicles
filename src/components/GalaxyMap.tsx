@@ -581,6 +581,38 @@ export const GalaxyMap = ({
   });
   const tempSphericalRef = useRef(new THREE.Spherical());
   const tempOffsetRef = useRef(new THREE.Vector3());
+  const systemPositionRef = useRef(new Map<string, THREE.Vector3>());
+  const scienceAnchorsRef = useRef<
+    Array<{ mesh: THREE.InstancedMesh; index: number; systemId: string; planetId: string | null; height: number }>
+  >([]);
+  const fleetAnchorsRef = useRef<
+    Array<{ mesh: THREE.InstancedMesh; index: number; systemId: string; planetId: string | null; height: number }>
+  >([]);
+
+  const resolveAnchorPositionLocal = (
+    systemId: string,
+    planetId: string | null | undefined,
+    height: number,
+  ): THREE.Vector3 | null => {
+    const systemPos = systemPositionRef.current.get(systemId);
+    const group = systemGroupRef.current;
+    if (!systemPos || !group) {
+      return null;
+    }
+    if (planetId) {
+      const planetObj = planetLookupRef.current.get(planetId);
+      if (planetObj) {
+        const world = getVector();
+        planetObj.getWorldPosition(world);
+        group.worldToLocal(world);
+        world.z += height;
+        return world;
+      }
+    }
+    const pos = getVector().copy(systemPos);
+    pos.z += height;
+    return pos;
+  };
   const lastFocusSystemRef = useRef<string | null>(null);
   const lastFocusPlanetRef = useRef<string | null>(null);
   const lastFocusAppliedRef = useRef<{ id: string | null; trigger: number }>({
@@ -979,13 +1011,14 @@ export const GalaxyMap = ({
       }
       const worldPos = new THREE.Vector3();
       targetNode.getWorldPosition(worldPos);
+      const systemId = targetNode.userData.systemId as string;
       const currentOffset = systemGroup.position.clone();
       offsetTargetRef.current = currentOffset.sub(worldPos);
       zoomTargetRef.current = clamp(60, minZoom, maxZoom);
       const projected = worldPos.clone().project(camera);
       const anchorX = ((projected.x + 1) / 2) * renderer.domElement.clientWidth;
       const anchorY = ((-projected.y + 1) / 2) * renderer.domElement.clientHeight;
-      onSelectRef.current?.(targetNode.userData.systemId as string, {
+      onSelectRef.current?.(systemId, {
         x: anchorX,
         y: anchorY,
       });
@@ -1028,6 +1061,7 @@ export const GalaxyMap = ({
         0,
         1,
       );
+
 
       const nebulaGroup = nebulaRef.current;
       if (nebulaGroup) {
@@ -1296,6 +1330,29 @@ export const GalaxyMap = ({
         glow.rotation.z -= delta * 0.25;
       }
 
+      scienceAnchorsRef.current.forEach((entry) => {
+        const pos = resolveAnchorPositionLocal(entry.systemId, entry.planetId, entry.height);
+        if (!pos) {
+          return;
+        }
+        const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z);
+        entry.mesh.setMatrixAt(entry.index, matrix);
+        entry.mesh.instanceMatrix.needsUpdate = true;
+        releaseMatrix(matrix);
+        releaseVector(pos);
+      });
+      fleetAnchorsRef.current.forEach((entry) => {
+        const pos = resolveAnchorPositionLocal(entry.systemId, entry.planetId, entry.height);
+        if (!pos) {
+          return;
+        }
+        const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z);
+        entry.mesh.setMatrixAt(entry.index, matrix);
+        entry.mesh.instanceMatrix.needsUpdate = true;
+        releaseMatrix(matrix);
+        releaseVector(pos);
+      });
+
       if (composerRef.current) {
         composerRef.current.render();
       } else {
@@ -1476,6 +1533,9 @@ export const GalaxyMap = ({
       group.add(node);
       positions.set(system.id, node.position.clone());
     });
+    systemPositionRef.current = positions;
+    scienceAnchorsRef.current = [];
+    fleetAnchorsRef.current = [];
 
     const scienceTargetGroup = new THREE.Group();
     scienceTargetGroup.name = 'scienceTargets';
@@ -1492,14 +1552,18 @@ export const GalaxyMap = ({
         scienceMaterials[status] ?? scienceMaterials.idle,
         list.length,
       );
+      mesh.userData = { entityKind: 'science', instances: list };
       list.forEach((ship, idx) => {
-        const pos = positions.get(ship.currentSystemId);
-        if (!pos) {
-          return;
-        }
-        const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z + 4);
-        mesh.setMatrixAt(idx, matrix);
-        releaseMatrix(matrix);
+        scienceAnchorsRef.current.push({
+          mesh,
+          index: idx,
+          systemId: ship.currentSystemId,
+          planetId:
+            ship.targetSystemId && ship.targetSystemId !== ship.currentSystemId
+              ? null
+              : ship.anchorPlanetId ?? null,
+          height: 6,
+        });
         if (ship.targetSystemId && ship.targetSystemId !== ship.currentSystemId) {
           const from = positions.get(ship.currentSystemId);
           const to = positions.get(ship.targetSystemId);
@@ -1543,13 +1607,18 @@ export const GalaxyMap = ({
       }
       const material = status === 'war' ? fleetMaterials.war : fleetMaterials.idle;
       const mesh = new THREE.InstancedMesh(fleetGeometry, material, list.length);
+      mesh.userData = { entityKind: 'fleet', instances: list };
       list.forEach((fleet, idx) => {
-        const pos = positions.get(fleet.systemId);
-        if (pos) {
-          const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z + 3);
-          mesh.setMatrixAt(idx, matrix);
-          releaseMatrix(matrix);
-        }
+        fleetAnchorsRef.current.push({
+          mesh,
+          index: idx,
+          systemId: fleet.systemId,
+          planetId:
+            fleet.targetSystemId && fleet.targetSystemId !== fleet.systemId
+              ? null
+              : fleet.anchorPlanetId ?? null,
+          height: 5,
+        });
         if (fleet.targetSystemId && fleet.targetSystemId !== fleet.systemId) {
           const from = positions.get(fleet.systemId);
           const to = positions.get(fleet.targetSystemId);
@@ -1579,6 +1648,33 @@ export const GalaxyMap = ({
       group.add(mesh);
     });
     group.add(fleetTargetGroup);
+
+    const updateAnchorInstances = () => {
+      scienceAnchorsRef.current.forEach((entry) => {
+        const pos = resolveAnchorPositionLocal(entry.systemId, entry.planetId, entry.height);
+        if (!pos) {
+          return;
+        }
+        const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z);
+        entry.mesh.setMatrixAt(entry.index, matrix);
+        entry.mesh.instanceMatrix.needsUpdate = true;
+        releaseMatrix(matrix);
+        releaseVector(pos);
+      });
+      fleetAnchorsRef.current.forEach((entry) => {
+        const pos = resolveAnchorPositionLocal(entry.systemId, entry.planetId, entry.height);
+        if (!pos) {
+          return;
+        }
+        const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z);
+        entry.mesh.setMatrixAt(entry.index, matrix);
+        entry.mesh.instanceMatrix.needsUpdate = true;
+        releaseMatrix(matrix);
+        releaseVector(pos);
+      });
+    };
+
+    updateAnchorInstances();
 
   }, [
     systems,

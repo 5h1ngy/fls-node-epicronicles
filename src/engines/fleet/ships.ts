@@ -86,18 +86,22 @@ export const createInitialFleet = (
   config: MilitaryConfig,
   ownerId = 'player',
 ): Fleet => {
-  const starterDesign = getShipDesign(
-    config,
-    config.shipyard.homeSystemDesignId,
-  );
-  const colonyDesign =
-    config.colonyShipDesignId !== config.shipyard.homeSystemDesignId
-      ? getShipDesign(config, config.colonyShipDesignId)
-      : starterDesign;
+  const ships: Fleet['ships'] = [];
+  const colonyCount = config.startingShips?.colony ?? 0;
 
-  const ships: Fleet['ships'] = [createFleetShip(starterDesign)];
-  if (config.startingColonyShips > 0) {
-    for (let idx = 0; idx < config.startingColonyShips; idx += 1) {
+  const militaryEntries = config.startingShips?.military ?? [];
+  if (militaryEntries.length > 0) {
+    militaryEntries.forEach(({ designId, count }) => {
+      const design = getShipDesign(config, designId);
+      for (let idx = 0; idx < count; idx += 1) {
+        ships.push(createFleetShip(design));
+      }
+    });
+  }
+
+  if (colonyCount > 0) {
+    const colonyDesign = getShipDesign(config, config.colonyShipDesignId);
+    for (let idx = 0; idx < colonyCount; idx += 1) {
       ships.push(createFleetShip(colonyDesign));
     }
   }

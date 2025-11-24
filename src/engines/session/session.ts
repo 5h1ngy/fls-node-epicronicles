@@ -13,7 +13,7 @@ import type {
   ResearchConfig,
   TraditionConfig,
 } from '@config/gameConfig';
-import { createInitialFleet } from '@domain/fleet/ships';
+import { createFleetShip, getShipDesign } from '@domain/fleet/ships';
 import { createInitialResearch } from '@domain/research/research';
 import { createInitialTraditions } from '@domain/traditions/traditions';
 
@@ -115,6 +115,55 @@ export const createSession = ({
   });
   const galaxy = { ...baseGalaxy, systems };
   const homeSystemId = systems[0]?.id ?? 'unknown';
+  const startingShips = militaryConfig.startingShips ?? {
+    science: 1,
+    construction: 0,
+    colony: 0,
+    military: [],
+  };
+
+  const buildFleet = (name: string, ships: GameSession['fleets'][number]['ships']) => ({
+    id: `FLEET-${crypto.randomUUID()}`,
+    name,
+    ownerId: 'player',
+    systemId: homeSystemId,
+    targetSystemId: null,
+    ticksToArrival: 0,
+    ships,
+  });
+
+  const makeShips = (designId: string, count: number) => {
+    if (count <= 0) {
+      return [];
+    }
+    const design = getShipDesign(militaryConfig, designId);
+    return Array.from({ length: count }, () => createFleetShip(design));
+  };
+
+  const fleets: GameSession['fleets'] = [];
+  const militaryShips = (startingShips.military ?? []).flatMap(({ designId, count }) =>
+    makeShips(designId, count),
+  );
+  if (militaryShips.length > 0) {
+    fleets.push(buildFleet('1 Flotta', militaryShips));
+  }
+
+  const colonyShips = makeShips(
+    militaryConfig.colonyShipDesignId,
+    startingShips.colony ?? 0,
+  );
+  if (colonyShips.length > 0) {
+    fleets.push(buildFleet('Flotta Coloniale', colonyShips));
+  }
+
+  const constructionShips = makeShips(
+    militaryConfig.constructionShipDesignId,
+    startingShips.construction ?? 0,
+  );
+  if (constructionShips.length > 0) {
+    fleets.push(buildFleet('Flotta Costruttrice', constructionShips));
+  }
+
   return {
     id: crypto.randomUUID(),
     label: label ?? `Session ${new Date().toLocaleTimeString()}`,
@@ -130,10 +179,10 @@ export const createSession = ({
     },
     warEvents: [],
     clock: createClock(),
-    scienceShips: createInitialScienceShips(galaxy),
+    scienceShips: createInitialScienceShips(galaxy, startingShips.science ?? 1),
     economy: createInitialEconomy(homeSystemId, economyConfig),
     colonizationTasks: [],
-    fleets: [createInitialFleet(homeSystemId, militaryConfig)],
+    fleets,
     shipyardQueue: [],
     districtConstructionQueue: [],
     combatReports: [],

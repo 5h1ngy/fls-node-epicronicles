@@ -135,6 +135,7 @@ export const advanceFleets = ({
       if (fleet.ticksToArrival === 0) {
         fleet.systemId = fleet.targetSystemId;
         fleet.targetSystemId = null;
+        fleet.localOffset = undefined;
       }
     }
 

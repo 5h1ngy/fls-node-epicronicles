@@ -9,6 +9,9 @@ export * from './populationThunks';
 export * from './persistenceThunks';
 export * from './progressionThunks';
 export * from './eventThunks';
+export { setFleetPosition } from './fleetThunks';
+export { stopFleet } from './fleetThunks';
+export { setScienceShipPosition } from './scienceThunks';
 
 export type {
   StartSessionArgs,

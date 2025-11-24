@@ -8,7 +8,7 @@ import type {
   ShipDesign,
   StarSystem,
 } from '@domain/types';
-
+import { Target, PauseCircle } from 'lucide-react';
 import '../../styles/components/FleetShared.scss';
 
 const fleetOrderErrors = {
@@ -35,16 +35,13 @@ const scienceStatusLabel: Record<ScienceShipStatus, string> = {
   surveying: 'Sondando',
 };
 
-const describeFleetShips = (
-  ships: Fleet['ships'],
-  designLookup: Map<string, ShipDesign>,
-) => {
-  const counts = ships.reduce<Record<string, number>>((acc, ship) => {
-    const key: string = ship.designId;
-    acc[key] = (acc[key] ?? 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
+const describeFleetShips = (ships: Fleet['ships'], designLookup: Map<string, ShipDesign>) => {
+  const counts = new Map<string, number>();
+  ships.forEach((ship) => {
+    const key = String(ship.designId);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  });
+  return Array.from(counts.entries())
     .map(([designId, count]) => {
       const design = designLookup.get(designId);
       return `${design?.name ?? designId} x${count}`;
@@ -62,6 +59,9 @@ interface FleetDetailPanelProps {
     success: boolean;
     reason?: keyof typeof fleetOrderErrors;
   };
+  onAnchorChange: (fleetId: string, planetId: string | null) => void;
+  onCenter?: (systemId: string) => void;
+  onStop?: (fleetId: string) => void;
   onMerge: (sourceId: string, targetId: string) => FleetMergeResult;
   onSplit: (fleetId: string) => FleetSplitResult;
   onClose: () => void;
@@ -74,6 +74,9 @@ export const FleetDetailPanel = ({
   scienceShips,
   designs,
   onOrder,
+  onAnchorChange,
+  onCenter,
+  onStop,
   onMerge,
   onSplit,
   onClose,
@@ -107,6 +110,12 @@ export const FleetDetailPanel = ({
     (candidate) =>
       candidate.id !== fleet.id && candidate.systemId === fleet.systemId,
   );
+  const currentSystem = systems.find((system) => system.id === fleet.systemId);
+  const anchorOptions =
+    currentSystem?.orbitingPlanets?.map((planet) => ({
+      id: planet.id,
+      name: planet.name ?? planet.id,
+    })) ?? [];
 
   return (
     <div className="fleet-detail">
@@ -117,14 +126,23 @@ export const FleetDetailPanel = ({
           <div className="fleet-detail__meta">
             <span>{resolveName(fleet.systemId)}</span>
             <span>• Navi: {fleet.ships.length}</span>
+          </div>
+          <div className="fleet-detail__tags">
             {fleet.targetSystemId ? (
-              <span>
-                • In rotta verso {resolveName(fleet.targetSystemId)}
+              <span className="pill pill--glass">
+                In rotta verso {resolveName(fleet.targetSystemId)}
                 {typeof fleet.ticksToArrival === 'number'
                   ? ` (${fleet.ticksToArrival} tick)`
                   : ''}
               </span>
-            ) : null}
+            ) : (
+              <span className="pill pill--glass">In stazione</span>
+            )}
+            {fleet.anchorPlanetId ? (
+              <span className="pill pill--glass">Agganciata a pianeta</span>
+            ) : (
+              <span className="pill pill--glass">Agganciata a stella</span>
+            )}
           </div>
         </div>
         <button className="dock-detail__close" onClick={onClose}>
@@ -155,6 +173,22 @@ export const FleetDetailPanel = ({
       </section>
 
       <section className="fleet-detail__section">
+        <div className="fleet-detail__actions">
+          <button
+            className="hud-icon-btn"
+            data-tooltip="Centra sulla flotta"
+            onClick={() => onCenter?.(fleet.systemId)}
+          >
+            <Target size={14} />
+          </button>
+          <button
+            className="hud-icon-btn"
+            data-tooltip="Ferma la flotta"
+            onClick={() => onStop?.(fleet.id)}
+          >
+            <PauseCircle size={14} />
+          </button>
+        </div>
         <div className="fleet-detail__row">
           <div className="fleet-detail__field">
             <label className="text-muted">Destinazione</label>
@@ -165,6 +199,25 @@ export const FleetDetailPanel = ({
               {surveyedSystems.map((system) => (
                 <option key={system.id} value={system.id}>
                   {system.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="fleet-detail__field">
+            <label className="text-muted">Aggancio (sistema attuale)</label>
+            <select
+              value={fleet.anchorPlanetId ?? ''}
+              onChange={(event) => {
+                onAnchorChange(
+                  fleet.id,
+                  event.target.value ? event.target.value : null,
+                );
+              }}
+            >
+              <option value="">Stella</option>
+              {anchorOptions.map((planet) => (
+                <option key={planet.id} value={planet.id}>
+                  {planet.name}
                 </option>
               ))}
             </select>

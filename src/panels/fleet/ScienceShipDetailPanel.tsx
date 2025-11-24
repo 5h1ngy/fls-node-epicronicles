@@ -7,6 +7,7 @@ interface ScienceShipDetailPanelProps {
   ship: ScienceShip;
   systems: StarSystem[];
   onOrder: (systemId: string) => void;
+  onAnchorChange: (planetId: string | null) => void;
   onToggleAuto: (auto: boolean) => void;
   onStop: () => void;
   onCenter?: (systemId: string) => void;
@@ -23,6 +24,7 @@ export const ScienceShipDetailPanel = ({
   ship,
   systems,
   onOrder,
+  onAnchorChange,
   onToggleAuto,
   onStop,
   onCenter,
@@ -34,6 +36,12 @@ export const ScienceShipDetailPanel = ({
       : 'N/D';
 
   const revealedSystems = systems.filter((system) => system.visibility !== 'unknown');
+  const currentSystem = systems.find((system) => system.id === ship.currentSystemId);
+  const anchorOptions =
+    currentSystem?.orbitingPlanets?.map((planet) => ({
+      id: planet.id,
+      name: planet.name ?? planet.id,
+    })) ?? [];
 
   return (
     <div className="science-detail">
@@ -44,6 +52,9 @@ export const ScienceShipDetailPanel = ({
           <div className="science-detail__meta">
             <span className={`pill ${ship.status !== 'idle' ? 'pill--success' : ''}`}>
               <Activity size={14} /> {statusLabel[ship.status]}
+            </span>
+            <span className="pill pill--glass">
+              {ship.anchorPlanetId ? 'Agganciata a pianeta' : 'Agganciata a stella'}
             </span>
             <label className="science-detail__toggle">
               <input
@@ -113,6 +124,22 @@ export const ScienceShipDetailPanel = ({
               {revealedSystems.map((system) => (
                 <option key={system.id} value={system.id}>
                   {system.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="science-detail__field">
+            <span>Aggancio (sistema attuale)</span>
+            <select
+              value={ship.anchorPlanetId ?? ''}
+              onChange={(e) =>
+                onAnchorChange(e.target.value ? e.target.value : null)
+              }
+            >
+              <option value="">Stella</option>
+              {anchorOptions.map((planet) => (
+                <option key={planet.id} value={planet.id}>
+                  {planet.name}
                 </option>
               ))}
             </select>

@@ -86,7 +86,13 @@ export interface MilitaryConfig {
     baseTravelTicks: number;
   };
   colonyShipDesignId: ShipClassId;
-  startingColonyShips: number;
+  constructionShipDesignId: ShipClassId;
+  startingShips: {
+    science: number;
+    construction: number;
+    colony: number;
+    military: Array<{ designId: ShipClassId; count: number }>;
+  };
   shipDesigns: ShipDesign[];
   templates: Array<{
     id: string;
@@ -592,11 +598,18 @@ export const gameConfig: GameConfig = {
       baseTravelTicks: 3,
     },
     colonyShipDesignId: 'colony',
-    startingColonyShips: 1,
+    constructionShipDesignId: 'constructor',
+    startingShips: {
+      science: 1,
+      construction: 1,
+      colony: 0,
+      military: [],
+    },
     shipDesigns: [
       {
         id: 'corvette',
         name: 'Classe Aurora',
+        role: 'military',
         description: 'Corvetta versatile per pattugliamenti rapidi e schermaglia.',
         buildCost: {
           minerals: 120,
@@ -611,6 +624,7 @@ export const gameConfig: GameConfig = {
       {
         id: 'frigate',
         name: 'Classe Asteria',
+        role: 'military',
         description: 'Fregata di linea, buon bilanciamento tra attacco e difesa.',
         buildCost: {
           minerals: 170,
@@ -625,6 +639,7 @@ export const gameConfig: GameConfig = {
       {
         id: 'colony',
         name: 'Classe Horizon',
+        role: 'colony',
         description: 'Nave colonia con moduli di supporto e stiva ampliata.',
         buildCost: {
           minerals: 150,
@@ -636,6 +651,21 @@ export const gameConfig: GameConfig = {
         defense: 1,
         hullPoints: 15,
         speed: 0.8,
+      },
+      {
+        id: 'constructor',
+        name: 'Classe Atlas',
+        role: 'construction',
+        description: 'Nave costruttrice per avamposti e infrastrutture orbitali.',
+        buildCost: {
+          minerals: 110,
+          energy: 55,
+        },
+        buildTime: 6,
+        attack: 0,
+        defense: 2,
+        hullPoints: 18,
+        speed: 0.85,
       },
     ],
     templates: [

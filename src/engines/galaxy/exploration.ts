@@ -72,6 +72,7 @@ const tickShip = (
         currentSystemId: updatedShip.targetSystemId,
         targetSystemId: null,
         ticksRemaining: Math.max(1, settings.surveyTicks),
+        localOffset: undefined,
       };
       updatedGalaxy = upgradeSystemVisibility(
         updatedGalaxy,
@@ -88,6 +89,7 @@ const tickShip = (
         ...updatedShip,
         status: 'idle',
         ticksRemaining: 0,
+        localOffset: undefined,
       };
       updatedGalaxy = upgradeSystemVisibility(
         updatedGalaxy,
@@ -106,24 +108,23 @@ const tickShip = (
 
 export const createInitialScienceShips = (
   galaxy: GalaxyState,
+  count = 1,
 ): ScienceShip[] => {
-  if (galaxy.systems.length === 0) {
+  if (galaxy.systems.length === 0 || count <= 0) {
     return [];
   }
 
   const homeSystem = galaxy.systems[0];
 
-  return [
-    {
-      id: `SCI-${crypto.randomUUID()}`,
-      name: 'ISS Pathfinder',
-      currentSystemId: homeSystem.id,
-      targetSystemId: null,
-      status: 'idle',
-      ticksRemaining: 0,
-      autoExplore: true,
-    },
-  ];
+  return Array.from({ length: count }, (_, idx) => ({
+    id: `SCI-${crypto.randomUUID()}`,
+    name: count > 1 ? `ISS Pathfinder-${idx + 1}` : 'ISS Pathfinder',
+    currentSystemId: homeSystem.id,
+    targetSystemId: null,
+    status: 'idle',
+    ticksRemaining: 0,
+    autoExplore: true,
+  }));
 };
 
 export const advanceExploration = (

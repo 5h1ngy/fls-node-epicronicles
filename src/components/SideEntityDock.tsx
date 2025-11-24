@@ -1,4 +1,5 @@
-﻿import { useAppSelector, useGameStore } from '@store/gameStore';
+import { useMemo } from 'react';
+import { useAppSelector, useGameStore } from '@store/gameStore';
 import {
   selectColonizedSystems,
   selectPlanets,
@@ -14,7 +15,7 @@ type DockSelection =
   | { kind: 'science'; shipId: string; systemId: string };
 
 interface SideEntityDockProps {
-  variant: 'colonies' | 'fleets' | 'science';
+  variant: 'colonies' | 'fleets' | 'science' | 'colonization' | 'construction';
   onSelect: (selection: DockSelection) => void;
   onCenter: (systemId: string, planetId?: string | null) => void;
 }
@@ -25,6 +26,21 @@ export const SideEntityDock = ({ variant, onSelect, onCenter }: SideEntityDockPr
   const systems = useAppSelector(selectSystems);
   const scienceShips = useAppSelector(selectScienceShips);
   const session = useGameStore((state) => state.session);
+  const designs = useGameStore((state) => state.config.military.shipDesigns);
+
+  const designLookup = useMemo(
+    () => new Map(designs.map((design) => [design.id, design])),
+    [designs],
+  );
+
+  const playerFleets =
+    useMemo(
+      () => session?.fleets.filter((fleet) => !fleet.ownerId || fleet.ownerId === 'player') ?? [],
+      [session],
+    );
+
+  const getRole = (designId: string): 'military' | 'colony' | 'construction' =>
+    designLookup.get(designId)?.role ?? 'military';
 
   const colonyEntries =
     session?.economy.planets.map((planet) => ({
@@ -83,15 +99,18 @@ export const SideEntityDock = ({ variant, onSelect, onCenter }: SideEntityDockPr
   }
 
   if (variant === 'fleets') {
+    const militaryFleets = playerFleets.filter((fleet) =>
+      fleet.ships.some((ship) => getRole(ship.designId) === 'military'),
+    );
     return (
       <aside className="side-entity-dock">
         <section>
-          <h4>Flotte</h4>
+          <h4>Flotte militari</h4>
           <ul>
-            {session?.fleets.length === 0 ? (
+            {militaryFleets.length === 0 ? (
               <li className="text-muted">Nessuna flotta.</li>
             ) : (
-              session?.fleets.map((fleet) => (
+              militaryFleets.map((fleet) => (
                 <li key={fleet.id}>
                   <div className="dock-row">
                     <span className="dock-name">{fleet.name ?? fleet.id}</span>
@@ -120,6 +139,69 @@ export const SideEntityDock = ({ variant, onSelect, onCenter }: SideEntityDockPr
                   </div>
                   <small className="text-muted">
                     {getSystemName(fleet.systemId)} - Navi: {fleet.ships.length}
+                  </small>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+      </aside>
+    );
+  }
+
+  if (variant === 'colonization' || variant === 'construction') {
+    const targetRole = variant === 'colonization' ? 'colony' : 'construction';
+    const ships = playerFleets.flatMap((fleet) =>
+      fleet.ships
+        .filter((ship) => getRole(ship.designId) === targetRole)
+        .map((ship) => ({
+          shipId: ship.id,
+          fleetId: fleet.id,
+          systemId: fleet.systemId,
+          designId: ship.designId,
+          fleetName: fleet.name ?? fleet.id,
+        })),
+    );
+    const title = variant === 'colonization' ? 'Navi colonia' : 'Navi costruttrici';
+    const labelFor = (designId: string) =>
+      designLookup.get(designId)?.name ?? designId;
+    return (
+      <aside className="side-entity-dock">
+        <section>
+          <h4>{title}</h4>
+          <ul>
+            {ships.length === 0 ? (
+              <li className="text-muted">Nessuna nave.</li>
+            ) : (
+              ships.map((entry) => (
+                <li key={entry.shipId}>
+                  <div className="dock-row">
+                    <span className="dock-name">{labelFor(entry.designId)}</span>
+                    <div className="dock-actions">
+                      <button
+                        className="hud-icon-btn"
+                        data-tooltip="Centra"
+                        onClick={() => onCenter(entry.systemId)}
+                      >
+                        <Crosshair size={14} />
+                      </button>
+                      <button
+                        className="hud-icon-btn"
+                        data-tooltip="Dettagli flotta"
+                        onClick={() =>
+                          onSelect({
+                            kind: 'fleet',
+                            fleetId: entry.fleetId,
+                            systemId: entry.systemId,
+                          })
+                        }
+                      >
+                        <Info size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <small className="text-muted">
+                    {getSystemName(entry.systemId)} - {entry.fleetName}
                   </small>
                 </li>
               ))
@@ -176,8 +258,3 @@ export const SideEntityDock = ({ variant, onSelect, onCenter }: SideEntityDockPr
     </aside>
   );
 };
-
-
-
-
-

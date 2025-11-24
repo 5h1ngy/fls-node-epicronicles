@@ -1,7 +1,14 @@
-﻿import type { GalaxyState, Fleet, GameSession } from '@domain/types';
+import type { GalaxyState, Fleet, GameSession } from '@domain/types';
 import { createFleetShip, createInitialFleet } from '../fleet/ships';
 import { calculateTravelTicks, sumFleetAttack } from '../fleet/fleets';
 import type { MilitaryConfig, DiplomacyConfig } from '@config/gameConfig';
+
+const getCombatDesigns = (military: MilitaryConfig) => {
+  const combat = military.shipDesigns.filter(
+    (design) => (design.role ?? 'military') === 'military',
+  );
+  return combat.length > 0 ? combat : military.shipDesigns;
+};
 
 const chooseTargetSystem = ({
   galaxy,
@@ -70,6 +77,7 @@ export const ensureAiFleet = (
   if (session.fleets.some((fleet) => fleet.ownerId === 'ai-1')) {
     return session;
   }
+  const designPool = getCombatDesigns(military);
   const size =
     diplomacy.aiFleetStrength.baseShips +
     Math.min(
@@ -82,7 +90,7 @@ export const ensureAiFleet = (
   );
   const ships: Fleet['ships'] = [];
   for (let idx = 0; idx < size; idx += 1) {
-    const design = military.shipDesigns[idx % military.shipDesigns.length];
+    const design = designPool[idx % designPool.length];
     const boost =
       hostileSystems >= 5 ? 6 : hostileSystems >= 3 ? 3 : hostileSystems >= 1 ? 1 : 0;
     ships.push({
@@ -117,6 +125,7 @@ export const reinforceAiFleets = (
       hostileSystems * diplomacy.aiFleetStrength.extraPerHostile,
       diplomacy.aiFleetStrength.maxShips,
     );
+  const designPool = getCombatDesigns(military);
   const fleets = session.fleets.map((fleet) => ({ ...fleet, ships: [...fleet.ships] }));
   let changed = false;
   fleets.forEach((fleet) => {
@@ -124,8 +133,7 @@ export const reinforceAiFleets = (
       return;
     }
     while (fleet.ships.length < desiredShips) {
-      const design =
-        military.shipDesigns[fleet.ships.length % military.shipDesigns.length];
+      const design = designPool[fleet.ships.length % designPool.length];
       fleet.ships.push(
         createFleetShip(design, {
           attackBonus: hostileSystems >= 3 ? 2 : 0,
@@ -212,4 +220,3 @@ export const advanceAiWarMoves = ({
   }
   return { ...session, fleets };
 };
-

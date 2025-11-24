@@ -3,14 +3,14 @@
 .fleet-detail {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .fleet-detail__header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .fleet-detail__eyebrow {
@@ -28,23 +28,29 @@
 .fleet-detail__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  font-size: 0.85rem;
+  gap: 0.5rem;
+  font-size: 0.87rem;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.fleet-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .fleet-detail__section {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  padding: 0.65rem 0.75rem;
+  padding: 0.8rem 0.9rem;
   background: rgba(255, 255, 255, 0.02);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .fleet-detail__ships {
-  margin: 0;
+  margin: 0.05rem 0;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -62,23 +68,23 @@
 
 .fleet-detail__row {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.7rem;
   flex-wrap: wrap;
 }
 
 .fleet-detail__field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
   flex: 1;
-  min-width: 180px;
+  min-width: 200px;
 }
 
 .fleet-detail__field select {
   background: rgba(6, 9, 20, 0.9);
   border: 1px solid rgba(90, 115, 150, 0.5);
   border-radius: 8px;
-  padding: 0.4rem 0.55rem;
+  padding: 0.5rem 0.65rem;
   color: #e9efff;
 }
 
@@ -165,40 +171,40 @@
 .science-detail__meta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 
 .science-detail__section {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  padding: 0.65rem 0.75rem;
+  padding: 0.8rem 0.9rem;
   background: rgba(255, 255, 255, 0.02);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .science-detail__row {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.9rem;
   flex-wrap: wrap;
 }
 
 .science-detail__row--split {
-  gap: 0.6rem;
+  gap: 0.7rem;
 }
 
 .science-detail__card {
   flex: 1 1 180px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
-  padding: 0.55rem 0.65rem;
+  padding: 0.65rem 0.75rem;
   border-radius: 10px;
 }
 
 .science-detail__value {
-  margin: 0.1rem 0 0;
+  margin: 0.15rem 0 0;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -211,20 +217,20 @@
 .science-detail__controls {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .science-detail__field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
 .science-detail__field select {
   background: rgba(6, 9, 20, 0.9);
   border: 1px solid rgba(90, 115, 150, 0.5);
   border-radius: 8px;
-  padding: 0.4rem 0.55rem;
+  padding: 0.5rem 0.65rem;
   color: #e9efff;
 }
 
