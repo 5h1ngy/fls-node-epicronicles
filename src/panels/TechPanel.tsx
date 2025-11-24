@@ -11,6 +11,19 @@ const kindLabels: Record<string, string> = {
   rare: 'Rara',
 };
 
+const groupBy = <T, K extends string | number | symbol>(
+  items: T[],
+  key: (item: T) => K,
+): Record<K, T[]> =>
+  items.reduce((acc, item) => {
+    const k = key(item);
+    if (!acc[k]) {
+      acc[k] = [];
+    }
+    acc[k].push(item);
+    return acc;
+  }, {} as Record<K, T[]>);
+
 export const TechPanel = () => {
   const research = useAppSelector(selectResearch);
   const traditions = useAppSelector(selectTraditions);
@@ -47,7 +60,12 @@ export const TechPanel = () => {
     );
   };
 
-  const renderBadges = (era?: number, kind?: string) => (
+  const renderBadges = (
+    era?: number,
+    kind?: string,
+    origin?: string,
+    exclusive?: string,
+  ) => (
     <span className="tech-card__badges">
       <span className="tech-card__badge tech-card__badge--muted">Era {era ?? 1}</span>
       {kind ? (
@@ -55,32 +73,47 @@ export const TechPanel = () => {
           {kindLabels[kind] ?? kind}
         </span>
       ) : null}
+      {origin && origin !== 'standard' ? (
+        <span className="tech-card__badge tech-card__badge--muted">{origin}</span>
+      ) : null}
+      {exclusive ? (
+        <span className="tech-card__badge tech-card__badge--warning">Esclusiva</span>
+      ) : null}
     </span>
   );
 
+  const branchOffers = branches.map((branch) => ({
+    branch,
+    offers: getResearchOffers(branch.id, research, config.research),
+    state: research.branches[branch.id],
+  }));
+
+  const perksByTree = groupBy(availablePerks, (perk) => perk.tree);
+
   return (
-    <div className="panel tech-panel">
-      <header className="panel-section__header tech-panel__header">
-        <div>
-          <h4>Ricerca & Tradizioni</h4>
-          {message ? <span className="panel-message">{message}</span> : null}
-        </div>
-        <div className="tech-panel__eras">
-          <span className="pill pill--glass">Era: {research.currentEra}</span>
-          <span className="text-muted">
-            Ere sbloccate: {research.unlockedEras.join(', ') || '1'}
-          </span>
-        </div>
-      </header>
-      <div className="panel-section">
-        <strong>Ricerca</strong>
+    <div className="panel tech-panel tech-panel__grid">
+      <div className="tech-panel__column">
+        <header className="panel-section__header tech-panel__header">
+          <div>
+            <h4>Ricerca</h4>
+            {message ? <span className="panel-message">{message}</span> : null}
+          </div>
+          <div className="tech-panel__eras">
+            <span className="pill pill--glass">Era: {research.currentEra}</span>
+            <span className="text-muted">
+              Ere sbloccate: {research.unlockedEras.join(', ') || '1'}
+            </span>
+          </div>
+        </header>
         <div className="tech-panel__branches">
-          {branches.map((branch) => {
-            const state = research.branches[branch.id];
+          {branchOffers.map(({ branch, offers, state }) => {
             const currentTech = state.currentTechId
               ? config.research.techs.find((t) => t.id === state.currentTechId)
               : null;
-            const available = getResearchOffers(branch.id, research, config.research);
+            const clusters = groupBy(
+              offers,
+              (tech) => tech.clusterId ?? 'Generiche',
+            );
             return (
               <div key={branch.id} className="tech-branch">
                 <div className="tech-branch__header">
@@ -99,40 +132,54 @@ export const TechPanel = () => {
                     )}
                   </div>
                 </div>
-                <div className="tech-branch__techs">
-                  {available.map((tech) => {
-                    const completed = state.completed.includes(tech.id);
-                    const active = state.currentTechId === tech.id;
-                    return (
-                      <div key={tech.id} className="tech-card">
-                        <div className="tech-card__title">
-                          {tech.name}{' '}
-                          {completed ? (
-                            <span className="tech-card__badge">Completata</span>
-                          ) : null}
-                          {renderBadges(tech.era, tech.kind)}
-                        </div>
-                        <p className="text-muted">{tech.description}</p>
-                        <div className="tech-card__meta">
-                          <span>Costo: {tech.cost}</span>
-                          {active ? (
-                            <span className="tech-card__badge tech-card__badge--active">
-                              In corso
-                            </span>
-                          ) : (
-                            <button
-                              className="panel__action panel__action--compact"
-                              onClick={() => handleStartTech(branch.id, tech.id)}
-                              disabled={completed}
-                            >
-                              Avvia
-                            </button>
-                          )}
-                        </div>
+                <div className="tech-branch__clusters">
+                  {Object.entries(clusters).map(([clusterId, techs]) => (
+                    <div key={clusterId} className="tech-cluster">
+                      <div className="tech-cluster__header">
+                        <span className="text-muted">Cluster: {clusterId}</span>
                       </div>
-                    );
+                      <div className="tech-branch__techs">
+                        {techs.map((tech) => {
+                          const completed = state.completed.includes(tech.id);
+                          const active = state.currentTechId === tech.id;
+                          return (
+                            <div key={tech.id} className="tech-card">
+                              <div className="tech-card__title">
+                                {tech.name}{' '}
+                                {completed ? (
+                                  <span className="tech-card__badge">Completata</span>
+                                ) : null}
+                                {renderBadges(
+                                  tech.era,
+                                  tech.kind,
+                                  tech.origin,
+                                  tech.mutuallyExclusiveGroup,
+                                )}
+                              </div>
+                              <p className="text-muted">{tech.description}</p>
+                              <div className="tech-card__meta">
+                                <span>Costo: {tech.cost}</span>
+                                {active ? (
+                                  <span className="tech-card__badge tech-card__badge--active">
+                                    In corso
+                                  </span>
+                                ) : (
+                                  <button
+                                    className="panel__action panel__action--compact"
+                                    onClick={() => handleStartTech(branch.id, tech.id)}
+                                    disabled={completed}
+                                  >
+                                    Avvia
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   })}
-                  {available.length === 0 ? (
+                  {offers.length === 0 ? (
                     <p className="text-muted">Nessuna tecnologia disponibile.</p>
                   ) : null}
                 </div>
@@ -142,41 +189,50 @@ export const TechPanel = () => {
         </div>
       </div>
 
-      <div className="panel-section">
-        <div className="tech-branch__header">
+      <div className="tech-panel__column">
+        <header className="panel-section__header">
           <div>
-            <strong>Tradizioni</strong>
+            <h4>Tradizioni</h4>
             <p className="text-muted">
               Punti disponibili: {traditions.availablePoints.toFixed(2)}
             </p>
           </div>
-        </div>
+        </header>
         <div className="tech-branch__techs">
-          {availablePerks.map((perk) => {
-            const unlocked = traditions.unlocked.includes(perk.id);
-            return (
-              <div key={perk.id} className="tech-card">
-                <div className="tech-card__title">
-                  {perk.name}{' '}
-                  {unlocked ? (
-                    <span className="tech-card__badge">Sbloccata</span>
-                  ) : null}
-                  {renderBadges(perk.era)}
-                </div>
-                <p className="text-muted">{perk.description}</p>
-                <div className="tech-card__meta">
-                  <span>Costo: {perk.cost}</span>
-                  <button
-                    className="panel__action panel__action--compact"
-                    onClick={() => handleUnlockPerk(perk.id)}
-                    disabled={unlocked}
-                  >
-                    Sblocca
-                  </button>
+          {Object.entries(perksByTree).map(([tree, perks]) => (
+            <div key={tree} className="tech-branch">
+              <div className="tech-branch__header">
+                <div>
+                  <div className="tech-branch__title">{tree}</div>
                 </div>
               </div>
-            );
-          })}
+              <div className="tech-branch__clusters">
+                {perks.map((perk) => {
+                  const unlocked = traditions.unlocked.includes(perk.id);
+                  return (
+                    <div key={perk.id} className="tech-card">
+                      <div className="tech-card__title">
+                        {perk.name}{' '}
+                        {unlocked ? <span className="tech-card__badge">Sbloccata</span> : null}
+                        {renderBadges(perk.era, undefined, undefined, perk.mutuallyExclusiveGroup)}
+                      </div>
+                      <p className="text-muted">{perk.description}</p>
+                      <div className="tech-card__meta">
+                        <span>Costo: {perk.cost}</span>
+                        <button
+                          className="panel__action panel__action--compact"
+                          onClick={() => handleUnlockPerk(perk.id)}
+                          disabled={unlocked}
+                        >
+                          Sblocca
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
           {availablePerks.length === 0 ? (
             <p className="text-muted">Nessun perk disponibile ora.</p>
           ) : null}
