@@ -183,6 +183,42 @@ export const listAvailableTechs = (
   });
 };
 
+const scoreKind = (kind?: ResearchTech['kind']) => {
+  switch (kind) {
+    case 'foundation':
+      return 2;
+    case 'feature':
+      return 1;
+    case 'rare':
+      return 0.5;
+    default:
+      return 1;
+  }
+};
+
+export const getResearchOffers = (
+  branch: ResearchBranch,
+  state: ResearchState,
+  config: ResearchConfig,
+  count = 3,
+): ResearchTech[] => {
+  const available = listAvailableTechs(branch, state, config);
+  if (available.length <= count) {
+    return available;
+  }
+  // Priorità: era corrente, fondazioni, poi feature/rare
+  const era = state.currentEra;
+  const sorted = [...available].sort((a, b) => {
+    const eraA = a.era ?? 1;
+    const eraB = b.era ?? 1;
+    if (eraA !== eraB) {
+      return eraA - eraB;
+    }
+    return scoreKind(b.kind) - scoreKind(a.kind);
+  });
+  return sorted.slice(0, count);
+};
+
 const computeEraUnlocks = (state: ResearchState, config: ResearchConfig) => {
   const completedAll = Object.values(state.branches).flatMap((b) => b.completed);
   const unlocked = new Set(state.unlockedEras);

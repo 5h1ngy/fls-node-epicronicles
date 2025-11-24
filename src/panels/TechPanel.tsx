@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAppSelector, useGameStore } from '@store/gameStore';
-import { listAvailableTechs } from '@domain/research/research';
+import { getResearchOffers } from '@domain/research/research';
 import { listTraditionChoices } from '@domain/traditions/traditions';
 import { selectResearch, selectTraditions } from '@store/selectors';
 import '../styles/components/TechPanel.scss';
@@ -47,16 +47,13 @@ export const TechPanel = () => {
     );
   };
 
-  const renderBadges = (era?: number, kind?: string, origin?: string) => (
+  const renderBadges = (era?: number, kind?: string) => (
     <span className="tech-card__badges">
       <span className="tech-card__badge tech-card__badge--muted">Era {era ?? 1}</span>
       {kind ? (
         <span className="tech-card__badge tech-card__badge--muted">
           {kindLabels[kind] ?? kind}
         </span>
-      ) : null}
-      {origin && origin !== 'standard' ? (
-        <span className="tech-card__badge tech-card__badge--muted">{origin}</span>
       ) : null}
     </span>
   );
@@ -69,7 +66,7 @@ export const TechPanel = () => {
           {message ? <span className="panel-message">{message}</span> : null}
         </div>
         <div className="tech-panel__eras">
-          <span className="pill pill--glass">Era corrente: {research.currentEra}</span>
+          <span className="pill pill--glass">Era: {research.currentEra}</span>
           <span className="text-muted">
             Ere sbloccate: {research.unlockedEras.join(', ') || '1'}
           </span>
@@ -83,7 +80,7 @@ export const TechPanel = () => {
             const currentTech = state.currentTechId
               ? config.research.techs.find((t) => t.id === state.currentTechId)
               : null;
-            const available = listAvailableTechs(branch.id, research, config.research);
+            const available = getResearchOffers(branch.id, research, config.research);
             return (
               <div key={branch.id} className="tech-branch">
                 <div className="tech-branch__header">
@@ -113,7 +110,7 @@ export const TechPanel = () => {
                           {completed ? (
                             <span className="tech-card__badge">Completata</span>
                           ) : null}
-                          {renderBadges(tech.era, tech.kind, tech.origin)}
+                          {renderBadges(tech.era, tech.kind)}
                         </div>
                         <p className="text-muted">{tech.description}</p>
                         <div className="tech-card__meta">
@@ -164,7 +161,7 @@ export const TechPanel = () => {
                   {unlocked ? (
                     <span className="tech-card__badge">Sbloccata</span>
                   ) : null}
-                  {renderBadges(perk.era, undefined, undefined)}
+                  {renderBadges(perk.era)}
                 </div>
                 <p className="text-muted">{perk.description}</p>
                 <div className="tech-card__meta">
