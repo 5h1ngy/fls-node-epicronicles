@@ -41,4 +41,4 @@
 
 ### Prossimi micro-step
 - Ampliare pool rare e collegarle ad altri eventi/anomalie (e.g. reliquie multiple, catene evento). → Nuove rare/anomalie Era 4 aggiunte (phase-catalyst, void-sentinels).
-- Bilanciare gateway: mantenere visibili alcune gateway dell’era successiva nel pescaggio (slot dedicati).
+- [x] Bilanciare gateway: mantenere visibili alcune gateway dell’era successiva nel pescaggio (slot dedicati) e hint UI quando lista vuota.

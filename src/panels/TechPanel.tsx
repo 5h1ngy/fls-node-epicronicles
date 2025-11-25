@@ -57,10 +57,6 @@ export const TechPanel = () => {
     }));
   }, [config.traditions.perks, traditions]);
 
-  if (!research || !traditions) {
-    return <p className="text-muted">Nessuna sessione attiva.</p>;
-  }
-
   const handleStartTech = (branchId: typeof branches[number]['id'], techId: string) => {
     const result = beginResearch(branchId, techId);
     setMessage(
@@ -115,13 +111,29 @@ export const TechPanel = () => {
     );
   };
 
-  const branchOffers = branches.map((branch) => ({
-    branch,
-    offers: getResearchOffers(branch.id, research, config.research),
-    state: research.branches[branch.id],
-  }));
+  const branchOffers =
+    research && traditions
+      ? branches.map((branch) => ({
+          branch,
+          offers: getResearchOffers(branch.id, research, config.research),
+          state: research.branches[branch.id],
+        }))
+      : [];
 
   const perksByTree = groupBy(availablePerks, (perk) => perk.tree);
+  const nextEraGateways = useMemo(() => {
+    if (!research) return [];
+    const targetEra = research.currentEra + 1;
+    const eraDef = config.research.eras?.find((era) => era.id === targetEra);
+    if (!eraDef) return [];
+    return eraDef.gatewayTechs
+      ?.map((id) => config.research.techs.find((t) => t.id === id))
+      .filter(Boolean) as typeof config.research.techs;
+  }, [config, research]);
+
+  if (!research || !traditions) {
+    return <p className="text-muted">Nessuna sessione attiva.</p>;
+  }
 
   return (
     <div className="tech-panel tech-panel__grid">
@@ -314,7 +326,15 @@ export const TechPanel = () => {
                       );
                     })}
                     {offers.length === 0 ? (
-                      <p className="text-muted">Nessuna tecnologia disponibile.</p>
+                      <div className="tech-empty">
+                        <p className="text-muted">Nessuna tecnologia disponibile.</p>
+                        {nextEraGateways.length > 0 ? (
+                          <p className="text-muted">
+                            Suggerimento: completa le gateway dell&apos;Era {research.currentEra + 1}:{' '}
+                            {nextEraGateways.map((t) => t.name).join(', ')}.
+                          </p>
+                        ) : null}
+                      </div>
                     ) : null}
                   </div>
                 </div>
