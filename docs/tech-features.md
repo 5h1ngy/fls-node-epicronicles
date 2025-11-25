@@ -48,3 +48,17 @@
 - Card cluster per tech/perk, badge foundation/feature/rare, origine.
 - Blocchi scelte esclusive con toggle e lock visivo.
 - Filtri: mostra/nascondi completate, rare disponibili, era.
+
+### Stato attuale (implementato)
+- Tipi estesi con `era`, `clusterId`, `kind`, `origin`, `mutuallyExclusiveGroup`.
+- Config aggiornata con ere e tag per tutte le tech/perk oggi presenti.
+- Pannello Ricerca/Tradizioni riorganizzato con badge era/tipo e cluster.
+- Coppie esclusive base (AI governance, Bio vs Cyber, Dottrine flotta) con lock/disabilitazione in UI.
+- Pillole di riepilogo percorsi esclusivi scelti nei pannelli Ricerca/Tradizioni.
+- Insight da eventi/anomalie aggiungono tech rare alla backlog di ricerca.
+- Pool rare ampliato con ricompense da eventi/anomalie (relic-sensors, ancient-drives, psi-echoes, chrono-scanners, void-harmonics, quantum-beacons, dark-core-reactor).
+- Le card mostrano l’origine (anomaly/relic/faction) quando non standard.
+- Badge origine differenziati e label percorsi esclusivi per tech/perk (più chiaro il lock).
+
+### Backlog breve
+1) Ampliare il pool di tech rare e le catene evento/anomalia che le sbloccano (variare rischi/ricompense).

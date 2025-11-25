@@ -54,8 +54,6 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
     });
   };
 
-  const queueUsage = `${queue.length}/${queueLimit}`;
-
   const handleBuild = (designId: ShipClassId, designName: string) => {
     const templateId = selectedTemplate[designId];
     const result = queueShipBuild(designId, templateId);

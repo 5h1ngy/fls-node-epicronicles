@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { useGameStore } from '@store/gameStore';
 import type { StarSystem } from '@domain/types';
@@ -589,7 +589,7 @@ export const GalaxyMap = ({
     Array<{ mesh: THREE.InstancedMesh; index: number; systemId: string; planetId: string | null; height: number }>
   >([]);
 
-  const resolveAnchorPositionLocal = (
+  const resolveAnchorPositionLocal = useCallback((
     systemId: string,
     planetId: string | null | undefined,
     height: number,
@@ -612,7 +612,7 @@ export const GalaxyMap = ({
     const pos = getVector().copy(systemPos);
     pos.z += height;
     return pos;
-  };
+  }, []);
   const lastFocusSystemRef = useRef<string | null>(null);
   const lastFocusPlanetRef = useRef<string | null>(null);
   const lastFocusAppliedRef = useRef<{ id: string | null; trigger: number }>({
@@ -1689,6 +1689,8 @@ export const GalaxyMap = ({
     galaxyShape,
     galaxySeed,
     maxSystemRadius,
+    resolveAnchorPositionLocal,
+    starVisuals,
   ]);
 
   return <div className="galaxy-map" ref={containerRef} />;

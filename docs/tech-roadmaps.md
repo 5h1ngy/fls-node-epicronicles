@@ -3,8 +3,8 @@
 ### Fase 1 – Modellazione e dati
 - [x] Estendere tipi `ResearchTech`/`TraditionPerk` con `era`, `clusterId`, `kind`, `origin`, `mutuallyExclusiveGroup`.
 - [x] Aggiungere `research.eras` in config con gateway iniziali.
-- [ ] Annotare tutte le tech/tradizioni esistenti con era/cluster/kind ed eventuale origine/rarità.
-- [ ] Definire e applicare i gruppi esclusivi (IA libera/regolata, Biotech/Cyber, Dottrine flotta).
+- [x] Annotare tutte le tech/tradizioni esistenti con era/cluster/kind ed eventuale origine/rarità.
+- [x] Definire e applicare i gruppi esclusivi (IA libera/regolata, Biotech/Cyber, Dottrine flotta).
 
 ### Fase 2 – Logica di gioco
 - [ ] Stato ricerca: `currentEra`, `unlockedEras`, conteggio gateway.
@@ -15,8 +15,11 @@
 ### Fase 3 – UI/UX
 - [x] Pannello Ricerca/Tradizioni ristrutturato: header era, badge era/tipo, grouping per cluster, colonne Ricerca/Tradizioni.
 - [ ] Aggiungere blocchi di scelte esclusive e filtri (completate, rare, era) + barre di avanzamento per ramo.
-- [ ] Filtri (completate, rare, era) e highlight completate.
-- [ ] Stato attivo/progresso per ramo con barre e countdown.
+- [x] Filtri (completate, rare, era) e highlight completate.
+- [x] Stato attivo/progresso per ramo con barre e countdown.
+- [x] Visualizzazione percorsi esclusivi scelti (pill/caption) e lock su card.
+- [x] Mostrare l’origine non standard sulle card (anomaly/relic/faction).
+- [x] Badge origine differenziati e label percorsi esclusivi nelle card per chiarezza.
 
 ### Fase 4 – Contenuti e varietà
 - [ ] Ampliare pool tech per ogni era/cluster.
@@ -31,8 +34,9 @@
 ### Stato attuale
 - Offerte Ricerca filtrate/bilanciate per era e tipo (Fondamenta/Feature/Rare).
 - UI Ricerca/Tradizioni con colonne, badge era/tipo e cluster.
+- Tutte le tech/perk correnti sono etichettate con era, cluster, kind/origin.
+- Config include coppie esclusive base (AI governance, Bio vs Cyber, Dottrine flotta) con lock in UI.
+- Prime tech rare collegate a eventi/anomalie (relic-sensors, ancient-drives, psi-echoes, chrono-scanners, void-harmonics, quantum-beacons, dark-core-reactor, stellar-ward) via insight/backlog.
 
 ### Prossimi micro-step
-- Annotare tutto il catalogo tech/perk con era/cluster/kind/esclusivi.
-- Aggiungere blocchi UI per scelte esclusive e filtri completate/rare/era (con barre progresso per ramo).
-- Gestire rare da eventi/reliquie nel pescaggio (hook da eventi/anomalie).
+- Ampliare pool rare e collegarle ad altri eventi/anomalie (e.g. reliquie multiple, catene evento).

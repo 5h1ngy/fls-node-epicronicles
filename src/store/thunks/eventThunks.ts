@@ -26,7 +26,7 @@ export const resolveActiveEvent =
       option,
       activeEvent: active,
       tick: session.clock.tick,
-      config: state.config.events,
+      config: state.config,
     });
     dispatch(
       setSessionState({

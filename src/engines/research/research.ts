@@ -158,7 +158,8 @@ export const listAvailableTechs = (
   config: ResearchConfig,
 ): ResearchTech[] => {
   const branchState = state.branches[branch];
-  return config.techs.filter((tech) => {
+  const pool = state.backlog && state.backlog.length > 0 ? state.backlog : config.techs;
+  return pool.filter((tech) => {
     if (tech.branch !== branch) {
       return false;
     }

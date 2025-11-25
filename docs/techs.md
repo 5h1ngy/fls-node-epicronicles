@@ -56,3 +56,33 @@ Esempi di rami:
 3. Alcune tech cambiano meccaniche, non solo bonus?
 4. Tech/eventi rari rendono le run diverse?
 5. Ogni era ha 1-3 tech soglia che segnano il salto di potenza?
+
+## 6. Catalogo attuale (bozza minima in config)
+
+### Ricerca
+- **Energia fotonica** (`photonics`) — Era 1, cluster `energy-1`, `foundation`, origin standard. Bonus energia.
+- **Bio-cupole** (`bio-domes`) — Era 1, cluster `bio-1`, `foundation`, origin standard. Bonus cibo.
+- **Leghe rinforzate** (`reinforced-alloys`) — Era 1, cluster `materials-1`, `foundation`, origin standard. Bonus minerali.
+- **Sensori avanzati** (`advanced-sensors`) — Era 2, cluster `sensors-1`, `feature`, origin standard, gateway Era 2.
+- **Burosfera** (`bureaucracy`) — Era 2, cluster `admin-1`, `feature`, origin standard.
+- **Cantieri modulari** (`modular-yards`) — Era 2, cluster `yards-1`, `feature`, origin standard, prereq `reinforced-alloys`.
+- **Sensori reliquia** (`relic-sensors`) — Era 1, cluster `relic-1`, `rare`, origin anomaly. Bonus ricerca, ottenibile da evento/anomalia.
+- **Propulsori antichi** (`ancient-drives`) — Era 2, cluster `relic-2`, `rare`, origin relic. Bonus energia, ottenibile da evento.
+- **Echi psionici** (`psi-echoes`) — Era 2, cluster `relic-3`, `rare`, origin relic/anomaly. Bonus ricerca e influenza, ottenibile da anomalia.
+- **Scanner cronici** (`chrono-scanners`) — Era 2, cluster `relic-4`, `rare`, origin anomaly. Bonus ricerca, ottenibile da anomalia.
+- **Armoniche del vuoto** (`void-harmonics`) — Era 3, cluster `relic-5`, `rare`, origin anomaly. Bonus energia e ricerca, ottenibile da anomalia.
+- **Beacon quantici** (`quantum-beacons`) — Era 3, cluster `relic-6`, `rare`, origin anomaly. Bonus energia e ricerca, ottenibile da anomalia.
+- **Reattore nucleo oscuro** (`dark-core-reactor`) — Era 3, cluster `relic-7`, `rare`, origin relic. Bonus energia e minerali, ottenibile da anomalia.
+- **Baluardo stellare** (`stellar-ward`) — Era 3, cluster `faction-1`, `rare`, origin faction. Bonus ricerca e influenza, ottenibile da evento fazione.
+- **IA aperta** (`ai-open`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
+- **IA regolata** (`ai-regulated`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
+- **Adattamento biologico** (`bio-adaptation`) — Era 2, cluster `bio-cyber-1`, `feature`, origin standard, gruppo esclusivo `bio-cyber`.
+- **Potenziamenti cibernetici** (`cyber-augmentation`) — Era 2, cluster `bio-cyber-1`, `feature`, origin standard, gruppo esclusivo `bio-cyber`.
+- **Dottrina sciame** (`doctrine-swarm`) — Era 2, cluster `doctrine-1`, `feature`, origin standard, gruppo esclusivo `fleet-doctrine`.
+- **Dottrina nucleo d’élite** (`doctrine-core`) — Era 2, cluster `doctrine-1`, `feature`, origin standard, gruppo esclusivo `fleet-doctrine`.
+
+### Tradizioni
+- **Scansioni fulminee** (`survey-speed`) — Era 1, cluster `explore-1`, origin standard.
+- **Logistica avanzata** (`logistics`) — Era 1, cluster `military-1`, origin standard.
+- **Quadri amministrativi** (`bureaucrats`) — Era 1, cluster `economy-1`, origin standard.
+- **Pianificazione planetaria** (`planetary-planning`) — Era 1, cluster `economy-1`, origin standard, prereq `bureaucrats`.

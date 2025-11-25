@@ -6,7 +6,11 @@ import type {
   GameSession,
   ResourceType,
 } from '@domain/types';
-import type { EventsConfig, EventDefinition } from '@config/gameConfig';
+import type {
+  EventsConfig,
+  EventDefinition,
+  GameConfig,
+} from '@config/gameConfig';
 import { canAffordCost, spendResources } from '@domain/economy/economy';
 
 export interface EventState {
@@ -25,7 +29,8 @@ const resourceLabels: Record<ResourceType, string> = {
 const applyEffect = (
   session: GameSession,
   effect: EventOptionEffect,
-  config: EventsConfig,
+  eventsConfig: EventsConfig,
+  gameConfig: GameConfig,
   fallbackSystemId?: string | null,
 ): { session: GameSession; queuedEvent: GameEvent | null } => {
   switch (effect.kind) {
@@ -107,10 +112,60 @@ const applyEffect = (
       if (!effect.nextEventId) {
         return { session, queuedEvent: null };
       }
-      const next = instantiateEventById(config, effect.nextEventId, fallbackSystemId ?? undefined);
+      const next = instantiateEventById(
+        eventsConfig,
+        effect.nextEventId,
+        fallbackSystemId ?? undefined,
+      );
       return { session, queuedEvent: next };
     }
     case 'insight':
+      {
+        const techId = effect.techId;
+        const perkId = effect.perkId;
+        let updated = session;
+
+        if (techId) {
+          const techDef = gameConfig.research.techs.find((t) => t.id === techId);
+          if (techDef) {
+            const branchState = session.research.branches[techDef.branch];
+            const alreadyCompleted = branchState.completed.includes(techDef.id);
+            const alreadyQueued = session.research.backlog.some(
+              (entry) => entry.id === techDef.id,
+            );
+            if (!alreadyCompleted && !alreadyQueued) {
+              updated = {
+                ...updated,
+                research: {
+                  ...updated.research,
+                  backlog: [...updated.research.backlog, techDef],
+                },
+              };
+            }
+          }
+        }
+
+        if (perkId) {
+          const perkDef = gameConfig.traditions.perks.find((p) => p.id === perkId);
+          if (perkDef) {
+            const alreadyUnlocked = session.traditions.unlocked.includes(perkDef.id);
+            const alreadyQueued = session.traditions.backlog.some(
+              (entry) => entry.id === perkDef.id,
+            );
+            if (!alreadyUnlocked && !alreadyQueued) {
+              updated = {
+                ...updated,
+                traditions: {
+                  ...updated.traditions,
+                  backlog: [...updated.traditions.backlog, perkDef],
+                },
+              };
+            }
+          }
+        }
+
+        return { session: updated, queuedEvent: null };
+      }
     default:
       return { session, queuedEvent: null };
   }
@@ -127,7 +182,7 @@ export const resolveEvent = ({
   option: EventOption;
   activeEvent: GameEvent;
   tick: number;
-  config: EventsConfig;
+  config: GameConfig;
 }): { session: GameSession; logEntry: EventLogEntry; queued: GameEvent[] } => {
   let updatedSession = session;
   const queued: GameEvent[] = [];
@@ -135,6 +190,7 @@ export const resolveEvent = ({
     const { session: nextSession, queuedEvent } = applyEffect(
       updatedSession,
       effect,
+      config.events,
       config,
       activeEvent.systemId,
     );

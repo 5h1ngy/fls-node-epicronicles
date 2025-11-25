@@ -107,11 +107,6 @@ interface HookState {
     jobId: PopulationJobId,
   ) => PopulationAdjustResult;
   removeDistrict: (planetId: string, districtId: string) => RemoveDistrictResult;
-  setFleetPosition: (
-    fleetId: string,
-    systemId: string,
-    offset: { x: number; y: number; z?: number },
-  ) => FleetMoveResult;
   cancelDistrictTask: (
     taskId: string,
   ) => DistrictQueueManageResult;
@@ -211,12 +206,6 @@ export const useGameStore = <T>(selector: (state: HookState) => T): T => {
         dispatch(unlockTraditionPerk(perkId)),
       resolveActiveEvent: (optionId: string) =>
         dispatch(resolveActiveEvent(optionId)),
-      setScienceShipPosition: (
-        shipId: string,
-        planetId: string | null,
-      ) => dispatch(setScienceShipPosition(shipId, planetId)),
-      setFleetPosition: (fleetId: string, planetId: string | null) =>
-        dispatch(setFleetPosition(fleetId, planetId)),
     }),
     [dispatch],
   );

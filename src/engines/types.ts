@@ -60,6 +60,7 @@ export interface TraditionPerk {
   effects?: string[];
   era?: number;
   clusterId?: string;
+  origin?: 'standard' | 'relic' | 'anomaly' | 'faction';
   mutuallyExclusiveGroup?: string;
 }
 
@@ -156,6 +157,8 @@ export interface EventOptionEffect {
   amount?: number;
   systemId?: string;
   nextEventId?: string;
+  techId?: string;
+  perkId?: string;
 }
 
 export interface EventOption {
@@ -256,6 +259,7 @@ export interface ScienceShip {
   currentSystemId: string;
   targetSystemId: string | null;
   anchorPlanetId?: string | null;
+  localOffset?: Vector3 | null;
   status: ScienceShipStatus;
   ticksRemaining: number;
   autoExplore: boolean;
@@ -304,6 +308,7 @@ export interface Fleet {
   systemId: string;
   targetSystemId: string | null;
   anchorPlanetId?: string | null;
+  localOffset?: Vector3 | null;
   ticksToArrival: number;
   ships: FleetShip[];
   lastTargetSystemId?: string | null;

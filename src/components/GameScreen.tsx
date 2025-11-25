@@ -145,7 +145,6 @@ export const GameScreen = () => {
   useEffect(() => {
     if (!session) {
       focusedSessionRef.current = null;
-      setSelectedEntity(null);
       return;
     }
     if (focusedSessionRef.current === session.id) {
@@ -333,11 +332,6 @@ export const GameScreen = () => {
           onSelect={(selection) => {
             setDockSelection(selection);
             setFocusPlanetId(null);
-            setSelectedEntity({
-              kind: 'fleet',
-              id: selection.fleetId,
-              systemId: selection.systemId,
-            });
           }}
         />
         <SideEntityDock
@@ -351,11 +345,6 @@ export const GameScreen = () => {
           onSelect={(selection) => {
             setDockSelection(selection);
             setFocusPlanetId(null);
-            setSelectedEntity({
-              kind: 'fleet',
-              id: selection.fleetId,
-              systemId: selection.systemId,
-            });
           }}
         />
         <SideEntityDock
@@ -377,7 +366,7 @@ export const GameScreen = () => {
         focusPlanetId={focusPlanetId}
         focusTrigger={focusTrigger}
         mapMessage={mapMessage}
-        onSelectSystem={(systemId, _anchor) => {
+        onSelectSystem={(systemId) => {
           const targetSystem = systems.find(
             (entry) => entry.id === systemId,
           );

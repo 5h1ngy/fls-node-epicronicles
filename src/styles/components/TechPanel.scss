@@ -1,39 +1,139 @@
 @use "../_tokens";
 
-.tech-panel__branches {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+.tech-panel {
+  width: 100%;
+  height: 100%;
 }
 
 .tech-panel__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  align-items: stretch;
 }
 
 .tech-panel__column {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.tech-panel__section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   gap: 0.6rem;
+  box-shadow: none;
 }
 
 .tech-panel__header {
   align-items: center;
+  justify-content: space-between;
 }
 
-.tech-panel__eras {
+.tech-panel__summary {
   display: flex;
   gap: 0.5rem;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.tech-branch {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 0.6rem;
+.tech-panel__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
   background: rgba(255, 255, 255, 0.02);
+}
+
+.tech-panel__filters {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.tech-panel__filters label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tech-panel__legend {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tech-panel__exclusive {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tech-panel__exclusive--compact {
+  margin-top: -0.35rem;
+}
+
+.tech-panel__exclusive-list {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.tech-panel__branches {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tech-panel__scroll {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.tech-panel__scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tech-panel__scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+.tech-panel__legend {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tech-branch {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -53,23 +153,24 @@
 .tech-branch__techs {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.55rem;
+  overflow: visible;
 }
 
 .tech-branch__clusters {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .tech-cluster {
-  border: 1px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 0.4rem;
-  background: rgba(255, 255, 255, 0.01);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.55rem;
+  background: rgba(255, 255, 255, 0.015);
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
 .tech-cluster__header {
@@ -80,12 +181,14 @@
 }
 
 .tech-card {
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
-  padding: 0.45rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 0.55rem 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.02);
+  min-width: 220px;
 }
 
 .tech-card__title {
@@ -130,4 +233,19 @@
 .tech-card__badge--warning {
   border-color: rgba(255, 171, 91, 0.6);
   color: #ffb36b;
+}
+
+.tech-card__badge--relic {
+  border-color: rgba(255, 215, 128, 0.7);
+  color: #ffd780;
+}
+
+.tech-card__badge--anomaly {
+  border-color: rgba(126, 214, 255, 0.7);
+  color: #7ed6ff;
+}
+
+.tech-card__badge--faction {
+  border-color: rgba(192, 160, 255, 0.7);
+  color: #c0a0ff;
 }
