@@ -260,7 +260,14 @@ const computeEraUnlocks = (state: ResearchState, config: ResearchConfig) => {
       return;
     }
     const gateways = era.gatewayTechs ?? [];
-    if (gateways.length === 0 || gateways.every((id) => completedAll.includes(id))) {
+    if (gateways.length === 0) {
+      unlocked.add(era.id);
+      return;
+    }
+    // Regola flessibile: sblocca l'era quando è completato almeno il 60% delle gateway (min 1)
+    const required = Math.max(1, Math.ceil(gateways.length * 0.6));
+    const completedCount = gateways.filter((id) => completedAll.includes(id)).length;
+    if (completedCount >= required) {
       unlocked.add(era.id);
     }
   });
