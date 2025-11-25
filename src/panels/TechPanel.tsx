@@ -130,6 +130,19 @@ export const TechPanel = () => {
       ?.map((id) => config.research.techs.find((t) => t.id === id))
       .filter(Boolean) as typeof config.research.techs;
   }, [config, research]);
+  const gatewayProgress = useMemo(() => {
+    if (!research) return null;
+    const targetEra = research.currentEra + 1;
+    const eraDef = config.research.eras?.find((era) => era.id === targetEra);
+    if (!eraDef || !eraDef.gatewayTechs || eraDef.gatewayTechs.length === 0) {
+      return null;
+    }
+    const completed = eraDef.gatewayTechs.filter((id) =>
+      Object.values(research.branches).some((b) => b.completed.includes(id)),
+    ).length;
+    const total = eraDef.gatewayTechs.length;
+    return { targetEra, completed, total };
+  }, [config, research]);
 
   if (!research || !traditions) {
     return <p className="text-muted">Nessuna sessione attiva.</p>;
@@ -149,6 +162,12 @@ export const TechPanel = () => {
               <span className="text-muted">
                 Ere sbloccate: {research.unlockedEras.join(', ') || '1'}
               </span>
+              {gatewayProgress ? (
+                <span className="pill pill--glass">
+                  Gateway Era {gatewayProgress.targetEra}: {gatewayProgress.completed}/
+                  {gatewayProgress.total}
+                </span>
+              ) : null}
             </div>
           </header>
           <div className="tech-panel__toolbar">
