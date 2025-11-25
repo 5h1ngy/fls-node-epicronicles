@@ -207,10 +207,17 @@ export const getResearchOffers = (
   if (available.length <= count) {
     return available;
   }
+  // Separiamo gateway (fondamenta era successiva) per non bloccare i progressi
+  const gatewayIds = new Set(
+    (config.eras ?? [])
+      .filter((era) => era.id > state.currentEra)
+      .flatMap((era) => era.gatewayTechs ?? []),
+  );
   const era = state.currentEra;
   const pool = available
     .filter((tech) => (tech.era ?? 1) <= era)
     .sort((a, b) => scoreKind(b.kind) - scoreKind(a.kind));
+  const gateways = available.filter((tech) => gatewayIds.has(tech.id));
   const foundations = pool.filter((t) => t.kind === 'foundation');
   const features = pool.filter((t) => t.kind === 'feature');
   const rares = pool.filter((t) => t.kind === 'rare');
@@ -235,6 +242,10 @@ export const getResearchOffers = (
   // Fallback con qualsiasi disponibile
   while (picks.length < count && pool.length > 0) {
     picks.push(pool.shift() as ResearchTech);
+  }
+  // Se ancora spazio, inserire gateway per mantenere la progressione visibile
+  while (picks.length < count && gateways.length > 0) {
+    picks.push(gateways.shift() as ResearchTech);
   }
 
   return picks;

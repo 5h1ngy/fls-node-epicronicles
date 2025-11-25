@@ -63,7 +63,7 @@ Esempi di rami:
 - **Energia fotonica** (`photonics`) — Era 1, cluster `energy-1`, `foundation`, origin standard. Bonus energia.
 - **Bio-cupole** (`bio-domes`) — Era 1, cluster `bio-1`, `foundation`, origin standard. Bonus cibo.
 - **Leghe rinforzate** (`reinforced-alloys`) — Era 1, cluster `materials-1`, `foundation`, origin standard. Bonus minerali.
-- **Sensori avanzati** (`advanced-sensors`) — Era 2, cluster `sensors-1`, `feature`, origin standard, gateway Era 2.
+ - **Sensori avanzati** (`advanced-sensors`) — Era 1, cluster `sensors-1`, `feature`, origin standard, gateway per Era 2.
 - **Burosfera** (`bureaucracy`) — Era 2, cluster `admin-1`, `feature`, origin standard.
 - **Cantieri modulari** (`modular-yards`) — Era 2, cluster `yards-1`, `feature`, origin standard, prereq `reinforced-alloys`.
 - **Sensori reliquia** (`relic-sensors`) — Era 1, cluster `relic-1`, `rare`, origin anomaly. Bonus ricerca, ottenibile da evento/anomalia.
@@ -76,6 +76,8 @@ Esempi di rami:
 - **Baluardo stellare** (`stellar-ward`) — Era 3, cluster `faction-1`, `rare`, origin faction. Bonus ricerca e influenza, ottenibile da evento fazione.
 - **Lente gravitica** (`gravitic-lens`) — Era 3, cluster `relic-8`, `rare`, origin anomaly. Bonus ricerca, ottenibile da anomalia.
 - **Fonderia droni reliquia** (`drone-foundry`) — Era 3, cluster `relic-9`, `rare`, origin relic. Bonus minerali e costo navi leggere, ottenibile da anomalia.
+- **Catalizzatore di fase** (`phase-catalyst`) — Era 4, cluster `relic-10`, `rare`, origin anomaly. Bonus ricerca ed energia, ottenibile da anomalia.
+- **Sentinelle del vuoto** (`void-sentinels`) — Era 4, cluster `relic-11`, `rare`, origin relic. Bonus costo navi capitali/difesa flotte, ottenibile da anomalia.
 - **IA aperta** (`ai-open`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
 - **IA regolata** (`ai-regulated`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
 - **Adattamento biologico** (`bio-adaptation`) — Era 2, cluster `bio-cyber-1`, `feature`, origin standard, gruppo esclusivo `bio-cyber`.
