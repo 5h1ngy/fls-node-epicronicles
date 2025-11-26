@@ -38,6 +38,7 @@
 - Config include coppie esclusive base (AI governance, Bio vs Cyber, Dottrine flotta) con lock in UI.
 - Prime tech rare collegate a eventi/anomalie/fazione (relic-sensors, ancient-drives, psi-echoes, chrono-scanners, void-harmonics, quantum-beacons, dark-core-reactor, stellar-ward, gravitic-lens, drone-foundry) via insight/backlog.
 - Gateway Era 2 tutti in Era 1 (sensori avanzati, leghe rinforzate) per evitare stalli.
+- Rare Era 4 ampliate con nuove anomalie (phase-shield-lattice, ancient-databanks).
 
 ### Prossimi micro-step
 - Ampliare pool rare e collegarle ad altri eventi/anomalie (e.g. reliquie multiple, catene evento). → Nuove rare/anomalie Era 4 aggiunte (phase-catalyst, void-sentinels).

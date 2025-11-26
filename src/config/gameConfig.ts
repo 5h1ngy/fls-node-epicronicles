@@ -496,6 +496,53 @@ export const gameConfig: GameConfig = {
           },
         ],
       },
+      {
+        id: 'phase-rift',
+        kind: 'anomaly',
+        title: 'Frattura di fase',
+        description: 'Una frattura instabile pulsa vicino alla stella.',
+        options: [
+          {
+            id: 'stabilizza',
+            label: 'Stabilizza la frattura',
+            description: 'Schema raro scudi di fase, rischio instabilita.',
+            effects: [
+              { kind: 'stability', amount: -3 },
+              { kind: 'insight', techId: 'phase-shield-lattice' },
+            ],
+          },
+          {
+            id: 'osserva',
+            label: 'Osserva a distanza',
+            description: 'Piccolo bonus ricerca senza rischi.',
+            effects: [{ kind: 'resource', target: 'research', amount: 10 }],
+          },
+        ],
+      },
+      {
+        id: 'ancient-datavault',
+        kind: 'anomaly',
+        title: 'Archivio dati antico',
+        description: 'Un relitto custodisce banche dati sigillate.',
+        options: [
+          {
+            id: 'decifra-dati',
+            label: 'Decifra i dati',
+            description: 'Ottieni schema raro e influenza, rischio instabilita.',
+            effects: [
+              { kind: 'stability', amount: -2 },
+              { kind: 'influence', amount: 2 },
+              { kind: 'insight', techId: 'ancient-databanks' },
+            ],
+          },
+          {
+            id: 'estrai-energia',
+            label: 'Estrarre energia residua',
+            description: 'Guadagni energia senza rischi.',
+            effects: [{ kind: 'resource', target: 'energy', amount: 10 }],
+          },
+        ],
+      },
     ],
     crisis: [
       {
@@ -928,6 +975,30 @@ export const gameConfig: GameConfig = {
         clusterId: 'relic-11',
         kind: 'rare',
         origin: 'relic',
+      },
+      {
+        id: 'phase-shield-lattice',
+        branch: 'physics',
+        name: 'Reticolo scudi di fase',
+        description: 'Tecnologia rara: +8% ricerca, +12% difesa flotte (Era 4).',
+        cost: 100,
+        effects: ['researchIncome:+0.08'],
+        era: 4,
+        clusterId: 'relic-12',
+        kind: 'rare',
+        origin: 'relic',
+      },
+      {
+        id: 'ancient-databanks',
+        branch: 'society',
+        name: 'Databank antichi',
+        description: 'Tecnologia rara: +0.8 influenza/tick, +8% ricerca (Era 4).',
+        cost: 95,
+        effects: ['influenceFlat:+0.8', 'researchIncome:+0.08'],
+        era: 4,
+        clusterId: 'relic-13',
+        kind: 'rare',
+        origin: 'anomaly',
       },
       {
         id: 'ai-open',

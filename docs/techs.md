@@ -78,6 +78,8 @@ Esempi di rami:
 - **Fonderia droni reliquia** (`drone-foundry`) — Era 3, cluster `relic-9`, `rare`, origin relic. Bonus minerali e costo navi leggere, ottenibile da anomalia.
 - **Catalizzatore di fase** (`phase-catalyst`) — Era 4, cluster `relic-10`, `rare`, origin anomaly. Bonus ricerca ed energia, ottenibile da anomalia.
 - **Sentinelle del vuoto** (`void-sentinels`) — Era 4, cluster `relic-11`, `rare`, origin relic. Bonus costo navi capitali/difesa flotte, ottenibile da anomalia.
+- **Reticolo scudi di fase** (`phase-shield-lattice`) — Era 4, cluster `relic-12`, `rare`, origin relic. Bonus ricerca e difesa flotte, ottenibile da anomalia.
+- **Databank antichi** (`ancient-databanks`) — Era 4, cluster `relic-13`, `rare`, origin anomaly. Bonus influenza e ricerca, ottenibile da anomalia.
 - **IA aperta** (`ai-open`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
 - **IA regolata** (`ai-regulated`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
 - **Adattamento biologico** (`bio-adaptation`) — Era 2, cluster `bio-cyber-1`, `feature`, origin standard, gruppo esclusivo `bio-cyber`.
