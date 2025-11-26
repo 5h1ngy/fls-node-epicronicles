@@ -7,7 +7,7 @@
 - [x] Definire e applicare i gruppi esclusivi (IA libera/regolata, Biotech/Cyber, Dottrine flotta).
 
 ### Fase 2 – Logica di gioco
-- [ ] Stato ricerca: `currentEra`, `unlockedEras`, conteggio gateway.
+- [x] Stato ricerca: `currentEra`, `unlockedEras`, conteggio gateway.
 - [x] Selezione offerte tech per ramo con filtri era/cluster/kind e mix foundation/feature.
 - [ ] Gestione scelte esclusive: blocco rami alternativi e memorizzazione scelta.
 - [ ] Tradizioni: gating per era e perk esclusivi; punti tradizione da influenze/bonus.
