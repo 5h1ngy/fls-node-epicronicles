@@ -208,9 +208,10 @@ export const getResearchOffers = (
     return available;
   }
   // Separiamo gateway (fondamenta era successiva) per non bloccare i progressi
+  const nextEra = state.currentEra + 1;
   const gatewayIds = new Set(
     (config.eras ?? [])
-      .filter((era) => era.id > state.currentEra)
+      .filter((era) => era.id === nextEra)
       .flatMap((era) => era.gatewayTechs ?? []),
   );
   const era = state.currentEra;
@@ -243,8 +244,8 @@ export const getResearchOffers = (
   while (picks.length < count && pool.length > 0) {
     picks.push(pool.shift() as ResearchTech);
   }
-  // Se ancora spazio, inserire gateway per mantenere la progressione visibile
-  while (picks.length < count && gateways.length > 0) {
+  // Se ancora spazio, inserire almeno una gateway per mantenere la progressione visibile
+  if (picks.length < count && gateways.length > 0) {
     picks.push(gateways.shift() as ResearchTech);
   }
 
