@@ -1,45 +1,43 @@
 ## Roadmap Ricerca & Tradizioni
 
-### Fase 1 – Modellazione e dati
+### Fase 1 - Modellazione e dati
 - [x] Estendere tipi `ResearchTech`/`TraditionPerk` con `era`, `clusterId`, `kind`, `origin`, `mutuallyExclusiveGroup`.
 - [x] Aggiungere `research.eras` in config con gateway iniziali.
-- [x] Annotare tutte le tech/tradizioni esistenti con era/cluster/kind ed eventuale origine/rarità.
-- [x] Definire e applicare i gruppi esclusivi (IA libera/regolata, Biotech/Cyber, Dottrine flotta).
+- [x] Annotare tech/tradizioni con era/cluster/kind e origine/rarita.
+- [x] Definire gruppi esclusivi (IA libera/regolata, Biotech/Cyber, Dottrine flotta).
 
-### Fase 2 – Logica di gioco
+### Fase 2 - Logica di gioco
 - [x] Stato ricerca: `currentEra`, `unlockedEras`, conteggio gateway.
 - [x] Selezione offerte tech per ramo con filtri era/cluster/kind e mix foundation/feature.
 - [ ] Gestione scelte esclusive: blocco rami alternativi e memorizzazione scelta.
-- [ ] Tradizioni: gating per era e perk esclusivi; punti tradizione da influenze/bonus.
+- [ ] Tradizioni: gating per era e perk esclusivi; punti tradizione da influssi/bonus.
 
-### Fase 3 – UI/UX
-- [x] Pannello Ricerca/Tradizioni ristrutturato: header era, badge era/tipo, grouping per cluster, colonne Ricerca/Tradizioni.
+### Fase 3 - UI/UX
+- [x] Pannello Ricerca/Tradizioni: header era, badge era/tipo, grouping per cluster, colonne Ricerca/Tradizioni.
 - [ ] Aggiungere blocchi di scelte esclusive e filtri (completate, rare, era) + barre di avanzamento per ramo.
 - [x] Filtri (completate, rare, era) e highlight completate.
 - [x] Stato attivo/progresso per ramo con barre e countdown.
 - [x] Visualizzazione percorsi esclusivi scelti (pill/caption) e lock su card.
-- [x] Mostrare l’origine non standard sulle card (anomaly/relic/faction).
-- [x] Badge origine differenziati e label percorsi esclusivi nelle card per chiarezza.
+- [x] Mostrare origine non standard sulle card (anomaly/relic/faction).
 
-### Fase 4 – Contenuti e varietà
-- [ ] Ampliare pool tech per ogni era/cluster.
-- [ ] Introdurre tech rare da reliquie/anomalie/eventi.
-- [ ] Tradizioni avanzate per stili di gioco (economia, espansione, militare, esplorazione, IA/bio).
+### Fase 4 - Contenuti e varieta (posticipata)
+- [ ] (Posticipato) Ampliare pool tech per ogni era/cluster.
+- [ ] (Posticipato) Reintrodurre tech rare da reliquie/anomalie/eventi.
+- [ ] (Posticipato) Tradizioni avanzate per stili di gioco (economia, espansione, militare, esplorazione, IA/bio).
 
-### Fase 5 – Bilanciamento e QA
+### Fase 5 - Bilanciamento e QA
 - [ ] Test di ritmo (gateway tech per era).
 - [ ] Equilibrio foundation vs feature; rischio eventi per scelte estreme (IA forte, armi bio, ecc.).
 - [ ] Feedback visivo e notifiche (completamento, scelte esclusive, era sbloccata).
 
 ### Stato attuale
-- Offerte Ricerca filtrate/bilanciate per era e tipo (Fondamenta/Feature/Rare).
-- UI Ricerca/Tradizioni con colonne, badge era/tipo e cluster.
-- Tutte le tech/perk correnti sono etichettate con era, cluster, kind/origin.
-- Config include coppie esclusive base (AI governance, Bio vs Cyber, Dottrine flotta) con lock in UI.
-- Prime tech rare collegate a eventi/anomalie/fazione (relic-sensors, ancient-drives, psi-echoes, chrono-scanners, void-harmonics, quantum-beacons, dark-core-reactor, stellar-ward, gravitic-lens, drone-foundry) via insight/backlog.
-- Gateway Era 2 tutti in Era 1 (sensori avanzati, leghe rinforzate) per evitare stalli.
-- Rare Era 4 ampliate con nuove anomalie (phase-shield-lattice, ancient-databanks).
+- Pool tech ridotto al set minimo (6 tech base in Era 1-2) e 4 perk base; rimosse rare/evento/fazione.
+- Eventi/anomalie ridotti a quelli essenziali e senza insight verso tech rare.
+- UI Ricerca/Tradizioni ristrutturata con badge era/tipo e cluster; offerte garantiscono gateway disponibili.
+- Config ancora etichettata per origine/kind, ma i percorsi esclusivi non sono ancora bloccati logicamente.
 
 ### Prossimi micro-step
-- Ampliare pool rare e collegarle ad altri eventi/anomalie (e.g. reliquie multiple, catene evento). → Nuove rare/anomalie Era 4 aggiunte (phase-catalyst, void-sentinels).
-- [x] Bilanciare gateway: mantenere visibili alcune gateway dell’era successiva nel pescaggio (slot dedicati) e hint UI quando lista vuota; garantire almeno una gateway tra le offerte se disponibile.
+- Completare gestione scelte esclusive (logica + UI) e blocchi dei percorsi alternativi.
+- Gating tradizioni per era e gestione punti tradizione su influsso/bonus.
+- QA ritmo base: verificare progressione con set minimo di tech e offerte non vuote, controllo gateway garantiti.
+- Solo in seguito: reintrodurre pool rare + anomalie/eventi dedicati e bilanciarli.

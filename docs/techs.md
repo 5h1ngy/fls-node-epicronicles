@@ -57,40 +57,20 @@ Esempi di rami:
 4. Tech/eventi rari rendono le run diverse?
 5. Ogni era ha 1-3 tech soglia che segnano il salto di potenza?
 
-## 6. Catalogo attuale (bozza minima in config)
+## 6. Catalogo attuale (set minimo in config)
 
-### Ricerca
-- **Energia fotonica** (`photonics`) — Era 1, cluster `energy-1`, `foundation`, origin standard. Bonus energia.
-- **Bio-cupole** (`bio-domes`) — Era 1, cluster `bio-1`, `foundation`, origin standard. Bonus cibo.
-- **Leghe rinforzate** (`reinforced-alloys`) — Era 1, cluster `materials-1`, `foundation`, origin standard. Bonus minerali.
- - **Sensori avanzati** (`advanced-sensors`) — Era 1, cluster `sensors-1`, `feature`, origin standard, gateway per Era 2.
-- **Burosfera** (`bureaucracy`) — Era 2, cluster `admin-1`, `feature`, origin standard.
-- **Cantieri modulari** (`modular-yards`) — Era 2, cluster `yards-1`, `feature`, origin standard, prereq `reinforced-alloys`.
-- **Sensori reliquia** (`relic-sensors`) — Era 1, cluster `relic-1`, `rare`, origin anomaly. Bonus ricerca, ottenibile da evento/anomalia.
-- **Propulsori antichi** (`ancient-drives`) — Era 2, cluster `relic-2`, `rare`, origin relic. Bonus energia, ottenibile da evento.
-- **Echi psionici** (`psi-echoes`) — Era 2, cluster `relic-3`, `rare`, origin relic/anomaly. Bonus ricerca e influenza, ottenibile da anomalia.
-- **Scanner cronici** (`chrono-scanners`) — Era 2, cluster `relic-4`, `rare`, origin anomaly. Bonus ricerca, ottenibile da anomalia.
-- **Armoniche del vuoto** (`void-harmonics`) — Era 3, cluster `relic-5`, `rare`, origin anomaly. Bonus energia e ricerca, ottenibile da anomalia.
-- **Beacon quantici** (`quantum-beacons`) — Era 3, cluster `relic-6`, `rare`, origin anomaly. Bonus energia e ricerca, ottenibile da anomalia.
-- **Reattore nucleo oscuro** (`dark-core-reactor`) — Era 3, cluster `relic-7`, `rare`, origin relic. Bonus energia e minerali, ottenibile da anomalia.
-- **Baluardo stellare** (`stellar-ward`) — Era 3, cluster `faction-1`, `rare`, origin faction. Bonus ricerca e influenza, ottenibile da evento fazione.
-- **Lente gravitica** (`gravitic-lens`) — Era 3, cluster `relic-8`, `rare`, origin anomaly. Bonus ricerca, ottenibile da anomalia.
-- **Fonderia droni reliquia** (`drone-foundry`) — Era 3, cluster `relic-9`, `rare`, origin relic. Bonus minerali e costo navi leggere, ottenibile da anomalia.
-- **Catalizzatore di fase** (`phase-catalyst`) — Era 4, cluster `relic-10`, `rare`, origin anomaly. Bonus ricerca ed energia, ottenibile da anomalia.
-- **Sentinelle del vuoto** (`void-sentinels`) — Era 4, cluster `relic-11`, `rare`, origin relic. Bonus costo navi capitali/difesa flotte, ottenibile da anomalia.
-- **Reticolo scudi di fase** (`phase-shield-lattice`) — Era 4, cluster `relic-12`, `rare`, origin relic. Bonus ricerca e difesa flotte, ottenibile da anomalia.
-- **Databank antichi** (`ancient-databanks`) — Era 4, cluster `relic-13`, `rare`, origin anomaly. Bonus influenza e ricerca, ottenibile da anomalia.
-- **IA aperta** (`ai-open`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
-- **IA regolata** (`ai-regulated`) — Era 2, cluster `ai-1`, `feature`, origin standard, gruppo esclusivo `ai-governance`.
-- **Adattamento biologico** (`bio-adaptation`) — Era 2, cluster `bio-cyber-1`, `feature`, origin standard, gruppo esclusivo `bio-cyber`.
-- **Potenziamenti cibernetici** (`cyber-augmentation`) — Era 2, cluster `bio-cyber-1`, `feature`, origin standard, gruppo esclusivo `bio-cyber`.
-- **Dottrina sciame** (`doctrine-swarm`) — Era 2, cluster `doctrine-1`, `feature`, origin standard, gruppo esclusivo `fleet-doctrine`.
-- **Dottrina nucleo d’élite** (`doctrine-core`) — Era 2, cluster `doctrine-1`, `feature`, origin standard, gruppo esclusivo `fleet-doctrine`.
+### Ricerca (solo il necessario)
+- **Energia fotonica** (`photonics`) - Era 1, cluster `energy-1`, `foundation`, origin standard. Bonus energia.
+- **Sensori avanzati** (`advanced-sensors`) - Era 1, cluster `sensors-1`, `feature`, origin standard. Gateway per Era 2.
+- **Bio-cupole** (`bio-domes`) - Era 1, cluster `bio-1`, `foundation`, origin standard. Bonus cibo.
+- **Leghe rinforzate** (`reinforced-alloys`) - Era 1, cluster `materials-1`, `foundation`, origin standard. Bonus minerali.
+- **Burosfera** (`bureaucracy`) - Era 2, cluster `admin-1`, `feature`, origin standard.
+- **Cantieri modulari** (`modular-yards`) - Era 2, cluster `yards-1`, `feature`, origin standard, prereq `reinforced-alloys`.
 
-### Tradizioni
-- **Scansioni fulminee** (`survey-speed`) — Era 1, cluster `explore-1`, origin standard.
-- **Logistica avanzata** (`logistics`) — Era 1, cluster `military-1`, origin standard.
-- **Quadri amministrativi** (`bureaucrats`) — Era 1, cluster `economy-1`, origin standard.
-- **Pianificazione planetaria** (`planetary-planning`) — Era 1, cluster `economy-1`, origin standard, prereq `bureaucrats`.
-- **Patto di difesa** (`faction-charter`) — Era 2, cluster `faction-1`, origin faction. Bonus influenza.
-- **Ispirazione reliquia** (`relic-inspiration`) — Era 3, cluster `relic-trad-1`, origin relic. Bonus ricerca.
+### Tradizioni (set base)
+- **Scansioni fulminee** (`survey-speed`) - Era 1, cluster `explore-1`, origin standard.
+- **Logistica avanzata** (`logistics`) - Era 1, cluster `military-1`, origin standard.
+- **Quadri amministrativi** (`bureaucrats`) - Era 1, cluster `economy-1`, origin standard.
+- **Pianificazione planetaria** (`planetary-planning`) - Era 1, cluster `economy-1`, origin standard, prereq `bureaucrats`.
+
+Nota: tech rare, perk di fazione/reliquia e anomalie speciali sono state rimosse per ora per mantenere solo le feature indispensabili al loop base di gioco.
