@@ -416,22 +416,22 @@ export const TechPanel = () => {
                           traditions.exclusivePicks[perk.mutuallyExclusiveGroup] !== perk.id,
                       );
                       const exclusiveGroup = perk.mutuallyExclusiveGroup;
-                      return (
-                        <div key={perk.id} className="tech-card">
-                          <div className="tech-card__title">
-                            {perk.name}{' '}
-                            {unlocked ? <span className="tech-card__badge">Sbloccata</span> : null}
-                            {renderBadges(
-                              perk.era,
-                              undefined,
-                              undefined,
-                              perk.mutuallyExclusiveGroup,
-                            )}
-                          </div>
-                          {exclusiveGroup ? (
-                            <p className="text-muted">
-                              Percorso esclusivo: {exclusiveGroup}
-                              {exclusiveLocked ? ' (bloccato)' : ''}
+                  return (
+                    <div key={perk.id} className="tech-card">
+                      <div className="tech-card__title">
+                        {perk.name}{' '}
+                        {unlocked ? <span className="tech-card__badge">Sbloccata</span> : null}
+                        {renderBadges(
+                          perk.era,
+                          undefined,
+                          perk.origin,
+                          perk.mutuallyExclusiveGroup,
+                        )}
+                      </div>
+                      {exclusiveGroup ? (
+                        <p className="text-muted">
+                          Percorso esclusivo: {exclusiveGroup}
+                          {exclusiveLocked ? ' (bloccato)' : ''}
                             </p>
                           ) : null}
                           {exclusiveLocked ? (
