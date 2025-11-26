@@ -92,3 +92,5 @@ Esempi di rami:
 - **Logistica avanzata** (`logistics`) — Era 1, cluster `military-1`, origin standard.
 - **Quadri amministrativi** (`bureaucrats`) — Era 1, cluster `economy-1`, origin standard.
 - **Pianificazione planetaria** (`planetary-planning`) — Era 1, cluster `economy-1`, origin standard, prereq `bureaucrats`.
+- **Patto di difesa** (`faction-charter`) — Era 2, cluster `faction-1`, origin faction. Bonus influenza.
+- **Ispirazione reliquia** (`relic-inspiration`) — Era 3, cluster `relic-trad-1`, origin relic. Bonus ricerca.
