@@ -10,7 +10,7 @@
 - [x] Stato ricerca: `currentEra`, `unlockedEras`, conteggio gateway.
 - [x] Selezione offerte tech per ramo con filtri era/cluster/kind e mix foundation/feature.
 - [x] Gestione scelte esclusive: blocco rami alternativi e memorizzazione scelta.
-- [ ] Tradizioni: gating per era e perk esclusivi; punti tradizione da influssi/bonus.
+- [x] Tradizioni: gating per era e perk esclusivi; punti tradizione da influssi/bonus.
 
 ### Fase 3 - UI/UX
 - [x] Pannello Ricerca/Tradizioni: header era, badge era/tipo, grouping per cluster, colonne Ricerca/Tradizioni.
@@ -37,6 +37,5 @@
 - Config ancora etichettata per origine/kind, ma i percorsi esclusivi non sono ancora bloccati logicamente.
 
 ### Prossimi micro-step
-- Gating tradizioni per era e gestione punti tradizione su influsso/bonus.
 - QA ritmo base: verificare progressione con set minimo di tech e offerte non vuote, controllo gateway garantiti.
 - Solo in seguito: reintrodurre pool rare + anomalie/eventi dedicati e bilanciarli.

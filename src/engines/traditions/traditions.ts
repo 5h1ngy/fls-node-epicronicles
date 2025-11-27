@@ -19,6 +19,33 @@ export const createInitialTraditions = (
 const getPerk = (config: TraditionConfig, perkId: string): TraditionPerk | undefined =>
   config.perks.find((perk) => perk.id === perkId);
 
+const computeEraUnlocks = (state: TraditionState, config: TraditionConfig) => {
+  const eraList = Array.from(
+    new Set(config.perks.map((perk) => perk.era ?? 1)),
+  ).sort((a, b) => a - b);
+  if (eraList.length === 0) {
+    return { currentEra: 1, unlockedEras: [1] };
+  }
+  const unlockedEras = new Set<number>([eraList[0]]);
+  const unlockedPerks = new Set(state.unlocked);
+  for (let i = 1; i < eraList.length; i += 1) {
+    const prevEra = eraList[i - 1];
+    const prevEraPerks = config.perks.filter((perk) => (perk.era ?? 1) === prevEra);
+    if (prevEraPerks.length === 0) {
+      continue;
+    }
+    const completedPrev = prevEraPerks.filter((perk) => unlockedPerks.has(perk.id)).length;
+    const requiredPrev = Math.max(1, Math.ceil(prevEraPerks.length * 0.6));
+    if (completedPrev >= requiredPrev) {
+      unlockedEras.add(eraList[i]);
+    }
+  }
+  return {
+    currentEra: Math.max(...Array.from(unlockedEras)),
+    unlockedEras: Array.from(unlockedEras).sort((a, b) => a - b),
+  };
+};
+
 export const advanceTraditions = ({
   state,
   influenceIncome,
@@ -32,10 +59,12 @@ export const advanceTraditions = ({
   if (gained <= 0) {
     return state;
   }
-  return {
+  const nextState: TraditionState = {
     ...state,
     availablePoints: state.availablePoints + gained,
   };
+  const eraState = computeEraUnlocks(nextState, config);
+  return { ...nextState, ...eraState };
 };
 
 export const unlockTradition = (
@@ -73,17 +102,21 @@ export const unlockTradition = (
   }
   return {
     success: true,
-    state: {
-      ...state,
-      availablePoints: state.availablePoints - perk.cost,
-      unlocked: [...state.unlocked, perk.id],
-      exclusivePicks: {
-        ...(state.exclusivePicks ?? {}),
-        ...(perk.mutuallyExclusiveGroup
-          ? { [perk.mutuallyExclusiveGroup]: perk.id }
-          : {}),
-      },
-    },
+    state: (() => {
+      const updated: TraditionState = {
+        ...state,
+        availablePoints: state.availablePoints - perk.cost,
+        unlocked: [...state.unlocked, perk.id],
+        exclusivePicks: {
+          ...(state.exclusivePicks ?? {}),
+          ...(perk.mutuallyExclusiveGroup
+            ? { [perk.mutuallyExclusiveGroup]: perk.id }
+            : {}),
+        },
+      };
+      const eraState = computeEraUnlocks(updated, config);
+      return { ...updated, ...eraState };
+    })(),
   };
 };
 
