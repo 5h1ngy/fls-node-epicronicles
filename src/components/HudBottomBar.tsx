@@ -154,7 +154,6 @@ export const HudBottomBar = ({
       </div>
       <div className="hud-bottom-bar__era">
         <div className="hud-era-pill" data-tooltip={`Era corrente: ${eraInfo.eraLabel}`}>
-          <span className="hud-era-pill__label">Era corrente</span>
           <span className="hud-era-pill__value">{eraInfo.eraLabel}</span>
         </div>
       </div>
