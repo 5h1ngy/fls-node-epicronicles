@@ -19,6 +19,7 @@
   align-items: center;
   gap: 0.65rem;
   flex-wrap: wrap;
+  flex: 1 1 0;
 }
 
 .hud-stat {
@@ -40,6 +41,37 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  flex: 1 1 0;
+  justify-content: flex-end;
+}
+
+.hud-bottom-bar__era {
+  flex: 0 0 auto;
+  margin: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-era-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(90, 140, 255, 0.18), rgba(90, 140, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  color: #e8ecff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  position: relative;
+}
+
+.hud-era-pill__label {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  opacity: 0.85;
 }
 
 .hud-icon-btn {

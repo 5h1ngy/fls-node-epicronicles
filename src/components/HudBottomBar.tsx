@@ -13,6 +13,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import '../styles/components/HudBottomBar.scss';
+import { gameConfig } from '@config/gameConfig';
 
 interface HudBottomBarProps {
   onToggleDebug: () => void;
@@ -33,6 +34,17 @@ export const HudBottomBar = ({
   const saveSession = useGameStore((state) => state.saveSession);
   const loadSession = useGameStore((state) => state.loadSession);
   const hasSavedSession = useGameStore((state) => state.hasSavedSession);
+
+  const eraInfo = useMemo(() => {
+    const currentEra = session?.research.currentEra ?? 1;
+    const eraLabel =
+      gameConfig.research.eras.find((era) => era.id === currentEra)?.label ??
+      `Era ${currentEra}`;
+    return {
+      currentEra,
+      eraLabel,
+    };
+  }, [session]);
 
   const stats = useMemo(() => {
     if (!session) return null;
@@ -139,6 +151,12 @@ export const HudBottomBar = ({
             <div className="hud-stat__value">{value}</div>
           </div>
         ))}
+      </div>
+      <div className="hud-bottom-bar__era">
+        <div className="hud-era-pill" data-tooltip={`Era corrente: ${eraInfo.eraLabel}`}>
+          <span className="hud-era-pill__label">Era corrente</span>
+          <span className="hud-era-pill__value">{eraInfo.eraLabel}</span>
+        </div>
       </div>
       <div className="hud-bottom-bar__actions">
         {actions.map(({ icon: Icon, label, desc, onClick, disabled }) => (
