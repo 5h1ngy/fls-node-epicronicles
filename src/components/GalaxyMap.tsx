@@ -649,16 +649,28 @@ export const GalaxyMap = ({
     matrixPoolRef.current.push(m);
   };
 
+  const fleetSignature = useMemo(
+    () =>
+      fleets
+        .map(
+          (fleet) =>
+            `${fleet.id}:${fleet.systemId}:${fleet.targetSystemId ?? ''}:${fleet.anchorPlanetId ?? ''}:${fleet.ticksToArrival ?? 0}`,
+        )
+        .join('|'),
+    [fleets],
+  );
+
   const systemsSignature = useMemo(
     () =>
       `${galaxyShape}:${galaxySeed}|` +
       systems
         .map(
           (system) =>
-            `${system.id}:${system.visibility}:${system.ownerId ?? ''}:${system.hostilePower ?? 0}:${system.orbitingPlanets.length}`,
+            `${system.id}:${system.visibility}:${system.ownerId ?? ''}:${system.hostilePower ?? 0}:${system.orbitingPlanets.length}:${system.hasShipyard ? 1 : 0}:${system.shipyardAnchorPlanetId ?? ''}`,
         )
-        .join('|'),
-    [systems, galaxyShape, galaxySeed],
+        .join('|') +
+      `|F:${fleetSignature}`,
+    [systems, galaxyShape, galaxySeed, fleetSignature],
   );
   const maxSystemRadius = useMemo(() => {
     if (!systems.length) {
