@@ -22,8 +22,11 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
   const queueLimit = useGameStore(
     (state) => state.config.military.shipyard.queueSize,
   );
+  const shipyardCost = useGameStore((state) => state.config.military.shipyard.buildCost);
   const queueShipBuild = useGameStore((state) => state.queueShipBuild);
   const shipTemplates = useGameStore((state) => state.config.military.templates);
+  const buildShipyard = useGameStore((state) => state.buildShipyard);
+  const session = useGameStore((state) => state.session);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Record<string, string>>({});
   const [customConfig, setCustomConfig] = useState<
@@ -42,18 +45,20 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
   const queue = useAppSelector(selectShipyardQueue);
   const research = useAppSelector(selectResearch);
 
-  const canAfford = (designCost: Record<string, number | undefined>) => {
-    if (!resources) {
-      return false;
-    }
-    return Object.entries(designCost).every(([type, amount]) => {
-      if (!amount) {
-        return true;
+  const canAfford = useMemo(() => {
+    return (designCost: Record<string, number | undefined>) => {
+      if (!resources) {
+        return false;
       }
-      const ledger = resources[type as keyof typeof resources];
-      return (ledger?.amount ?? 0) >= amount;
-    });
-  };
+      return Object.entries(designCost).every(([type, amount]) => {
+        if (!amount) {
+          return true;
+        }
+        const ledger = resources[type as keyof typeof resources];
+        return (ledger?.amount ?? 0) >= amount;
+      });
+    };
+  }, [resources]);
 
   const handleBuild = (designId: ShipClassId, designName: string) => {
     const templateId = selectedTemplate[designId];
@@ -105,11 +110,58 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
     [queue],
   );
 
-  const completedTechs = new Set(
-    research
-      ? Object.values(research.branches).flatMap((b) => b.completed)
-      : [],
+  const completedTechs = useMemo(
+    () =>
+      new Set(
+        research
+          ? Object.values(research.branches).flatMap((b) => b.completed)
+          : [],
+      ),
+    [research],
   );
+  const canBuildShipyard = useMemo(() => {
+    if (!session || !system) {
+      return { ok: false, reason: 'NO_SESSION' as const };
+    }
+    if (system.hasShipyard) {
+      return { ok: false, reason: 'ALREADY_BUILT' as const };
+    }
+    if (!completedTechs.has('orbital-shipyard')) {
+      return { ok: false, reason: 'TECH_MISSING' as const };
+    }
+    const constructorPresent = session.fleets.some(
+      (fleet) =>
+        fleet.systemId === system.id &&
+        fleet.ships.some(
+          (ship) => designs.find((d) => d.id === ship.designId)?.role === 'construction',
+        ),
+    );
+    if (!constructorPresent) {
+      return { ok: false, reason: 'NO_CONSTRUCTOR' as const };
+    }
+    if (!canAfford(shipyardCost)) {
+      return { ok: false, reason: 'INSUFFICIENT_RESOURCES' as const };
+    }
+    return { ok: true as const };
+  }, [session, system, completedTechs, designs, shipyardCost, canAfford]);
+
+  const handleBuildShipyard = () => {
+    if (!system) return;
+    const result = buildShipyard(system.id, system.shipyardAnchorPlanetId ?? null);
+    if (result.success) {
+      setMessage('Cantiere orbitale costruito.');
+    } else if (result.reason) {
+      const labels = {
+        NO_SESSION: 'Nessuna sessione attiva.',
+        SYSTEM_NOT_FOUND: 'Sistema non valido.',
+        TECH_MISSING: 'Richiede la tecnologia Cantiere orbitale.',
+        ALREADY_BUILT: 'Cantiere già presente.',
+        NO_CONSTRUCTOR: 'Serve una nave costruttrice nel sistema.',
+        INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
+      } as const;
+      setMessage(labels[result.reason] ?? 'Azione non disponibile.');
+    }
+  };
   const allowedDesign = (designId: string) => {
     if (designId === 'constructor') return true;
     if (designId === 'colony') return completedTechs.has('colony-foundations');
@@ -128,46 +180,76 @@ export const ShipyardPanel = ({ system }: ShipyardPanelProps) => {
         <div className="shipyard-panel__header-meta">
         </div>
       </header>
-      {message ? null : null}
-      <div className="shipyard-panel__columns">
-        <div className="shipyard-panel__col shipyard-panel__col--designs">
-          <div className="shipyard-panel__grid">
-            {designs.filter((d) => allowedDesign(d.id)).map((design) => {
-              const templates = shipTemplates.filter(
-                (template) => template.base === design.id,
-              );
-              const templateId = selectedTemplate[design.id] ?? '';
-              const customState = customConfig[design.id] ?? {
-                offense: 0,
-                defense: 0,
-                hull: 0,
-                name: '',
-              };
-              return (
-                <ShipDesignCard
-                  key={design.id}
-                  design={design}
-                  templates={templates}
-                  queueLength={queue.length}
-                  queueLimit={queueLimit}
-                  canAfford={canAfford}
-                  selectedTemplateId={templateId}
-                  onSelectTemplate={(id) =>
-                    setSelectedTemplate((prev) => ({ ...prev, [design.id]: id }))
-                  }
-                  customState={customState}
-                  setCustomState={setCustomConfig}
-                  onBuild={handleBuild}
-                  onBuildCustom={handleBuildCustom}
-                />
-              );
-            })}
-          </div>
+      {message ? <p className="panel-message">{message}</p> : null}
+      {system && !system.hasShipyard ? (
+        <div className="shipyard-panel__empty">
+          <p className="text-muted">
+            Nessun cantiere orbitale in questo sistema. Usa una nave costruttrice per costruirlo.
+          </p>
+          <p className="text-muted">
+            Costo: energia {shipyardCost.energy ?? 0} / minerali {shipyardCost.minerals ?? 0}
+          </p>
+          <button
+            className="panel__action"
+            onClick={handleBuildShipyard}
+            disabled={!canBuildShipyard.ok}
+          >
+            Costruisci cantiere
+          </button>
+          {canBuildShipyard.ok ? null : (
+            <small className="text-muted">
+              {canBuildShipyard.reason === 'TECH_MISSING'
+                ? 'Richiede tecnologia Cantiere orbitale.'
+                : canBuildShipyard.reason === 'NO_CONSTRUCTOR'
+                  ? 'Serve una nave costruttrice nel sistema.'
+                  : canBuildShipyard.reason === 'INSUFFICIENT_RESOURCES'
+                    ? 'Risorse insufficienti.'
+                    : null}
+            </small>
+          )}
         </div>
-        <aside className="shipyard-panel__col shipyard-panel__col--queue-right shipyard-queue__section">
-          <BuildQueue queue={queueWithProgress} />
-        </aside>
-      </div>
+      ) : null}
+      {system?.hasShipyard ? (
+        <div className="shipyard-panel__columns">
+          <div className="shipyard-panel__col shipyard-panel__col--designs">
+            <div className="shipyard-panel__grid">
+              {designs.filter((d) => allowedDesign(d.id)).map((design) => {
+                const templates = shipTemplates.filter(
+                  (template) => template.base === design.id,
+                );
+                const templateId = selectedTemplate[design.id] ?? '';
+                const customState = customConfig[design.id] ?? {
+                  offense: 0,
+                  defense: 0,
+                  hull: 0,
+                  name: '',
+                };
+                return (
+                  <ShipDesignCard
+                    key={design.id}
+                    design={design}
+                    templates={templates}
+                    queueLength={queue.length}
+                    queueLimit={queueLimit}
+                    canAfford={canAfford}
+                    selectedTemplateId={templateId}
+                    onSelectTemplate={(id) =>
+                      setSelectedTemplate((prev) => ({ ...prev, [design.id]: id }))
+                    }
+                    customState={customState}
+                    setCustomState={setCustomConfig}
+                    onBuild={handleBuild}
+                    onBuildCustom={handleBuildCustom}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <aside className="shipyard-panel__col shipyard-panel__col--queue-right shipyard-queue__section">
+            <BuildQueue queue={queueWithProgress} />
+          </aside>
+        </div>
+      ) : null}
     </section>
   );
 };

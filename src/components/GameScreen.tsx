@@ -388,7 +388,7 @@ export const GameScreen = () => {
           const isAccessible =
             targetSystem.visibility === 'surveyed' ||
             colonizedSystems.has(targetSystem.id);
-          setShipyardSystemId(isAccessible && targetSystem.hasShipyard ? systemId : null);
+          setShipyardSystemId(isAccessible ? systemId : null);
           setSelectedPlanetId(null);
           setFocusSystemId(systemId);
           setFocusPlanetId(null);

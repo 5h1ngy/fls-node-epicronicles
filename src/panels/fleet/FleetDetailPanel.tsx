@@ -134,7 +134,7 @@ export const FleetDetailPanel = ({
         NO_SESSION: 'Nessuna sessione attiva.',
         SYSTEM_NOT_FOUND: 'Sistema non valido.',
         TECH_MISSING: 'Richiede la tecnologia Cantiere orbitale.',
-        ALREADY_BUILT: 'Cantiere giù presente nel sistema.',
+        ALREADY_BUILT: 'Cantiere gia presente nel sistema.',
         NO_CONSTRUCTOR: 'Serve una nave costruttrice nel sistema.',
         INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
       };

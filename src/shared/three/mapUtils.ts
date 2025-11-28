@@ -800,10 +800,25 @@ export const createSystemNode = (
         depthWrite: false,
       }),
     );
-    square.position.set(0, baseRadius + 2.5, 1);
     square.userData.systemId = system.id;
     square.userData.kind = 'shipyard';
-    node.add(square);
+    square.rotation.z = Math.PI / 4;
+    const anchorPlanet =
+      system.shipyardAnchorPlanetId && planetLookup
+        ? planetLookup.get(system.shipyardAnchorPlanetId)
+        : null;
+    if (anchorPlanet) {
+      const planetMesh = anchorPlanet as Mesh;
+      if (planetMesh.geometry && !planetMesh.geometry.boundingSphere) {
+        planetMesh.geometry.computeBoundingSphere();
+      }
+      const radius = planetMesh.geometry?.boundingSphere?.radius ?? 2.5;
+      square.position.set(0, radius + 1.5, 0.6);
+      anchorPlanet.add(square);
+    } else {
+      square.position.set(0, baseRadius + 2.5, 1);
+      node.add(square);
+    }
   }
 
   if (isSurveyed && system.orbitingPlanets.length > 0) {
