@@ -1042,8 +1042,7 @@ export const GalaxyMap = ({
       const systemId = targetNode.userData.systemId as string;
       const planetId = targetNode.userData.planetId as string | undefined;
       const kind = targetNode.userData.kind as string | undefined;
-      const currentOffset = systemGroup.position.clone();
-      offsetTargetRef.current = currentOffset.sub(worldPos);
+      offsetTargetRef.current.set(-worldPos.x, -worldPos.y, 0);
       zoomTargetRef.current = clamp(60, minZoom, maxZoom);
       const projected = worldPos.clone().project(camera);
       const anchorX = ((projected.x + 1) / 2) * renderer.domElement.clientWidth;

@@ -59,7 +59,7 @@ export const MapPanels = ({
 
   return (
     <div className="floating-panels">
-      {focusedSystem ? (
+      {focusedSystem && !focusedPlanet ? (
         <div className="system-mini-panel">
           <header className="system-mini-panel__header">
             <div>
