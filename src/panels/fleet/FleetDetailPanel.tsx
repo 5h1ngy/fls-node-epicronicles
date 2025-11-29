@@ -82,7 +82,7 @@ export const FleetDetailPanel = ({
   designs,
   completedTechs,
   onOrder,
-  showConstructionActions = false,
+  showConstructionActions = true,
   onAnchorChange,
   onCenter,
   onStop,
