@@ -1,6 +1,6 @@
 import { DraggablePanel } from '@panels/shared/DraggablePanel';
 import { Suspense, lazy } from 'react';
-import type { StarSystem } from '@domain/types';
+import type { StarSystem, Planet } from '@domain/types';
 
 import '../styles/components/MapPanels.scss';
 
@@ -12,6 +12,8 @@ const ShipyardPanel = lazy(() =>
 
 interface MapPanelsProps {
   focusedSystem: StarSystem | null;
+  focusedPlanet: Planet | null;
+  focusedPlanetSystem: StarSystem | null;
   viewportWidth: number;
   viewportHeight: number;
   onClearFocusTargets: () => void;
@@ -21,6 +23,8 @@ interface MapPanelsProps {
 
 export const MapPanels = ({
   focusedSystem,
+  focusedPlanet,
+  focusedPlanetSystem,
   viewportWidth,
   viewportHeight,
   onClearFocusTargets,
@@ -95,6 +99,47 @@ export const MapPanels = ({
             <div className="system-mini-panel__row">
               <span className="text-muted">Pianeti</span>
               <span>{focusedSystem.orbitingPlanets?.length ?? 0}</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {focusedPlanet ? (
+        <div className="planet-mini-panel">
+          <header className="system-mini-panel__header">
+            <div>
+              <p className="system-mini-panel__eyebrow">Pianeta</p>
+              <h4 className="system-mini-panel__title">{focusedPlanet.name}</h4>
+              <small className="text-muted">
+                {focusedPlanetSystem?.name ?? focusedPlanet.systemId}
+              </small>
+            </div>
+            <button
+              className="system-mini-panel__close"
+              onClick={onClearFocusTargets}
+            >
+              ×
+            </button>
+          </header>
+          <div className="system-mini-panel__rows">
+            <div className="system-mini-panel__row">
+              <span className="text-muted">Tipo</span>
+              <span>{focusedPlanet.kind}</span>
+            </div>
+            <div className="system-mini-panel__row">
+              <span className="text-muted">Abitabilità</span>
+              <span>{Math.round(focusedPlanet.habitability)}%</span>
+            </div>
+            <div className="system-mini-panel__row">
+              <span className="text-muted">Dimensione</span>
+              <span>{focusedPlanet.size}</span>
+            </div>
+            <div className="system-mini-panel__row">
+              <span className="text-muted">Popolazione</span>
+              <span>{focusedPlanet.population?.total ?? 0}</span>
+            </div>
+            <div className="system-mini-panel__row">
+              <span className="text-muted">Distretto</span>
+              <span>{Object.values(focusedPlanet.districts ?? {}).reduce((acc, n) => acc + (n ?? 0), 0)}</span>
             </div>
           </div>
         </div>

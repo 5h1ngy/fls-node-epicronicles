@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { PopulationJobId, StarSystem } from '@domain/types';
-import { canAffordCost } from '@domain/economy/economy';
+import type { StarSystem } from '@domain/types';
 import { useAppSelector, useGameStore } from '@store/gameStore';
 import { DraggablePanel } from '@panels/shared/DraggablePanel';
 import { useGameLoop } from '@shared/useGameLoop';
@@ -10,7 +9,6 @@ import { HudBottomBar } from './HudBottomBar';
 import { HudTopBar } from './HudTopBar';
 import { MapLayer } from './MapLayer';
 import { MapPanels } from './MapPanels';
-import { PlanetDetail } from '@panels/PlanetDetail';
 import { useWarEvents } from '@hooks/useWarEvents';
 import { MissionsPanel } from '@panels/MissionsPanel';
 import { SideDock } from './SideDock';
@@ -28,7 +26,6 @@ import { ScienceShipDetailPanel } from '@panels/fleet/ScienceShipDetailPanel';
 import { selectScienceShips, selectResearch } from '@store/selectors';
 import {
   selectColonizedSystems,
-  selectDistrictQueue,
   selectPlanets,
   selectSystems,
 } from '@store/selectors';
@@ -45,7 +42,6 @@ export const GameScreen = () => {
   const systems = useAppSelector(selectSystems);
   const planets = useAppSelector(selectPlanets);
   const colonizedSystems = useAppSelector(selectColonizedSystems);
-  const districtQueue = useAppSelector(selectDistrictQueue);
   const scienceShips = useAppSelector(selectScienceShips);
   const researchState = useAppSelector(selectResearch);
   const completedTechs = useMemo(
@@ -63,27 +59,11 @@ export const GameScreen = () => {
       branch.completed.includes('colony-foundations'),
     );
   }, [researchState]);
-  const economyConfig = useGameStore((state) => state.config.economy);
-  const districtDefinitions = economyConfig.districts;
-  const populationJobs = economyConfig.populationJobs;
-  const automationConfig = economyConfig.populationAutomation;
-  const queueDistrictConstruction = useGameStore(
-    (state) => state.queueDistrictConstruction,
-  );
-  const removeDistrict = useGameStore((state) => state.removeDistrict);
-  const promotePopulationJob = useGameStore(
-    (state) => state.promotePopulation,
-  );
-  const demotePopulationJob = useGameStore(
-    (state) => state.demotePopulation,
-  );
   const [focusSystemId, setFocusSystemId] = useState<string | null>(null);
   const [focusTrigger, setFocusTrigger] = useState(0);
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
-  const [, setDistrictMessage] = useState<string | null>(null);
-  const [populationMessage, setPopulationMessage] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
   const [missionsOpen, setMissionsOpen] = useState(false);
   const [eventsOpen, setEventsOpen] = useState(false);
@@ -218,11 +198,14 @@ export const GameScreen = () => {
   const focusedSystem: StarSystem | null = focusSystemId
     ? systems.find((system) => system.id === focusSystemId) ?? null
     : null;
-  const selectedPlanet =
-    planets.find((planet) => planet.id === selectedPlanetId) ?? null;
-  const selectedPlanetSystem = selectedPlanet
-    ? systems.find((system) => system.id === selectedPlanet.systemId) ?? null
-    : null;
+  const focusedPlanet =
+    selectedPlanetId && planets.find((planet) => planet.id === selectedPlanetId)
+      ? planets.find((planet) => planet.id === selectedPlanetId)
+      : focusPlanetId
+        ? planets.find((planet) => planet.id === focusPlanetId) ?? null
+        : null;
+  const focusedPlanetSystem =
+    focusedPlanet && systems.find((system) => system.id === focusedPlanet.systemId);
   const selectedFleet =
     dockSelection?.kind === 'fleet'
       ? session.fleets.find((fleet) => fleet.id === dockSelection.fleetId) ?? null
@@ -231,78 +214,6 @@ export const GameScreen = () => {
     dockSelection?.kind === 'science'
       ? session.scienceShips.find((ship) => ship.id === dockSelection.shipId) ?? null
       : null;
-  const planetDistrictQueue = selectedPlanet
-    ? districtQueue
-        .filter((task) => task.planetId === selectedPlanet.id)
-        .map((task) => {
-          const definition =
-            districtDefinitions.find(
-              (entry) => entry.id === task.districtId,
-            ) ?? null;
-          return {
-            ...task,
-            label: definition?.label ?? task.districtId,
-            progress:
-              1 - task.ticksRemaining / Math.max(1, task.totalTicks),
-          };
-        })
-    : [];
-  const canAffordDistricts = districtDefinitions.reduce<Record<string, boolean>>(
-    (acc, definition) => {
-      acc[definition.id] = session ? canAffordCost(session.economy, definition.cost) : false;
-      return acc;
-    },
-    {},
-  );
-  const districtErrorMessages: Record<string, string> = {
-    NO_SESSION: 'Nessuna sessione attiva.',
-    PLANET_NOT_FOUND: 'Pianeta non trovato.',
-    INVALID_DISTRICT: 'Distretto non valido.',
-    INSUFFICIENT_RESOURCES: 'Risorse insufficienti.',
-  };
-  const populationErrorMessages: Record<string, string> = {
-    NO_SESSION: 'Nessuna sessione attiva.',
-    PLANET_NOT_FOUND: 'Pianeta non trovato.',
-    INVALID_JOB: 'Ruolo non valido.',
-    NO_WORKERS: 'Nessun lavoratore disponibile.',
-    NO_POPULATION: 'Nessun pop assegnato al ruolo.',
-  };
-
-  const handleQueueDistrict = (districtId: string) => {
-    if (!selectedPlanet) {
-      return;
-    }
-    const result = queueDistrictConstruction(selectedPlanet.id, districtId);
-    setDistrictMessage(
-      result.success
-        ? 'Costruzione distretto avviata.'
-        : districtErrorMessages[result.reason],
-    );
-  };
-
-  const handlePromotePopulation = (jobId: PopulationJobId) => {
-    if (!selectedPlanet) {
-      return;
-    }
-    const result = promotePopulationJob(selectedPlanet.id, jobId);
-    setPopulationMessage(
-      result.success
-        ? 'Pop assegnato al nuovo ruolo.'
-        : populationErrorMessages[result.reason],
-    );
-  };
-
-  const handleDemotePopulation = (jobId: PopulationJobId) => {
-    if (!selectedPlanet) {
-      return;
-    }
-    const result = demotePopulationJob(selectedPlanet.id, jobId);
-    setPopulationMessage(
-      result.success
-        ? 'Pop riportato tra i lavoratori.'
-        : populationErrorMessages[result.reason],
-    );
-  };
 
   return (
     <div className="game-layout">
@@ -432,6 +343,8 @@ export const GameScreen = () => {
       <div className="floating-panels">
         <MapPanels
           focusedSystem={focusedSystem}
+          focusedPlanet={focusedPlanet}
+          focusedPlanetSystem={focusedPlanetSystem ?? null}
           viewportWidth={viewportWidth}
           viewportHeight={viewportHeight}
           onClearFocusTargets={clearFocusTargets}
@@ -633,31 +546,6 @@ export const GameScreen = () => {
             onClose={() => setDebugModalOpen(false)}
           >
             <DebugConsole />
-          </DraggablePanel>
-        ) : null}
-        {selectedPlanet && selectedPlanetSystem ? (
-          <DraggablePanel
-            title={`${selectedPlanet.name} (${selectedPlanetSystem.name})`}
-            initialX={wide.initialX}
-            initialY={wide.initialY}
-            initialWidth={wide.width}
-            initialHeight={wide.height}
-            onClose={closePlanetPanel}
-          >
-          <PlanetDetail
-            planet={selectedPlanet}
-            systemName={selectedPlanetSystem.name}
-            onPromote={handlePromotePopulation}
-            onDemote={handleDemotePopulation}
-            onRemoveDistrict={(districtId) => removeDistrict(selectedPlanet.id, districtId)}
-            automationConfig={automationConfig}
-            populationJobs={populationJobs}
-            districtDefinitions={districtDefinitions}
-            canAffordDistricts={canAffordDistricts}
-            planetDistrictQueue={planetDistrictQueue}
-              populationMessage={populationMessage}
-              onQueueDistrict={handleQueueDistrict}
-            />
           </DraggablePanel>
         ) : null}
       </div>
