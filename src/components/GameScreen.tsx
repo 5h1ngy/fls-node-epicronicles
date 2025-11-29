@@ -215,6 +215,9 @@ export const GameScreen = () => {
   const shipyardSystem: StarSystem | null = shipyardSystemId
     ? systems.find((system) => system.id === shipyardSystemId) ?? null
     : null;
+  const focusedSystem: StarSystem | null = focusSystemId
+    ? systems.find((system) => system.id === focusSystemId) ?? null
+    : null;
   const selectedPlanet =
     planets.find((planet) => planet.id === selectedPlanetId) ?? null;
   const selectedPlanetSystem = selectedPlanet
@@ -428,12 +431,12 @@ export const GameScreen = () => {
       />
       <div className="floating-panels">
         <MapPanels
-          focusSystemId={focusSystemId}
+          focusedSystem={focusedSystem}
           viewportWidth={viewportWidth}
           viewportHeight={viewportHeight}
-        onClearFocusTargets={clearFocusTargets}
-        shipyardSystem={shipyardSystem}
-        closeShipyard={closeShipyardPanel}
+          onClearFocusTargets={clearFocusTargets}
+          shipyardSystem={shipyardSystem}
+          closeShipyard={closeShipyardPanel}
       />
         {missionsOpen ? (
           <DraggablePanel

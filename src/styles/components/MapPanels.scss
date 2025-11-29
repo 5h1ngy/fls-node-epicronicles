@@ -6,3 +6,61 @@
   pointer-events: none;
   z-index: 3;
 }
+
+.system-mini-panel {
+  position: fixed;
+  left: 12px;
+  bottom: 64px;
+  width: 320px;
+  background: rgba(6, 10, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  pointer-events: auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.system-mini-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.system-mini-panel__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+}
+
+.system-mini-panel__title {
+  margin: 0.05rem 0;
+}
+
+.system-mini-panel__close {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #f4f4f4;
+  border-radius: 6px;
+  padding: 0.1rem 0.35rem;
+  cursor: pointer;
+}
+
+.system-mini-panel__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.system-mini-panel__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}
