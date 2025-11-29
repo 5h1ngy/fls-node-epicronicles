@@ -1,6 +1,6 @@
 import { advanceSimulation } from '@domain/session';
 import type { GameSession } from '@domain/types';
-import type { GameConfig } from '@config/gameConfig';
+import type { GameConfig } from '@config';
 
 export type SimulationWorkerMessage =
   | {

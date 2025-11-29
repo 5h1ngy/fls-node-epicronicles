@@ -11,8 +11,7 @@ export * from './populationThunks';
 export * from './persistenceThunks';
 export * from './progressionThunks';
 export * from './eventThunks';
-export { setFleetPosition } from './fleetThunks';
-export { stopFleet } from './fleetThunks';
+export { setFleetPosition, stopFleet } from './fleetThunks';
 export { setScienceShipPosition } from './scienceThunks';
 
 export type {
@@ -37,5 +36,5 @@ export type {
   UnlockTraditionResult,
   ResolveEventResult,
 } from '../slice/gameSlice';
-export type { GameConfig } from '@config/gameConfig';
+export type { GameConfig } from '@config';
 export type { GameSession, EconomyState } from '@domain/types';

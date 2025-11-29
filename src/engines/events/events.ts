@@ -10,7 +10,7 @@ import type {
   EventsConfig,
   EventDefinition,
   GameConfig,
-} from '@config/gameConfig';
+} from '@config';
 import { canAffordCost, spendResources } from '@domain/economy/economy';
 
 export interface EventState {

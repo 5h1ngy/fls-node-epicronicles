@@ -1,5 +1,5 @@
 ﻿import type { GalaxyState, ScienceShip, SystemVisibility } from '@domain/types';
-import type { GameConfig } from '@config/gameConfig';
+import type { GameConfig } from '@config';
 
 const visibilityRank: Record<SystemVisibility, number> = {
   unknown: 0,

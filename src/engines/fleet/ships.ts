@@ -1,4 +1,4 @@
-﻿import type { MilitaryConfig } from '@config/gameConfig';
+﻿import type { MilitaryConfig } from '@config';
 import type { Fleet, FleetShip, ShipClassId, ShipDesign } from '@domain/types';
 import type { ShipCustomization } from '@domain/types';
 

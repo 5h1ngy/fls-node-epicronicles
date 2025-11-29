@@ -1,5 +1,5 @@
 import type { TraditionPerk, TraditionState } from '@domain/types';
-import type { TraditionConfig } from '@config/gameConfig';
+import type { TraditionConfig } from '@config';
 
 export type UnlockTraditionResult =
   | { success: true; state: TraditionState }

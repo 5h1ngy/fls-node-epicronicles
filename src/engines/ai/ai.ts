@@ -1,7 +1,7 @@
 import type { GalaxyState, Fleet, GameSession } from '@domain/types';
 import { createFleetShip, createInitialFleet } from '../fleet/ships';
 import { calculateTravelTicks, sumFleetAttack } from '../fleet/fleets';
-import type { MilitaryConfig, DiplomacyConfig } from '@config/gameConfig';
+import type { MilitaryConfig, DiplomacyConfig } from '@config';
 
 const getCombatDesigns = (military: MilitaryConfig) => {
   const combat = military.shipDesigns.filter(

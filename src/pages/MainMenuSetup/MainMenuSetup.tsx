@@ -1,4 +1,4 @@
-import type { GameConfig } from '@config/gameConfig';
+import type { GameConfig } from '@config';
 import { MainMenuLayout } from '../MainMenuLayout';
 
 import './MainMenuSetup.scss';

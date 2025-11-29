@@ -1,4 +1,4 @@
-﻿import type { MilitaryConfig } from '@config/gameConfig';
+﻿import type { MilitaryConfig } from '@config';
 import {
   createFleetShip,
   createInitialFleet,

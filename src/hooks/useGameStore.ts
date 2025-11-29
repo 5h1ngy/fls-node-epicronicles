@@ -8,7 +8,7 @@ import type {
   ShipClassId,
   ResearchBranch,
 } from '@domain/types';
-import type { GameConfig } from '@config/gameConfig';
+import type { GameConfig } from '@config';
 import type { GameView } from '../store/slice/gameSlice';
 import {
   startNewSession,

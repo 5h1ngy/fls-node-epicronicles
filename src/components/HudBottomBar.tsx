@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useGameStore } from '@store/gameStore';
 import {
   Globe2,
@@ -13,7 +13,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import './HudBottomBar.scss';
-import { gameConfig } from '@config/gameConfig';
+import { gameConfig } from '@config';
 
 interface HudBottomBarProps {
   onToggleDebug: () => void;
@@ -164,7 +164,7 @@ export const HudBottomBar = ({
             className="hud-icon-btn"
             onClick={onClick}
             disabled={disabled}
-            data-tooltip={`${label} – ${desc}`}
+            data-tooltip={`${label} - ${desc}`}
             aria-label={label}
           >
             <Icon size={16} />

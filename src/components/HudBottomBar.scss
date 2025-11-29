@@ -2,7 +2,7 @@
 @use '../styles/_shared' as *;
 
 .hud-bottom-bar {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
@@ -18,9 +18,12 @@
   box-shadow:
     0 -12px 26px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(90, 200, 255, 0.12);
-  z-index: 2;
+  z-index: 6;
   font-size: 0.78rem;
-  @include grid-overlay(26px, 0.025);
+  @include grid-overlay(26px, 0.025, false);
+  position: fixed !important;
+  top: auto;
+  pointer-events: auto;
 }
 
 .hud-bottom-bar__stats {

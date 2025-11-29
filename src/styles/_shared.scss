@@ -60,8 +60,10 @@
   backdrop-filter: blur(2px);
 }
 
-@mixin grid-overlay($size: 28px, $opacity: 0.04) {
-  position: relative;
+@mixin grid-overlay($size: 28px, $opacity: 0.04, $set-position: true) {
+  @if $set-position {
+    position: relative;
+  }
   &::after {
     content: '';
     position: absolute;

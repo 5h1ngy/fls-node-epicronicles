@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@config": ["src/config"],
       "@store/*": ["src/store/*"],
       "@domain/*": ["src/engines/*"],
       "@components/*": ["src/components/*"],

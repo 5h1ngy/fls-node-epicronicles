@@ -1,5 +1,5 @@
 ﻿import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { gameConfig, type GameConfig } from '../../config/gameConfig';
+import { gameConfig, type GameConfig } from '@config';
 import type { GameSession } from '@domain/types';
 
 export interface StartSessionArgs {

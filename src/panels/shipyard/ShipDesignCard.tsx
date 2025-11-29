@@ -1,7 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { ShipDesign } from '@domain/types';
 import { applyShipTemplate, applyCustomization } from '@domain/fleet/ships';
-import type { MilitaryConfig } from '@config/gameConfig';
+import type { MilitaryConfig } from '@config';
 
 import '../fleet/FleetShared.scss';
 import '../ShipyardPanel.scss';

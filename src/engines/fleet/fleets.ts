@@ -1,4 +1,4 @@
-﻿import type { GameConfig } from '@config/gameConfig';
+﻿import type { GameConfig } from '@config';
 import type {
   CombatReport,
   CombatResultType,

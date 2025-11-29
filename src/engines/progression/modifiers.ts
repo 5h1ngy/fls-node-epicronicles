@@ -1,5 +1,5 @@
 import type { ResearchState, TraditionState, ResourceType } from '@domain/types';
-import type { ResearchConfig, TraditionConfig } from '@config/gameConfig';
+import type { ResearchConfig, TraditionConfig } from '@config';
 
 export interface ProgressionModifiers {
   incomeMultipliers: Partial<Record<ResourceType, number>>;

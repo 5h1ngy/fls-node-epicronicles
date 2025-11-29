@@ -17,7 +17,7 @@
   pointer-events: auto;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
   @include column-stack(0.5rem);
-  @include grid-overlay(22px, 0.02);
+  @include grid-overlay(22px, 0.02, false);
 }
 
 .planet-mini-panel {
@@ -29,7 +29,7 @@
   pointer-events: auto;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
   @include column-stack(0.5rem);
-  @include grid-overlay(22px, 0.02);
+  @include grid-overlay(22px, 0.02, false);
 }
 
 .system-mini-panel__header {

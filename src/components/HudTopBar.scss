@@ -20,7 +20,8 @@
     0 12px 26px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(90, 200, 255, 0.12);
   z-index: 2;
-  @include grid-overlay(26px, 0.025);
+  @include grid-overlay(26px, 0.025, false);
+  position: absolute !important;
 }
 
 .hud-top-bar__left {

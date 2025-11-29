@@ -12,7 +12,7 @@ import type {
   MilitaryConfig,
   ResearchConfig,
   TraditionConfig,
-} from '@config/gameConfig';
+} from '@config';
 import { createFleetShip, getShipDesign } from '@domain/fleet/ships';
 import { createInitialResearch } from '@domain/research/research';
 import { createInitialTraditions } from '@domain/traditions/traditions';

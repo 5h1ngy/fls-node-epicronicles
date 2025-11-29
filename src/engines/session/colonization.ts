@@ -1,4 +1,4 @@
-﻿import type { ColonizationConfig } from '@config/gameConfig';
+﻿import type { ColonizationConfig } from '@config';
 import type {
   ColonizationTask,
   ColonizationStatus,

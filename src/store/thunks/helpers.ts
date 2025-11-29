@@ -1,4 +1,4 @@
-import type { GameConfig } from '@config/gameConfig';
+import type { GameConfig } from '@config';
 import type { Empire, GameSession, WarStatus } from '@domain/types';
 
 export const tickDurationMs = (cfg: GameConfig) =>

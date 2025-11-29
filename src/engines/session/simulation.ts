@@ -4,7 +4,7 @@
   CombatResultType,
   GalaxyState,
 } from '@domain/types';
-import type { GameConfig } from '@config/gameConfig';
+import type { GameConfig } from '@config';
 import { advanceExploration } from '@domain/galaxy/exploration';
 import { advanceEconomy } from '@domain/economy/economy';
 import { advanceColonization } from './colonization';

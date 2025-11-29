@@ -4,7 +4,7 @@ import type {
   ResearchState,
   ResearchTech,
 } from '@domain/types';
-import type { ResearchConfig } from '@config/gameConfig';
+import type { ResearchConfig } from '@config';
 
 export type StartResearchResult =
   | { success: true; state: ResearchState }

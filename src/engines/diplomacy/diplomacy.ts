@@ -1,4 +1,4 @@
-﻿import type { DiplomacyConfig } from '@config/gameConfig';
+﻿import type { DiplomacyConfig } from '@config';
 import type { Empire, GameNotification, GalaxyState, StarSystem } from '@domain/types';
 
 const clampOpinion = (value: number) => Math.max(-100, Math.min(100, value));
