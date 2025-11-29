@@ -106,9 +106,13 @@ export const SideEntityDock = ({ variant, onSelect, onCenter }: SideEntityDockPr
   }
 
   if (variant === 'fleets') {
-    const militaryFleets = playerFleets.filter((fleet) =>
-      fleet.ships.some((ship) => getRole(ship.designId) === 'military'),
-    );
+    const militaryFleets = playerFleets.filter((fleet) => {
+      const roles = fleet.ships.map((ship) => getRole(ship.designId));
+      if (roles.includes('military')) return true;
+      // Se la flotta ha solo ruoli sconosciuti, considerala comunque militare per non perderla dal dock
+      const known = roles.some((r) => r === 'construction' || r === 'colony' || r === 'science');
+      return !known && fleet.ships.length > 0;
+    });
     return (
       <aside className="side-entity-dock">
         <section>
