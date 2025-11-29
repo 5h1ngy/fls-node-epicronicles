@@ -1,11 +1,11 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { canAffordCost, spendResources } from '@domain/economy/economy';
 import { createColonizationTask } from '@domain/session';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { StartColonizationResult } from '../slice/gameSlice';
-import { appendNotification } from '../utils';
-import { detachColonyShip } from './helpers';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { StartColonizationResult } from '@store/slice/gameSlice';
+import { appendNotification } from '@store/common';
+import { detachColonyShip } from '@store/thunks/common/helpers';
 
 export const startColonization =
   (systemId: string): ThunkAction<StartColonizationResult, RootState, unknown, AnyAction> =>
@@ -80,3 +80,4 @@ export const startColonization =
 
     return { success: true };
   };
+

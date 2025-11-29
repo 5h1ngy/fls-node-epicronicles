@@ -1,9 +1,9 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import type { PopulationJobId } from '@domain/types';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { PopulationAdjustResult } from '../slice/gameSlice';
-import { updatePopulationCounts } from '../utils';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { PopulationAdjustResult } from '@store/slice/gameSlice';
+import { updatePopulationCounts } from '@store/common';
 
 export const promotePopulation =
   (planetId: string, jobId: PopulationJobId): ThunkAction<PopulationAdjustResult, RootState, unknown, AnyAction> =>
@@ -80,3 +80,4 @@ export const demotePopulation =
     );
     return { success: true };
   };
+

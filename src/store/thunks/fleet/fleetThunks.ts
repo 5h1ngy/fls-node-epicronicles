@@ -1,13 +1,13 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { calculateTravelTicks } from '@domain/fleet';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
 import type {
   FleetMergeResult,
   FleetMoveResult,
   FleetSplitResult,
-} from '../slice/gameSlice';
-import { createFleetFromShip } from './helpers';
+} from '@store/slice/gameSlice';
+import { createFleetFromShip } from '@store/thunks/common/helpers';
 
 export const orderFleetMove =
   (fleetId: string, systemId: string): ThunkAction<FleetMoveResult, RootState, unknown, AnyAction> =>
@@ -190,3 +190,4 @@ export const stopFleet =
       }),
     );
   };
+

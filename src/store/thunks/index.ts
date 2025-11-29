@@ -1,18 +1,17 @@
-export * from './sessionThunks';
-export * from './colonizationThunks';
-export * from './shipyardThunks';
-export * from './buildShipyardThunk';
-export type { BuildShipyardResult } from '../slice/gameSlice';
-export * from './districtThunks';
-export * from './diplomacyThunks';
-export * from './fleetThunks';
-export * from './scienceThunks';
-export * from './populationThunks';
-export * from './persistenceThunks';
-export * from './progressionThunks';
-export * from './eventThunks';
-export { setFleetPosition, stopFleet } from './fleetThunks';
-export { setScienceShipPosition } from './scienceThunks';
+export * from './session/sessionThunks';
+export * from './session/persistenceThunks';
+export * from './colonization/colonizationThunks';
+export * from './fleet/shipyardThunks';
+export * from './fleet/buildShipyardThunk';
+export * from './economy/districtThunks';
+export * from './diplomacy/diplomacyThunks';
+export * from './fleet/fleetThunks';
+export * from './science/scienceThunks';
+export * from './population/populationThunks';
+export * from './progression/progressionThunks';
+export * from './events/eventThunks';
+export { setFleetPosition, stopFleet } from './fleet/fleetThunks';
+export { setScienceShipPosition } from './science/scienceThunks';
 
 export type {
   StartSessionArgs,
@@ -35,6 +34,8 @@ export type {
   StartResearchResult,
   UnlockTraditionResult,
   ResolveEventResult,
+  BuildShipyardResult,
 } from '../slice/gameSlice';
 export type { GameConfig } from '@config';
 export type { GameSession, EconomyState } from '@domain/types';
+

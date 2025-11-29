@@ -5,9 +5,9 @@ import type { ResearchBranch } from '@domain/types';
 import type {
   StartResearchResult,
   UnlockTraditionResult,
-} from '../slice/gameSlice';
-import { setSessionState } from '../slice/gameSlice';
-import type { RootState } from '../index';
+} from '@store/slice/gameSlice';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { RootState } from '@store';
 
 export const beginResearch =
   (
@@ -53,3 +53,4 @@ export const unlockTraditionPerk =
     );
     return { success: true };
   };
+

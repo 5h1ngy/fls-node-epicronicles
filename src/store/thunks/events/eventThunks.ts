@@ -1,8 +1,8 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { canAffordOption, resolveEvent, applyOptionCost } from '@domain/events/events';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { ResolveEventResult } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { ResolveEventResult } from '@store/slice/gameSlice';
 
 export const resolveActiveEvent =
   (optionId: string): ThunkAction<ResolveEventResult, RootState, unknown, AnyAction> =>
@@ -49,3 +49,4 @@ export const resolveActiveEvent =
     );
     return { success: true };
   };
+

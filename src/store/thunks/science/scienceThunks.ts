@@ -1,8 +1,8 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import type { ScienceShipStatus } from '@domain/types';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { ScienceShipOrderResult } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { ScienceShipOrderResult } from '@store/slice/gameSlice';
 
 export const orderScienceShip =
   (shipId: string, systemId: string): ThunkAction<ScienceShipOrderResult, RootState, unknown, AnyAction> =>
@@ -154,3 +154,4 @@ export const setScienceShipPosition =
     );
     return { success: true };
   };
+

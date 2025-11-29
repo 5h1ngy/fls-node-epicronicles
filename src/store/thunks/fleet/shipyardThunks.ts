@@ -2,9 +2,9 @@ import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { canAffordCost, spendResources } from '@domain/economy/economy';
 import { createShipyardTask } from '@domain/fleet';
 import type { ShipClassId } from '@domain/types';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { QueueShipBuildResult } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { QueueShipBuildResult } from '@store/slice/gameSlice';
 
 export const queueShipBuild =
   (
@@ -87,3 +87,4 @@ export const queueShipBuild =
 
     return { success: true };
   };
+

@@ -1,10 +1,10 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { applyWarPressureToGalaxy } from '@domain/diplomacy';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { DiplomacyActionResult } from '../slice/gameSlice';
-import { appendNotification, appendWarEvent } from '../utils';
-import { setEmpireWarStatus } from './helpers';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { DiplomacyActionResult } from '@store/slice/gameSlice';
+import { appendNotification, appendWarEvent } from '@store/common';
+import { setEmpireWarStatus } from '@store/thunks/common/helpers';
 
 export const declareWarOnEmpire =
   (empireId: string): ThunkAction<DiplomacyActionResult, RootState, unknown, AnyAction> =>
@@ -127,3 +127,4 @@ export const requestBorderAccess =
     );
     return { success: true };
   };
+

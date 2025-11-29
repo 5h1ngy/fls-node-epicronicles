@@ -1,7 +1,7 @@
-﻿import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import { useMemo } from 'react';
-import type { AppDispatch, RootState } from '../store/index';
+import type { AppDispatch, RootState } from '@store';
 import type {
   GameSession,
   PopulationJobId,
@@ -43,8 +43,8 @@ import {
   resolveActiveEvent,
   stopScienceShip,
   setScienceShipPosition,
-} from '../store/thunks';
-export * from '../store/selectors';
+} from '@store';
+export * from '@store/selectors';
 import type {
   StartSessionArgs,
   StartColonizationResult,
@@ -64,7 +64,7 @@ import type {
   UnlockTraditionResult,
   ResolveEventResult,
   BuildShipyardResult,
-} from '../store/thunks';
+} from '@store';
 
 export const useAppDispatch: () => AppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

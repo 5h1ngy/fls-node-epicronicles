@@ -73,3 +73,4 @@ export const createFleetFromShip = ({
   ticksToArrival: 0,
   ships: [ship],
 });
+

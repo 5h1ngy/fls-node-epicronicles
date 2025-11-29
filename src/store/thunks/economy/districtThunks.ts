@@ -1,14 +1,14 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { canAffordCost, spendResources } from '@domain/economy/economy';
 import { createDistrictConstructionTask } from '@domain/economy';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
 import type {
   DistrictQueueManageResult,
   QueueDistrictBuildResult,
   RemoveDistrictResult,
-} from '../slice/gameSlice';
-import { appendNotification, refundResourceCost } from '../utils';
+} from '@store/slice/gameSlice';
+import { appendNotification, refundResourceCost } from '@store/common';
 
 export const queueDistrictConstruction =
   (
@@ -180,3 +180,4 @@ export const prioritizeDistrictTask =
     );
     return { success: true };
   };
+

@@ -1,8 +1,8 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import type { GameSession } from '@domain/types';
-import type { RootState } from '../index';
-import { startSessionSuccess } from '../slice/gameSlice';
-import type { LoadGameResult, SaveGameResult } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { startSessionSuccess } from '@store/slice/gameSlice';
+import type { LoadGameResult, SaveGameResult } from '@store/slice/gameSlice';
 
 const STORAGE_KEY = 'fls-save-v1';
 
@@ -72,3 +72,4 @@ export const loadSessionFromStorage =
 export const hasSavedSession = () =>
   typeof localStorage !== 'undefined' &&
   Boolean(localStorage.getItem(STORAGE_KEY));
+

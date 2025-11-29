@@ -1,9 +1,9 @@
 import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { spendResources, canAffordCost } from '@domain/economy/economy';
 import { getShipDesign } from '@domain/fleet/ships';
-import type { RootState } from '../index';
-import { setSessionState } from '../slice/gameSlice';
-import type { BuildShipyardResult } from '../slice/gameSlice';
+import type { RootState } from '@store';
+import { setSessionState } from '@store/slice/gameSlice';
+import type { BuildShipyardResult } from '@store/slice/gameSlice';
 
 export const buildShipyard =
   (
@@ -86,3 +86,4 @@ export const buildShipyard =
     );
     return { success: true };
   };
+

@@ -2,14 +2,14 @@ import { type AnyAction, type ThunkAction } from '@reduxjs/toolkit';
 import { createSession, advanceSimulation } from '@domain/session';
 import { advanceClock, setClockRunning as setClockRunningDomain, setClockSpeed } from '@domain/time/clock';
 import type { GameSession } from '@domain/types';
-import type { RootState } from '../index';
+import type { RootState } from '@store';
 import {
   startSessionSuccess,
   returnToMenu as returnToMenuAction,
   setSessionState,
-} from '../slice/gameSlice';
-import type { StartSessionArgs } from '../slice/gameSlice';
-import { tickDurationMs } from './helpers';
+} from '@store/slice/gameSlice';
+import type { StartSessionArgs } from '@store/slice/gameSlice';
+import { tickDurationMs } from '@store/thunks/common/helpers';
 
 type SimulationWorkerMessage =
   | { type: 'ready' }
@@ -35,7 +35,7 @@ const getSimulationWorker = () => {
     return simulationWorker;
   }
   simulationWorker = new Worker(
-    new URL('../../shared/workers/simulationWorker.ts', import.meta.url),
+    new URL('../../../shared/workers/simulationWorker.ts', import.meta.url),
     { type: 'module' },
   );
   simulationWorker.onmessage = (event: MessageEvent<SimulationWorkerMessage>) => {
@@ -185,3 +185,4 @@ export const advanceClockBy =
       }),
     );
   };
+
