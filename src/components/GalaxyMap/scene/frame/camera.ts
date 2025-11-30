@@ -41,6 +41,7 @@ export const updateCameraAndTilt = ({
     controls.maxDistance = maxZoom;
     controls.minPolarAngle = Math.PI / 2;
     controls.maxPolarAngle = Math.PI / 2 + Math.PI / 6;
+    controls.target.copy(systemGroup.position);
     const tilt = tiltStateRef.current;
     const deltaTilt = tilt.target - tilt.current;
     if (Math.abs(deltaTilt) > 0.0005) {
