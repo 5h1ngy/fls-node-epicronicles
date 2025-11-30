@@ -45,15 +45,15 @@ export const useGalaxyScene = ({
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.enabled = false;
-    controls.enablePan = false;
-    controls.screenSpacePanning = false;
+    controls.enabled = true;
+    controls.enablePan = true;
+    controls.screenSpacePanning = true;
     controls.enableRotate = false;
     controls.minDistance = minZoom;
     controls.maxDistance = maxZoom;
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.PAN,
-      MIDDLE: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
       RIGHT: THREE.MOUSE.PAN,
     };
     controls.minAzimuthAngle = 0;

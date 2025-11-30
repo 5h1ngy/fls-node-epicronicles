@@ -51,9 +51,6 @@ export const useMapInteractions = ({
     const { renderer, camera, controls } = sceneContext;
     const systemGroup = group;
 
-    let isPanning = false;
-    let lastPointer = { x: 0, y: 0 };
-
     const handleContextMenu = (event: MouseEvent) => event.preventDefault();
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
@@ -70,31 +67,6 @@ export const useMapInteractions = ({
         const isAtMax =
           Math.abs(tiltStateRef.current.target - maxTiltDown) < 0.01;
         tiltStateRef.current.target = isAtMax ? baseTilt : maxTiltDown;
-        return;
-      }
-      if (event.button === 2) {
-        isPanning = true;
-        lastPointer = { x: event.clientX, y: event.clientY };
-        controls.enablePan = true;
-      }
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isPanning) {
-        return;
-      }
-      const deltaX = event.clientX - lastPointer.x;
-      const deltaY = event.clientY - lastPointer.y;
-      lastPointer = { x: event.clientX, y: event.clientY };
-      const panScale = (camera.position.z / 400) * 0.8;
-      offsetTargetRef.current.x += deltaX * -panScale;
-      offsetTargetRef.current.y += deltaY * panScale;
-    };
-
-    const handleMouseUp = (event: MouseEvent) => {
-      if (event.button === 2) {
-        isPanning = false;
-        controls.enablePan = false;
       }
     };
 
@@ -165,16 +137,12 @@ export const useMapInteractions = ({
     renderer.domElement.addEventListener('contextmenu', handleContextMenu);
     renderer.domElement.addEventListener('wheel', handleWheel, { passive: false });
     renderer.domElement.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
     renderer.domElement.addEventListener('click', handleClick);
 
     return () => {
       renderer.domElement.removeEventListener('wheel', handleWheel);
       renderer.domElement.removeEventListener('mousedown', handleMouseDown);
       renderer.domElement.removeEventListener('click', handleClick);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
     };
   }, [
