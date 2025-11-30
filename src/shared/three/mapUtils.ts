@@ -415,6 +415,8 @@ export const createLabelSprite = (text: string) => {
   sprite.userData.baseHeight = canvas.height / 30;
   sprite.scale.set(sprite.userData.baseWidth, sprite.userData.baseHeight, 1);
   sprite.position.set(0, 8, 0);
+  // Non deve contribuire all'hitbox di selezione
+  sprite.raycast = () => null;
   sprite.name = 'label';
   return sprite;
 };
@@ -480,6 +482,7 @@ export const createOrbitingPlanets = (
     if (label) {
       label.name = 'planetLabel';
       label.position.set(0, planet.size + 2.5, 0.2);
+      label.raycast = () => null;
       planetMesh.add(label);
     }
 
@@ -499,6 +502,8 @@ export const createOrbitingPlanets = (
         planetId: planet.id,
         systemId,
       };
+      // Evita di ampliare la hitbox del pianeta
+      ring.raycast = () => null;
       planetMesh.add(ring);
 
       // Map colonized id to this mesh for focus
@@ -741,6 +746,8 @@ export const createSystemNode = (
     ring.material.side = DoubleSide;
     ring.userData.systemId = system.id;
     ring.userData.kind = 'owner';
+    // Non estende l'area di click del sistema
+    ring.raycast = () => null;
     node.add(ring);
   }
 
@@ -756,6 +763,7 @@ export const createSystemNode = (
     ring.material.side = DoubleSide;
     ring.userData.systemId = system.id;
     ring.userData.kind = 'hostile';
+    ring.raycast = () => null;
     node.add(ring);
   }
 
@@ -771,6 +779,7 @@ export const createSystemNode = (
     ring.material.side = DoubleSide;
     ring.userData.systemId = system.id;
     ring.userData.kind = 'combat';
+    ring.raycast = () => null;
     node.add(ring);
   }
 
@@ -787,6 +796,7 @@ export const createSystemNode = (
     cross.userData.systemId = system.id;
     battleIconMaterial.depthWrite = false;
     cross.scale.set(1, 0.2, 1);
+    cross.raycast = () => null;
     node.add(cross);
   }
 
