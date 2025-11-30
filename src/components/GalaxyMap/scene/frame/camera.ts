@@ -34,9 +34,7 @@ export const updateCameraAndTilt = ({
   const target = controls?.target ?? new THREE.Vector3();
   systemGroup.rotation.y = 0;
   systemGroup.rotation.x = 0;
-  const desiredOffset = tempOffsetRef.current.set(-target.x, -target.y, 0);
-  systemGroup.position.lerp(desiredOffset, 0.08);
-  offsetTargetRef.current.copy(systemGroup.position);
+  offsetTargetRef.current.copy(target);
 
   if (controls) {
     controls.minDistance = minZoom;

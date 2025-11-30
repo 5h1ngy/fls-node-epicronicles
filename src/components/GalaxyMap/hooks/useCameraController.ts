@@ -17,7 +17,6 @@ export const useCameraController = () => {
     baseTilt,
     maxTiltDown,
     cameraState: {
-      systemGroupRef,
       cameraRef,
       offsetTargetRef,
       zoomTargetRef,
@@ -35,25 +34,29 @@ export const useCameraController = () => {
     (pos: { x: number; y: number; z?: number } | THREE.Vector3, options?: FocusOptions) => {
       const zoom = options?.zoom ?? zoomTargetRef.current;
       const targetZoom = clampZoom(zoom);
-      const group = systemGroupRef.current;
-      const desiredOffset = offsetTargetRef.current;
-      desiredOffset.set(-pos.x, -pos.y, 0);
-      if (group) {
-        group.position.copy(desiredOffset);
-      }
+      const targetVector =
+        pos instanceof THREE.Vector3 ? pos : new THREE.Vector3(pos.x, pos.y, pos.z ?? 0);
       if (sceneContext?.controls) {
-        sceneContext.controls.target.set(pos.x, pos.y, pos.z ?? 0);
+        sceneContext.controls.target.copy(targetVector);
         sceneContext.controls.update();
       }
+      offsetTargetRef.current.copy(targetVector);
       zoomTargetRef.current = targetZoom;
       zoomTargetDirtyRef.current = true;
       if (options?.immediate && cameraRef.current) {
-        cameraRef.current.position.z = targetZoom;
+        const camera = cameraRef.current;
+        const currentTarget = sceneContext?.controls?.target ?? targetVector;
+        const offset = camera.position.clone().sub(currentTarget);
+        if (offset.lengthSq() === 0) {
+          offset.set(0, 0, targetZoom);
+        } else {
+          offset.setLength(targetZoom);
+        }
+        camera.position.copy(offset.add(currentTarget));
       }
     },
     [
       clampZoom,
-      systemGroupRef,
       offsetTargetRef,
       zoomTargetRef,
       zoomTargetDirtyRef,

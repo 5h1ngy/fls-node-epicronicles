@@ -62,6 +62,7 @@ export const GameScreen = () => {
   const [focusSystemId, setFocusSystemId] = useState<string | null>(null);
   const [focusTrigger, setFocusTrigger] = useState(0);
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
+  const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
@@ -110,6 +111,7 @@ export const GameScreen = () => {
   const clearFocusTargets = () => {
     setFocusSystemId(null);
     setShipyardSystemId(null);
+    setSelectedSystemId(null);
     setSelectedPlanetId(null);
     setFocusPlanetId(null);
     setMapMessage(null);
@@ -153,6 +155,9 @@ export const GameScreen = () => {
     if (homeSystemId) {
       setFocusSystemId(homeSystemId);
       setFocusPlanetId(null);
+      setSelectedSystemId(null);
+      setSelectedPlanetId(null);
+      setMapMessage(null);
     }
     focusedSessionRef.current = session.id;
   }, [session, setFocusPlanetId, setFocusSystemId]);
@@ -188,14 +193,12 @@ export const GameScreen = () => {
   const shipyardSystem: StarSystem | null = shipyardSystemId
     ? systems.find((system) => system.id === shipyardSystemId) ?? null
     : null;
-  const focusedSystem: StarSystem | null = focusSystemId
-    ? systems.find((system) => system.id === focusSystemId) ?? null
+  const focusedSystem: StarSystem | null = selectedSystemId
+    ? systems.find((system) => system.id === selectedSystemId) ?? null
     : null;
   const focusedPlanet: Planet | null = selectedPlanetId
     ? planets.find((planet) => planet.id === selectedPlanetId) ?? null
-    : focusPlanetId
-      ? planets.find((planet) => planet.id === focusPlanetId) ?? null
-      : null;
+    : null;
   const focusedPlanetSystem: StarSystem | null = focusedPlanet
     ? systems.find((system) => system.id === focusedPlanet.systemId) ?? null
     : null;
@@ -230,6 +233,8 @@ export const GameScreen = () => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
             setFocusPlanetId(planetId ?? null);
+            setSelectedSystemId(null);
+            setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -245,6 +250,8 @@ export const GameScreen = () => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
             setFocusPlanetId(null);
+            setSelectedSystemId(null);
+            setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -258,6 +265,8 @@ export const GameScreen = () => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
             setFocusPlanetId(null);
+            setSelectedSystemId(null);
+            setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -271,6 +280,8 @@ export const GameScreen = () => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
             setFocusPlanetId(null);
+            setSelectedSystemId(null);
+            setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -284,6 +295,8 @@ export const GameScreen = () => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
             setFocusPlanetId(null);
+            setSelectedSystemId(null);
+            setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
@@ -308,6 +321,7 @@ export const GameScreen = () => {
             targetSystem.visibility === 'surveyed' ||
             colonizedSystems.has(targetSystem.id);
           setSelectedPlanetId(null);
+          setSelectedSystemId(isAccessible ? systemId : null);
           setFocusSystemId(systemId);
           setFocusPlanetId(null);
           setMapMessage(
@@ -326,6 +340,8 @@ export const GameScreen = () => {
           const hasShipyardStructure =
             targetSystem.hasShipyard || Boolean(targetSystem.shipyardBuild);
           setShipyardSystemId(isAccessible && hasShipyardStructure ? systemId : null);
+          setSelectedSystemId(null);
+          setSelectedPlanetId(null);
           setFocusSystemId(systemId);
           setFocusPlanetId(null);
         }}
@@ -433,6 +449,8 @@ export const GameScreen = () => {
                 setGalaxyOpen(false);
                 setFocusSystemId(systemId);
                 setFocusPlanetId(null);
+                setSelectedSystemId(null);
+                setSelectedPlanetId(null);
               }}
             />
           </DraggablePanel>
@@ -451,6 +469,8 @@ export const GameScreen = () => {
                 setColonizationOpen(false);
                 setFocusSystemId(systemId);
                 setFocusPlanetId(null);
+                setSelectedSystemId(null);
+                setSelectedPlanetId(null);
               }}
             />
           </DraggablePanel>
@@ -500,6 +520,8 @@ export const GameScreen = () => {
                 onCenter={(systemId) => {
                   setFocusSystemId(systemId);
                   setFocusPlanetId(null);
+                  setSelectedSystemId(null);
+                  setSelectedPlanetId(null);
                   setFocusTrigger((value) => value + 1);
                 }}
                 onStop={(fleetId) => stopFleet(fleetId)}
@@ -533,6 +555,8 @@ export const GameScreen = () => {
                 onCenter={(systemId) => {
                   setFocusSystemId(systemId);
                   setFocusPlanetId(null);
+                  setSelectedSystemId(null);
+                  setSelectedPlanetId(null);
                   setFocusTrigger((value) => value + 1);
                 }}
                 onClose={() => setDockSelection(null)}
