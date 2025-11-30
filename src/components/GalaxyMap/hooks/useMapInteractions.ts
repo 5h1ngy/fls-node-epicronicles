@@ -86,11 +86,9 @@ export const useMapInteractions = ({
       const deltaX = event.clientX - lastPointer.x;
       const deltaY = event.clientY - lastPointer.y;
       lastPointer = { x: event.clientX, y: event.clientY };
-      controls.target.x -= (deltaX / renderer.domElement.clientWidth) * camera.position.z;
-      controls.target.y += (deltaY / renderer.domElement.clientHeight) * camera.position.z;
-      controls.update();
-      const target = controls.target;
-      offsetTargetRef.current.set(-target.x, -target.y, 0);
+      const panScale = (camera.position.z / 400) * 0.8;
+      offsetTargetRef.current.x += deltaX * -panScale;
+      offsetTargetRef.current.y += deltaY * panScale;
     };
 
     const handleMouseUp = (event: MouseEvent) => {
