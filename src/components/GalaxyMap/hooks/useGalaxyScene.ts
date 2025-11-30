@@ -94,6 +94,7 @@ export const useGalaxyScene = ({
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
       composer.setSize(container.clientWidth, container.clientHeight);
+      bloomPass.setSize(container.clientWidth, container.clientHeight);
     };
     window.addEventListener('resize', handleResize);
 

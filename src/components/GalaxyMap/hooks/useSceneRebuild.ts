@@ -25,6 +25,24 @@ export interface UseSceneRebuildParams {
   fleetMaterials: Record<string, THREE.Material>;
 }
 
+const disposeObjectResources = (object: THREE.Object3D) => {
+  const mesh = object as THREE.Mesh;
+  if (mesh.geometry) {
+    mesh.geometry.dispose();
+  }
+  const material = mesh.material as THREE.Material | THREE.Material[] | undefined;
+  if (material) {
+    const materials = Array.isArray(material) ? material : [material];
+    materials.forEach((mat) => {
+      // @ts-expect-error allow optional texture cleanup
+      if (mat.map?.dispose) mat.map.dispose();
+      if (mat instanceof THREE.Material) {
+        mat.dispose();
+      }
+    });
+  }
+};
+
 export const useSceneRebuild = ({
   systems,
   galaxyShape,
@@ -90,6 +108,11 @@ export const useSceneRebuild = ({
       });
     });
 
+    group.traverse((child) => {
+      if (child !== group) {
+        disposeObjectResources(child);
+      }
+    });
     group.clear();
     planetLookupRef.current.clear();
 
