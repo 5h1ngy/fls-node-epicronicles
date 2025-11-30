@@ -106,15 +106,6 @@ export const SideDock = ({
       <button
         type="button"
         className="side-dock__btn"
-        onClick={onOpenLog}
-        aria-label="Log eventi"
-        data-tooltip="Log eventi"
-      >
-        <ScrollText size={18} />
-      </button>
-      <button
-        type="button"
-        className="side-dock__btn"
         onClick={onOpenBattles}
         aria-label="Flotte & Battaglie"
         data-tooltip="Flotte & Battaglie"
