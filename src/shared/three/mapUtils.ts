@@ -494,7 +494,7 @@ export const createOrbitingPlanets = (
         }),
       );
       ring.raycast = () => null;
-      ring.rotation.x = Math.PI / 2;
+      ring.rotation.set(0, 0, 0);
       ring.userData = {
         planetId: planet.id,
         systemId,

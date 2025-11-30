@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { createBlackHole } from '../scene/blackHole';
-import { useGalaxyMapContext } from './GalaxyMapContext';
+import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 
 export const useBlackHole = () => {
   const {

@@ -4,7 +4,7 @@ import type { StarSystem, ScienceShip, Fleet } from '@domain/types';
 import { disposeNebula } from '../scene/background';
 import { rebuildSceneGraph } from '../scene/rebuildScene';
 import { createAnchorResolver } from '../scene/anchors';
-import { useGalaxyMapContext } from './GalaxyMapContext';
+import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 
 export interface UseSceneRebuildParams {
   systems: StarSystem[];

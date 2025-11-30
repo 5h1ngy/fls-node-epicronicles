@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { MutableRefObject } from 'react';
 import * as THREE from 'three';
-import { useGalaxyMapContext } from './GalaxyMapContext';
+import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 import { useCameraController } from './useCameraController';
 
 interface UseMapInteractionsParams {

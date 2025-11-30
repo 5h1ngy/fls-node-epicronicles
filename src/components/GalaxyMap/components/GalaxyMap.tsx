@@ -1,6 +1,6 @@
 import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useGalaxyMapData } from '../hooks/useGalaxyMapData';
-import { GalaxyMapProvider, useGalaxyMapContext } from '../hooks/GalaxyMapContext';
+import { GalaxyMapProvider, useGalaxyMapContext } from '../providers/GalaxyMapContext';
 import { useGalaxyMapRefs } from '../hooks/useGalaxyMapRefs';
 import { useGalaxyScene, type GalaxySceneContext } from '../hooks/useGalaxyScene';
 import { updateFrame } from '../scene/frameUpdate';

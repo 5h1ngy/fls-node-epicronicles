@@ -1,8 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import type { GalaxySceneContext } from './useGalaxyScene';
-import type { GalaxyMapRefs } from './useGalaxyMapRefs';
+import type { GalaxySceneContext } from '../hooks/useGalaxyScene';
+import type { GalaxyMapRefs } from '../hooks/useGalaxyMapRefs';
 
 export interface GalaxyMapContextValue {
   cameraState: GalaxyMapRefs['cameraState'];

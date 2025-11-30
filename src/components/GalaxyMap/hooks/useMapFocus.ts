@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { useGalaxyMapContext } from './GalaxyMapContext';
+import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 import { useCameraController } from './useCameraController';
 
 export interface MapFocusParams {

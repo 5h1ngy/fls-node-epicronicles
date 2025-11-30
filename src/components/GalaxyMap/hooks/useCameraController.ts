@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useCallback, useMemo } from 'react';
-import { useGalaxyMapContext } from './GalaxyMapContext';
+import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
