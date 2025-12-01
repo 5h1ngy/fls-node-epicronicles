@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
-import { createAnchorResolver, type AnchorEntry } from '../scene/anchors';
+import { createAnchorResolver, type AnchorEntry } from '../lib/anchors';
 import type { GalaxySceneContext } from './useGalaxyScene';
 
 export type GalaxyMapRefs = ReturnType<typeof useGalaxyMapRefs>;

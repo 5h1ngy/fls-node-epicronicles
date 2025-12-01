@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { StarSystem } from '@domain/types';
-import { createSystemNode } from '@three/mapUtils';
+import { createSystemNode } from '../map/systemNodes';
 
 interface SystemBuildParams {
   group: THREE.Group;

@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import type { StarSystem, ScienceShip, Fleet } from '@domain/types';
-import { disposeNebula } from '../scene/background';
-import { rebuildSceneGraph } from '../scene/rebuildScene';
-import { createAnchorResolver } from '../scene/anchors';
+import { disposeNebula } from '../lib/background';
+import { rebuildSceneGraph } from '../lib/rebuildScene';
+import { createAnchorResolver } from '../lib/anchors';
 import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 
 export interface UseSceneRebuildParams {
