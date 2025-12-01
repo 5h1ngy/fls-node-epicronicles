@@ -37,11 +37,12 @@ export const useGalaxySceneSetup = ({
     controls.enablePan = true;
     controls.screenSpacePanning = true;
     controls.enableRotate = false;
+    controls.enableZoom = false; // gestito a mano per evitare side-effect su tilt
     controls.minDistance = minZoom;
     controls.maxDistance = maxZoom;
     controls.mouseButtons = {
-      LEFT: THREE.MOUSE.PAN,
-      MIDDLE: THREE.MOUSE.DOLLY,
+      LEFT: THREE.MOUSE.ROTATE, // rotation disabilitata, click sinistro non muove
+      MIDDLE: THREE.MOUSE.ROTATE, // click centrale gestito a mano, nessun drag
       RIGHT: THREE.MOUSE.PAN,
     };
     controls.minAzimuthAngle = 0;

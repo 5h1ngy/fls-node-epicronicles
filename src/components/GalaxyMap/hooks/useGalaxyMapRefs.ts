@@ -34,7 +34,6 @@ export const useGalaxyMapRefs = () => {
     }
     cameraRef.current = sceneContext.camera;
     systemGroupRef.current = sceneContext.systemGroup;
-    tiltStateRef.current = { current: Math.PI / 2, target: Math.PI / 2 };
   };
 
   const cameraState = {

@@ -27,7 +27,7 @@ export const useMapInteractions = ({
   onPlanetSelect,
   onShipyardSelect,
 }: UseMapInteractionsParams) => {
-  const { focusOnPosition, toggleTilt, syncZoomToCurrent } = useCameraController();
+  const { focusOnPosition, toggleTilt, clampZoom, setZoomTarget } = useCameraController();
   const {
     sceneContext,
     cameraState: { systemGroupRef },
@@ -46,16 +46,19 @@ export const useMapInteractions = ({
     const handleContextMenu = (event: MouseEvent) => event.preventDefault();
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
-      controls.enableZoom = true;
-      syncZoomToCurrent();
+      const target = controls.target ?? new THREE.Vector3();
+      const distance = sceneContext.camera.position.distanceTo(target);
+      const step = Math.max(20, distance * 0.35);
+      const delta = Math.sign(event.deltaY) * step;
+      const next = clampZoom(distance + delta);
+      setZoomTarget(next);
     };
 
-    const handleAuxiliaryTilt = (event: MouseEvent | MouseEvent) => {
-      if (event.button === 1) {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleTilt();
-      }
+    const handleAuxiliaryTilt = (event: MouseEvent) => {
+      if (event.button !== 1) return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleTilt();
     };
 
     const handleClick = (event: MouseEvent) => {
@@ -97,13 +100,11 @@ export const useMapInteractions = ({
 
     renderer.domElement.addEventListener('contextmenu', handleContextMenu);
     renderer.domElement.addEventListener('wheel', handleWheel, { passive: false });
-    renderer.domElement.addEventListener('mousedown', handleAuxiliaryTilt);
     renderer.domElement.addEventListener('auxclick', handleAuxiliaryTilt);
     renderer.domElement.addEventListener('click', handleClick);
 
     return () => {
       renderer.domElement.removeEventListener('wheel', handleWheel);
-      renderer.domElement.removeEventListener('mousedown', handleAuxiliaryTilt);
       renderer.domElement.removeEventListener('auxclick', handleAuxiliaryTilt);
       renderer.domElement.removeEventListener('click', handleClick);
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
@@ -117,6 +118,7 @@ export const useMapInteractions = ({
     onShipyardSelect,
     focusOnPosition,
     toggleTilt,
-    syncZoomToCurrent,
+    clampZoom,
+    setZoomTarget,
   ]);
 };
