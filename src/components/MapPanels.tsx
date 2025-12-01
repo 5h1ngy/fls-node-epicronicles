@@ -1,6 +1,11 @@
 import { DraggablePanel } from '@panels/shared/DraggablePanel';
 import { Suspense, lazy } from 'react';
-import type { StarSystem, Planet, OrbitingPlanet } from '@domain/types';
+import type {
+  StarSystem,
+  Planet,
+  OrbitingPlanet,
+  StarClass,
+} from '@domain/types';
 
 import './MapPanels.scss';
 
@@ -9,6 +14,19 @@ const ShipyardPanel = lazy(() =>
     default: m.ShipyardPanel,
   })),
 );
+
+const starMeta: Record<
+  StarClass,
+  { label: string; temperature: string }
+> = {
+  O: { label: 'Gigante blu (Classe O)', temperature: '30.000–50.000 K' },
+  B: { label: 'Blu-bianca (Classe B)', temperature: '10.000–30.000 K' },
+  A: { label: 'Bianca (Classe A)', temperature: '7.500–10.000 K' },
+  F: { label: 'Bianco-gialla (Classe F)', temperature: '6.000–7.500 K' },
+  G: { label: 'Gialla (Classe G)', temperature: '5.200–6.000 K' },
+  K: { label: 'Arancio (Classe K)', temperature: '3.700–5.200 K' },
+  M: { label: 'Rossa (Classe M)', temperature: '2.400–3.700 K' },
+};
 
 interface MapPanelsProps {
   focusedSystem: StarSystem | null;
@@ -61,50 +79,68 @@ export const MapPanels = ({
 
   return (
     <div className="floating-panels">
-      {focusedSystem && !focusedPlanet ? (
-        <div className="system-mini-panel">
-          <header className="system-mini-panel__header">
-            <div>
-              <p className="system-mini-panel__eyebrow">Stella</p>
-              <h4 className="system-mini-panel__title">{focusedSystem.name}</h4>
-            </div>
-            <button
-              className="system-mini-panel__close"
-              onClick={onClearFocusTargets}
-            >
-              ×
-            </button>
-          </header>
-          <div className="system-mini-panel__rows">
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Stato</span>
-              <span>
-                {focusedSystem.visibility === 'surveyed'
-                  ? 'Sondato'
-                  : focusedSystem.visibility === 'revealed'
-                    ? 'Rivelato'
-                    : 'Sconosciuto'}
-              </span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Proprietario</span>
-              <span>{ownerLabel(focusedSystem.ownerId)}</span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Minaccia</span>
-              <span>{focusedSystem.hostilePower ?? 0}</span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Cantiere</span>
-              <span>{shipyardLabel(focusedSystem)}</span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Pianeti</span>
-              <span>{focusedSystem.orbitingPlanets?.length ?? 0}</span>
+      {(() => {
+        if (!focusedSystem || focusedPlanet) return null;
+        const meta =
+          starMeta[focusedSystem.starClass] ?? {
+            label: `Classe ${focusedSystem.starClass}`,
+            temperature: '—',
+          };
+        return (
+          <div className="system-mini-panel">
+            <header className="system-mini-panel__header">
+              <div>
+                <p className="system-mini-panel__eyebrow">Stella</p>
+                <h4 className="system-mini-panel__title">
+                  {focusedSystem.name}
+                </h4>
+              </div>
+              <button
+                className="system-mini-panel__close"
+                onClick={onClearFocusTargets}
+              >
+                ×
+              </button>
+            </header>
+            <div className="system-mini-panel__rows">
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Tipologia</span>
+                <span>{meta.label}</span>
+              </div>
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Temperatura</span>
+                <span>{meta.temperature}</span>
+              </div>
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Stato</span>
+                <span>
+                  {focusedSystem.visibility === 'surveyed'
+                    ? 'Sondato'
+                    : focusedSystem.visibility === 'revealed'
+                      ? 'Rivelato'
+                      : 'Sconosciuto'}
+                </span>
+              </div>
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Proprietario</span>
+                <span>{ownerLabel(focusedSystem.ownerId)}</span>
+              </div>
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Minaccia</span>
+                <span>{focusedSystem.hostilePower ?? 0}</span>
+              </div>
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Cantiere</span>
+                <span>{shipyardLabel(focusedSystem)}</span>
+              </div>
+              <div className="system-mini-panel__row">
+                <span className="text-muted">Pianeti</span>
+                <span>{focusedSystem.orbitingPlanets?.length ?? 0}</span>
+              </div>
             </div>
           </div>
-        </div>
-      ) : null}
+        );
+      })()}
       {focusedPlanet || focusedOrbitingPlanet ? (
         <div className="planet-mini-panel">
           <header className="system-mini-panel__header">
