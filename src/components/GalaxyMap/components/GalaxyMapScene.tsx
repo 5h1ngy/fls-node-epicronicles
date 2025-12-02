@@ -71,6 +71,7 @@ export const GalaxyMapScene = ({
     scienceMaterials,
     scienceLineMaterials,
     fleetMaterials,
+    shipDesignLookup: data.shipDesignLookup,
   });
 
   useMapFocus({

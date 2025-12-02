@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
 export type AnchorEntry = {
-  mesh: THREE.InstancedMesh;
-  index: number;
+  mesh?: THREE.InstancedMesh;
+  object?: THREE.Object3D;
+  index?: number;
   systemId: string;
   planetId: string | null;
   height: number;
@@ -56,10 +57,14 @@ export const createAnchorResolver = (
       if (!pos) {
         return;
       }
-      const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z);
-      entry.mesh.setMatrixAt(entry.index, matrix);
-      entry.mesh.instanceMatrix.needsUpdate = true;
-      releaseMatrix(matrix);
+      if (entry.mesh && typeof entry.index === 'number') {
+        const matrix = getMatrix().setPosition(pos.x, pos.y, pos.z);
+        entry.mesh.setMatrixAt(entry.index, matrix);
+        entry.mesh.instanceMatrix.needsUpdate = true;
+        releaseMatrix(matrix);
+      } else if (entry.object) {
+        entry.object.position.set(pos.x, pos.y, pos.z);
+      }
       releaseVector(pos);
     });
   };

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useGameStore } from '@store/gameStore';
-import type { StarSystem, ScienceShip, Fleet } from '@domain/types';
+import type { StarSystem, ScienceShip, Fleet, ShipDesign } from '@domain/types';
 import { computeZoomBounds } from './mapDataUtils';
 import { buildFleetSignature, buildSystemsSignature } from './signatures';
 
@@ -8,6 +8,7 @@ export interface GalaxyMapData {
   systems: StarSystem[];
   scienceShips: ScienceShip[];
   fleets: Fleet[];
+  shipDesignLookup: Map<string, ShipDesign>;
   galaxyShape: 'circle' | 'spiral';
   galaxySeed: string;
   starVisuals: Record<string, unknown>;
@@ -29,6 +30,9 @@ export const useGalaxyMapData = (): GalaxyMapData => {
     (state) => state.session?.scienceShips ?? [],
   );
   const fleets = useGameStore((state) => state.session?.fleets ?? []);
+  const shipDesigns = useGameStore(
+    (state) => state.config.military.shipDesigns,
+  );
   const galaxyShape = useGameStore(
     (state) => state.session?.galaxy.galaxyShape ?? 'circle',
   );
@@ -102,6 +106,11 @@ export const useGalaxyMapData = (): GalaxyMapData => {
     [fleets],
   );
 
+  const shipDesignLookup = useMemo(
+    () => new Map(shipDesigns.map((design) => [design.id, design])),
+    [shipDesigns],
+  );
+
   const systemsSignature = useMemo(
     () =>
       buildSystemsSignature({
@@ -117,6 +126,7 @@ export const useGalaxyMapData = (): GalaxyMapData => {
     systems,
     scienceShips,
     fleets,
+    shipDesignLookup,
     galaxyShape,
     galaxySeed,
     starVisuals,

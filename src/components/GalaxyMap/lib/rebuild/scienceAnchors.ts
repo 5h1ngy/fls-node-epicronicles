@@ -1,18 +1,13 @@
 import * as THREE from 'three';
 import type { ScienceShip } from '@domain/types';
 import { createTravelPath } from './anchorUtils';
+import type { AnchorEntry } from '../anchors';
 
 interface ScienceAnchorParams {
   group: THREE.Group;
   scienceShips: ScienceShip[];
   positions: Map<string, THREE.Vector3>;
-  scienceAnchorsRef: Array<{
-    mesh: THREE.InstancedMesh;
-    index: number;
-    systemId: string;
-    planetId: string | null;
-    height: number;
-  }>;
+  scienceAnchorsRef: AnchorEntry[];
   scienceMaterials: Record<string, THREE.Material>;
   scienceLineMaterials: Record<string, THREE.Material>;
   getVector: () => THREE.Vector3;

@@ -23,6 +23,7 @@ export interface UseSceneRebuildParams {
   scienceMaterials: Record<string, THREE.Material>;
   scienceLineMaterials: Record<string, THREE.Material>;
   fleetMaterials: Record<string, THREE.Material>;
+  shipDesignLookup: Map<string, import('@domain/types').ShipDesign>;
 }
 
 const disposeObjectResources = (object: THREE.Object3D) => {
@@ -84,6 +85,7 @@ export const useSceneRebuild = ({
   scienceMaterials,
   scienceLineMaterials,
   fleetMaterials,
+  shipDesignLookup,
 }: UseSceneRebuildParams) => {
   const {
     sceneContext,
@@ -150,6 +152,7 @@ export const useSceneRebuild = ({
       releaseVector: resolverForBuild.releaseVector,
       getMatrix: resolverForBuild.getMatrix,
       releaseMatrix: resolverForBuild.releaseMatrix,
+      shipDesignLookup,
     });
 
     nebulaRef.current = nebula;
