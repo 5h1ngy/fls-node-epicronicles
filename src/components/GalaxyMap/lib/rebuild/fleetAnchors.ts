@@ -79,7 +79,7 @@ const constructorModel = (() => {
               mesh.receiveShadow = false;
             }
           });
-          obj.scale.set(0.12, 0.12, 0.12);
+          obj.scale.set(1.8, 1.8, 1.8);
           obj.rotation.x = Math.PI / 2;
           resolve(obj);
         },
@@ -208,7 +208,7 @@ export const buildFleetAnchors = ({
                 fleet.targetSystemId && fleet.targetSystemId !== fleet.systemId
                   ? null
                   : fleet.anchorPlanetId ?? null,
-              height: 6,
+              height: 3,
             };
             fleetAnchorsRef.push(entry);
             group.add(placeholder);
