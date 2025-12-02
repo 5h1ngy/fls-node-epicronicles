@@ -85,11 +85,13 @@ export const ownerMaterials: Record<string, THREE.MeshBasicMaterial> = {
   player: new THREE.MeshBasicMaterial({
     color: 0x6fa8ff,
     transparent: true,
-    opacity: 0.4,
+    opacity: 0.08,
+    depthWrite: false,
   }),
   ai: new THREE.MeshBasicMaterial({
     color: 0xffc857,
     transparent: true,
-    opacity: 0.35,
+    opacity: 0.14,
+    depthWrite: false,
   }),
 };

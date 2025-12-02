@@ -131,7 +131,8 @@ const createOrbitingPlanets = (
         new MeshBasicMaterial({
           color: '#6fe6a5',
           transparent: true,
-          opacity: 0.9,
+          opacity: 0.08,
+          depthWrite: false,
           side: DoubleSide,
         }),
       );
