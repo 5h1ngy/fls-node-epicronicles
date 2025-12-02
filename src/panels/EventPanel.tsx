@@ -59,19 +59,15 @@ export const EventPanel = () => {
 
   return (
     <div className="event-panel-modern">
-      <header className="event-panel-modern__header">
-        <div>
-          <p className="eyebrow">Eventi & Anomalie</p>
-          <h3>Gestione emergenze</h3>
-        </div>
-        <div className="event-panel-modern__meta">
-          <span className="pill">Tick {tick}</span>
-          {message ? <span className="pill pill--success">{message}</span> : null}
-        </div>
-      </header>
-
       <div className="event-panel-modern__body">
         <section className="event-panel-modern__active">
+          <header className="event-panel-modern__header">
+            <div className="pill pill--muted">In corso</div>
+            <div className="event-panel-modern__meta">
+              <span className="pill">Tick {tick}</span>
+              {message ? <span className="pill pill--success">{message}</span> : null}
+            </div>
+          </header>
           {activeEvent ? (
             <div className="event-hero">
               <div className="event-hero__badge">{kindLabel(activeEvent.kind)}</div>
@@ -91,7 +87,7 @@ export const EventPanel = () => {
           ) : (
             <div className="event-empty">
               <p className="eyebrow">Nessun evento attivo</p>
-              <p className="text-muted">Attendi l’arrivo di nuove anomalie o notifiche.</p>
+              <p className="text-muted">Attendi l'arrivo di nuove anomalie o notifiche.</p>
             </div>
           )}
         </section>
@@ -99,7 +95,6 @@ export const EventPanel = () => {
         <section className="event-panel-modern__log">
           <header className="event-log__header">
             <p className="eyebrow">Registro</p>
-            <h4>Eventi risolti</h4>
           </header>
           <div className="event-timeline">
             {log.length === 0 ? (

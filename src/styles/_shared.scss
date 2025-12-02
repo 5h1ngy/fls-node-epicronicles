@@ -60,7 +60,7 @@
   backdrop-filter: blur(2px);
 }
 
-@mixin grid-overlay($size: 28px, $opacity: 0.04, $set-position: true) {
+@mixin grid-overlay($size: 28px, $opacity: 0.04, $set-position: true, $raise-children: true) {
   @if $set-position {
     position: relative;
   }
@@ -74,6 +74,13 @@
     background-size: $size $size;
     opacity: 1;
     pointer-events: none;
+    z-index: 0;
+  }
+  @if $raise-children {
+    > * {
+      position: relative;
+      z-index: 1;
+    }
   }
 }
 
