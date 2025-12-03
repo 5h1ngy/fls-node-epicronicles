@@ -1,6 +1,4 @@
 import type { StarClass, StarSystem } from '@domain/types';
-import './SystemMiniPanel.scss';
-
 const starMeta: Record<
   StarClass,
   { label: string; temperature: string }

@@ -1,6 +1,8 @@
 import { DraggablePanel } from '@windows/common/DraggablePanel';
 import { Suspense, lazy } from 'react';
 import type { StarSystem, Planet, OrbitingPlanet } from '@domain/types';
+import { SystemMiniPanel } from '@panels/SystemMiniPanel';
+import { PlanetMiniPanel } from '@panels/PlanetMiniPanel';
 import './MapPanels.scss';
 
 const ShipyardWindow = lazy(() =>
@@ -60,121 +62,21 @@ export const MapPanels = ({
 
   return (
     <div className="floating-panels">
-      {(() => {
-        if (!focusedSystem || focusedPlanet) return null;
-        const meta =
-          starMeta[focusedSystem.starClass] ?? {
-            label: `Classe ${focusedSystem.starClass}`,
-            temperature: '—',
-          };
-        return (
-          <div className="system-mini-panel">
-            <header className="system-mini-panel__header">
-              <div>
-                <p className="system-mini-panel__eyebrow">Stella</p>
-                <h4 className="system-mini-panel__title">
-                  {focusedSystem.name}
-                </h4>
-              </div>
-              <button
-                className="system-mini-panel__close"
-                onClick={onClearFocusTargets}
-              >
-                ×
-              </button>
-            </header>
-            <div className="system-mini-panel__rows">
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Tipologia</span>
-                <span>{meta.label}</span>
-              </div>
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Temperatura</span>
-                <span>{meta.temperature}</span>
-              </div>
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Stato</span>
-                <span>
-                  {focusedSystem.visibility === 'surveyed'
-                    ? 'Sondato'
-                    : focusedSystem.visibility === 'revealed'
-                      ? 'Rivelato'
-                      : 'Sconosciuto'}
-                </span>
-              </div>
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Proprietario</span>
-                <span>{ownerLabel(focusedSystem.ownerId)}</span>
-              </div>
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Minaccia</span>
-                <span>{focusedSystem.hostilePower ?? 0}</span>
-              </div>
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Cantiere</span>
-                <span>{shipyardLabel(focusedSystem)}</span>
-              </div>
-              <div className="system-mini-panel__row">
-                <span className="text-muted">Pianeti</span>
-                <span>{focusedSystem.orbitingPlanets?.length ?? 0}</span>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {focusedSystem && !focusedPlanet ? (
+        <SystemMiniPanel
+          system={focusedSystem}
+          ownerLabel={ownerLabel}
+          shipyardLabel={shipyardLabel}
+          onClose={onClearFocusTargets}
+        />
+      ) : null}
       {focusedPlanet || focusedOrbitingPlanet ? (
-        <div className="planet-mini-panel">
-          <header className="system-mini-panel__header">
-            <div>
-              <p className="system-mini-panel__eyebrow">Pianeta</p>
-              <h4 className="system-mini-panel__title">
-                {focusedPlanet?.name ?? focusedOrbitingPlanet?.name ?? 'Pianeta'}
-              </h4>
-              <small className="text-muted">
-                {focusedPlanetSystem?.name ?? 'Sistema sconosciuto'}
-              </small>
-            </div>
-            <button
-              className="system-mini-panel__close"
-              onClick={onClearFocusTargets}
-            >
-              ×
-            </button>
-          </header>
-          <div className="system-mini-panel__rows">
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Tipo</span>
-              <span>{focusedPlanet?.kind ?? 'Sconosciuto'}</span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Abitabilità</span>
-              <span>
-                {focusedPlanet
-                  ? `${Math.round(focusedPlanet.habitability)}%`
-                  : 'Sconosciuta'}
-              </span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Dimensione</span>
-              <span>{focusedPlanet?.size ?? focusedOrbitingPlanet?.size ?? '?'}</span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Popolazione</span>
-              <span>{focusedPlanet?.population?.total ?? 0}</span>
-            </div>
-            <div className="system-mini-panel__row">
-              <span className="text-muted">Distretto</span>
-              <span>
-                {focusedPlanet
-                  ? Object.values(focusedPlanet.districts ?? {}).reduce(
-                      (acc, n) => acc + (n ?? 0),
-                      0,
-                    )
-                  : 0}
-              </span>
-            </div>
-          </div>
-        </div>
+        <PlanetMiniPanel
+          planet={focusedPlanet}
+          orbitingPlanet={focusedOrbitingPlanet}
+          system={focusedPlanetSystem}
+          onClose={onClearFocusTargets}
+        />
       ) : null}
       {shipyardSystem ? (
         <DraggablePanel

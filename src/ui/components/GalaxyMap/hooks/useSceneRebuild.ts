@@ -180,6 +180,7 @@ export const useSceneRebuild = ({
     starVisuals,
     scienceShips,
     fleets,
+    shipDesignLookup,
     empireWar,
     systemsSignature,
     scienceMaterials,

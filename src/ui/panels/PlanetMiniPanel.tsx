@@ -1,6 +1,4 @@
 import type { OrbitingPlanet, Planet, StarSystem } from '@domain/types';
-import './SystemMiniPanel.scss';
-
 type PlanetMiniPanelProps = {
   planet: Planet | null;
   orbitingPlanet: OrbitingPlanet | null;

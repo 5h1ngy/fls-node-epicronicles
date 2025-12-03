@@ -26,23 +26,23 @@ interface FleetAnchorParams {
 const constructorModel = (() => {
   let cache: Promise<THREE.Object3D> | null = null;
   const objUrl = new URL(
-    '../../../../assets/scene/spaceships-constructor/base.obj',
+    '../../../../../assets/scene/spaceships-constructor/base.obj',
     import.meta.url,
   ).href;
   const diffuseUrl = new URL(
-    '../../../../assets/scene/spaceships-constructor/texture_diffuse.png',
+    '../../../../../assets/scene/spaceships-constructor/texture_diffuse.png',
     import.meta.url,
   ).href;
   const normalUrl = new URL(
-    '../../../../assets/scene/spaceships-constructor/texture_normal.png',
+    '../../../../../assets/scene/spaceships-constructor/texture_normal.png',
     import.meta.url,
   ).href;
   const roughnessUrl = new URL(
-    '../../../../assets/scene/spaceships-constructor/texture_roughness.png',
+    '../../../../../assets/scene/spaceships-constructor/texture_roughness.png',
     import.meta.url,
   ).href;
   const metallicUrl = new URL(
-    '../../../../assets/scene/spaceships-constructor/texture_metallic.png',
+    '../../../../../assets/scene/spaceships-constructor/texture_metallic.png',
     import.meta.url,
   ).href;
 
