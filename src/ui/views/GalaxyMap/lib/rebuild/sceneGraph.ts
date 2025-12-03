@@ -32,6 +32,7 @@ export interface RebuildSceneParams {
   getMatrix: () => THREE.Matrix4;
   releaseMatrix: (m: THREE.Matrix4) => void;
   shipDesignLookup: Map<string, ShipDesign>;
+  starRotations?: Map<string, number>;
 }
 
 export const rebuildSceneGraph = (params: RebuildSceneParams) => {
@@ -61,6 +62,7 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
     getMatrix,
     releaseMatrix,
     shipDesignLookup,
+    starRotations,
   } = params;
 
   const nebula = buildNebula({
@@ -81,6 +83,7 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
     recentCombatSystems,
     activeBattles,
     starVisuals,
+    starRotations,
   });
 
   const scienceTargetGroup = buildScienceAnchors({

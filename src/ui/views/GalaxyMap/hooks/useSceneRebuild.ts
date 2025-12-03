@@ -59,6 +59,21 @@ const preserveOrbitAngles = (group: THREE.Group, planetAngleRef: Map<string, num
   });
 };
 
+const preserveStarRotations = (group: THREE.Group) => {
+  const map = new Map<string, number>();
+  group.children.forEach((child) => {
+    const systemId = child.userData?.systemId as string | undefined;
+    if (!systemId) {
+      return;
+    }
+    const starGroup = child.getObjectByName('starVisual') as THREE.Group | null;
+    if (starGroup) {
+      map.set(systemId, starGroup.rotation.z);
+    }
+  });
+  return map;
+};
+
 const disposeGroupResources = (group: THREE.Group) => {
   group.traverse((child) => {
     if (child !== group) {
@@ -119,6 +134,7 @@ export const useSceneRebuild = ({
     }
 
     preserveOrbitAngles(group, planetAngleRef.current);
+    const starRotations = preserveStarRotations(group);
 
     disposeGroupResources(group);
     planetLookupRef.current.clear();
@@ -153,6 +169,7 @@ export const useSceneRebuild = ({
       getMatrix: resolverForBuild.getMatrix,
       releaseMatrix: resolverForBuild.releaseMatrix,
       shipDesignLookup,
+      starRotations,
     });
 
     nebulaRef.current = nebula;

@@ -12,6 +12,7 @@ interface SystemBuildParams {
   recentCombatSystems: Set<string>;
   activeBattles: Set<string>;
   starVisuals: Record<string, unknown>;
+  starRotations?: Map<string, number>;
 }
 
 export const buildSystems = ({
@@ -24,6 +25,7 @@ export const buildSystems = ({
   recentCombatSystems,
   activeBattles,
   starVisuals,
+  starRotations,
 }: SystemBuildParams) => {
   const positions = new Map<string, THREE.Vector3>();
 
@@ -40,6 +42,13 @@ export const buildSystems = ({
       colonizedPlanet,
       visuals,
     );
+    const preservedSpin = starRotations?.get(system.id);
+    if (preservedSpin !== undefined) {
+      const starGroup = node.getObjectByName('starVisual') as THREE.Group | null;
+      if (starGroup) {
+        starGroup.rotation.z = preservedSpin;
+      }
+    }
     group.add(node);
     positions.set(system.id, node.position.clone());
   });

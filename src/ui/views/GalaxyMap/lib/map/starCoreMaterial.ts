@@ -175,10 +175,17 @@ const createStarCoreMaterial = ({
         float jets = pow(max(0.0, sin(angle * 6.2 + uSeed * 12.0 + time * 0.92)), 3.0) * jetBurst;
         jets *= smoothstep(0.2, 0.75, length(uvCentered)) * uJetIntensity;
         plasma += jets * 0.5;
+        // Sunspot mask: coarse noise projected on disk to darken areas
+        float spotNoise = fbm(uvCentered * 7.5 + time * 0.12 + uSeed * 1.7);
+        float spotMask = smoothstep(0.52, 0.78, spotNoise) * smoothstep(0.18, 0.85, length(uvCentered));
+        float spotDarken = mix(0.0, 0.65, spotMask);
         float fresnel = pow(1.0 - max(dot(normalize(vNormal), normalize(vViewDir)), 0.0), uFresnelPower);
         float plasmaMask = clamp(plasma, 0.0, 1.0);
-        vec3 color = (tex * 0.9 + plasmaMask * 0.6 + jets * 0.35) * uTint * (0.88 + uGlow * 0.6) + fresnel * vec3(1.0, 1.0, 1.0);
+        vec3 color = (tex * 0.9 + plasmaMask * 0.6 + jets * 0.35) * uTint * (0.88 + uGlow * 0.6);
+        color *= (1.0 - spotDarken * 0.7);
+        color += fresnel * vec3(1.0, 1.0, 1.0);
         float alpha = clamp(max(max(tex.r, plasmaMask), fresnel) + jets * 0.3, 0.0, 1.0);
+        alpha *= (1.0 - spotMask * 0.15);
         gl_FragColor = vec4(color, alpha);
       }
     `,
