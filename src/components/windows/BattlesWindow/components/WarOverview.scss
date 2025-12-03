@@ -1,0 +1,12 @@
+@use "../../../../styles/_tokens";
+@use "../../../../styles/_shared" as *;
+
+.war-event {
+  @include panel-card(0.55rem 0.6rem, 8px);
+  @include column-stack(0.25rem);
+}
+
+.war-event--new {
+  border-color: rgba(127, 227, 143, 0.6);
+  box-shadow: 0 0 0 1px rgba(127, 227, 143, 0.2);
+}

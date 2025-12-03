@@ -1,0 +1,37 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.district-queue-panel ul {
+  @include panel-list(0.5rem, 0.4rem);
+}
+
+.district-queue__item {
+  @include panel-card(0.5rem);
+  @include column-stack(0.35rem);
+}
+
+.district-queue__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.district-queue__meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.district-queue__actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.progress-bar {
+  @include progress-bar();
+}
+
+.progress-bar__fill {
+  @include progress-fill();
+}

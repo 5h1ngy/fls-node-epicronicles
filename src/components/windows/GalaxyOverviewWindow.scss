@@ -1,0 +1,150 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.galaxy-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  &__map {
+    flex: 0 0 auto;
+  }
+
+  &__list {
+    flex: 1;
+    min-width: 320px;
+  }
+
+  &__cols {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__col {
+    flex: 1;
+    min-width: 220px;
+    @include panel-card(0.75rem, 8px, rgba(4, 7, 16, 0.6));
+  }
+
+  &__colonies {
+    @include panel-list(0.5rem, 0.5rem);
+
+    li {
+      @include panel-card(0.4rem 0.5rem, 6px);
+      @include column-stack(0.2rem);
+    }
+  }
+
+  &__focus {
+    fill: transparent;
+    stroke: rgba(255, 255, 255, 0.25);
+    stroke-dasharray: 4;
+    pointer-events: auto;
+  }
+}
+
+.galaxy-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.galaxy-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.galaxy-modal__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.galaxy-modal__summary {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.galaxy-modal__content {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+  gap: 0.9rem;
+}
+
+.galaxy-modal__map {
+  @include panel-card(0.5rem, 12px, radial-gradient(circle at 18% 18%, rgba(120, 150, 255, 0.08), rgba(255, 255, 255, 0.02)));
+}
+
+.galaxy-modal__system {
+  cursor: pointer;
+}
+
+.galaxy-modal__label {
+  font-size: 0.7rem;
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+.galaxy-modal__hostile {
+  fill: rgba(255, 140, 120, 0.18);
+  stroke: rgba(255, 140, 120, 0.6);
+}
+
+.galaxy-modal__focus {
+  fill: transparent;
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.galaxy-modal__ship {
+  fill: #7fe38f;
+  stroke: rgba(0, 0, 0, 0.4);
+  stroke-width: 1;
+}
+
+.galaxy-modal__lists {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+}
+
+.galaxy-modal__block {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.galaxy-modal__list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.galaxy-list__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.galaxy-list__tag {
+  padding: 0.1rem 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 900px) {
+  .galaxy-modal__content {
+    grid-template-columns: 1fr;
+  }
+}

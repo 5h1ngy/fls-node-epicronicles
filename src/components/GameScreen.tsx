@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { OrbitingPlanet, Planet, StarSystem } from '@domain/types';
 import { canAffordCost } from '@domain/economy/economy';
 import { useAppSelector, useGameStore } from '@store/gameStore';
-import { DraggablePanel } from '@panels/shared/DraggablePanel';
+import { DraggablePanel } from '@windows/shared/DraggablePanel';
 import { useGameLoop } from '@shared/useGameLoop';
 import { DebugConsole } from './DebugConsole';
 import { HudBottomBar } from './HudBottomBar';
@@ -11,21 +11,21 @@ import { HudTopBar } from './HudTopBar';
 import { MapLayer } from './MapLayer';
 import { MapPanels } from './MapPanels';
 import { useWarEvents } from '@hooks/useWarEvents';
-import { MissionsPanel } from '@panels/MissionsPanel';
+import { MissionsWindow } from '@windows/MissionsWindow';
 import { SideDock } from './SideDock';
-import { DiplomacyPanel } from '@panels/DiplomacyPanel';
-import { EconomyPanel } from '@panels/EconomyPanel';
-import { EventPanel } from '@panels/EventPanel';
-import { TechPanel } from '@panels/TechPanel';
-import { GalaxyOverview } from '@panels/GalaxyOverview';
-import { ColonizationPanel } from '@panels/ColonizationPanel';
-import { BattlesPanel } from '@panels/BattlesPanel';
-import { PlanetDetail } from '@panels/PlanetDetail';
-import { LogPanel } from '@panels/LogPanel';
+import { DiplomacyWindow } from '@windows/DiplomacyWindow';
+import { EconomyWindow } from '@windows/EconomyWindow';
+import { EventWindow } from '@windows/EventWindow';
+import { TechWindow } from '@windows/TechWindow';
+import { GalaxyOverviewWindow } from '@windows/GalaxyOverviewWindow';
+import { ColonizationWindow } from '@windows/ColonizationWindow';
+import { BattlesWindow } from '@windows/BattlesWindow';
+import { PlanetDetailWindow } from '@windows/PlanetDetailWindow';
+import { LogWindow } from '@windows/LogWindow';
 import { SideEntityDock } from './SideEntityDock';
-import { FleetDetailPanel } from '@panels/fleet/FleetDetailPanel';
-import { ConstructionDetailPanel } from '@panels/fleet/ConstructionDetailPanel';
-import { ScienceShipDetailPanel } from '@panels/fleet/ScienceShipDetailPanel';
+import { FleetDetailWindow } from '@windows/FleetDetailWindow';
+import { ConstructionDetailWindow } from '@windows/ConstructionDetailWindow';
+import { ScienceShipDetailWindow } from '@windows/ScienceShipDetailWindow';
 import { selectScienceShips, selectResearch } from '@store/selectors';
 import {
   selectColonizedSystems,
@@ -67,7 +67,7 @@ export const GameScreen = () => {
   const [shipyardSystemId, setShipyardSystemId] = useState<string | null>(null);
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
-  const [planetDetailId, setPlanetDetailId] = useState<string | null>(null);
+  const [planetDetailId, setPlanetDetailWindowId] = useState<string | null>(null);
   const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
   const [missionsOpen, setMissionsOpen] = useState(false);
@@ -124,7 +124,7 @@ export const GameScreen = () => {
     setShipyardSystemId(null);
     setSelectedSystemId(null);
     setSelectedPlanetId(null);
-    setPlanetDetailId(null);
+    setPlanetDetailWindowId(null);
     setFocusPlanetId(null);
     setMapMessage(null);
   };
@@ -267,7 +267,7 @@ export const GameScreen = () => {
           onSelect={(selection) => {
             if (selection.kind === 'colony') {
               setSelectedPlanetId(null);
-              setPlanetDetailId(selection.planetId);
+              setPlanetDetailWindowId(selection.planetId);
               setDockSelection(null);
             }
           }}
@@ -379,11 +379,11 @@ export const GameScreen = () => {
           const isColonized =
             session?.economy.planets.some((planet) => planet.id === planetId) ?? false;
           if (isColonized) {
-            setPlanetDetailId(planetId);
+            setPlanetDetailWindowId(planetId);
             setSelectedPlanetId(null);
           } else {
             setSelectedPlanetId(planetId);
-            setPlanetDetailId(null);
+            setPlanetDetailWindowId(null);
           }
           setFocusTrigger((value) => value + 1);
         }}
@@ -421,7 +421,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setMissionsOpen(false)}
           >
-            <MissionsPanel />
+            <MissionsWindow />
           </DraggablePanel>
         ) : null}
         {eventsOpen ? (
@@ -433,7 +433,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setEventsOpen(false)}
           >
-            <EventPanel />
+            <EventWindow />
           </DraggablePanel>
         ) : null}
         {diplomacyOpen ? (
@@ -445,7 +445,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setDiplomacyOpen(false)}
           >
-            <DiplomacyPanel />
+            <DiplomacyWindow />
           </DraggablePanel>
         ) : null}
         {economyOpen ? (
@@ -457,7 +457,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setEconomyOpen(false)}
           >
-            <EconomyPanel />
+            <EconomyWindow />
           </DraggablePanel>
         ) : null}
         {researchOpen ? (
@@ -469,7 +469,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setResearchOpen(false)}
           >
-            <TechPanel />
+            <TechWindow />
           </DraggablePanel>
         ) : null}
         {galaxyOpen ? (
@@ -481,7 +481,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setGalaxyOpen(false)}
           >
-            <GalaxyOverview
+            <GalaxyOverviewWindow
               onFocusSystem={(systemId) => {
                 setGalaxyOpen(false);
                 setFocusSystemId(systemId);
@@ -501,7 +501,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setColonizationOpen(false)}
           >
-            <ColonizationPanel
+            <ColonizationWindow
               onFocusSystem={(systemId) => {
                 setColonizationOpen(false);
                 setFocusSystemId(systemId);
@@ -521,7 +521,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setBattlesOpen(false)}
           >
-            <BattlesPanel
+            <BattlesWindow
               warEventsRef={warEventsRef}
               unreadWarIds={unreadWarIds}
               onMarkWarRead={markWarsRead}
@@ -537,7 +537,7 @@ export const GameScreen = () => {
             initialHeight={large.height}
             onClose={() => setLogOpen(false)}
           >
-            <LogPanel />
+            <LogWindow />
           </DraggablePanel>
         ) : null}
         {planetDetail ? (
@@ -547,9 +547,9 @@ export const GameScreen = () => {
             initialY={large.initialY}
             initialWidth={large.width}
             initialHeight={large.height}
-            onClose={() => setPlanetDetailId(null)}
+            onClose={() => setPlanetDetailWindowId(null)}
           >
-            <PlanetDetail
+            <PlanetDetailWindow
               planet={planetDetail}
               systemName={
                 systems.find((system) => system.id === planetDetail.systemId)?.name ??
@@ -597,7 +597,7 @@ export const GameScreen = () => {
               onClose={() => setDockSelection(null)}
             >
               {selectedFleet ? (
-                <ConstructionDetailPanel
+                <ConstructionDetailWindow
                   fleet={selectedFleet}
                   systems={systems}
                   designs={shipDesigns}
@@ -625,7 +625,7 @@ export const GameScreen = () => {
           ) : (
             <div className="dock-detail-modal">
               {selectedFleet ? (
-                <FleetDetailPanel
+                <FleetDetailWindow
                   fleet={selectedFleet}
                   fleets={session.fleets}
                   systems={systems}
@@ -663,7 +663,7 @@ export const GameScreen = () => {
         {dockSelection && dockSelection.kind === 'science' ? (
           <div className="dock-detail-modal">
             {selectedScienceShip ? (
-              <ScienceShipDetailPanel
+              <ScienceShipDetailWindow
                 ship={selectedScienceShip}
                 systems={systems}
                 onOrder={(systemId) => orderScienceShip(selectedScienceShip.id, systemId)}

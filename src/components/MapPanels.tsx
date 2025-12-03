@@ -1,4 +1,4 @@
-import { DraggablePanel } from '@panels/shared/DraggablePanel';
+import { DraggablePanel } from '@windows/shared/DraggablePanel';
 import { Suspense, lazy } from 'react';
 import type {
   StarSystem,
@@ -9,9 +9,9 @@ import type {
 
 import './MapPanels.scss';
 
-const ShipyardPanel = lazy(() =>
-  import('@panels/ShipyardPanel').then((m) => ({
-    default: m.ShipyardPanel,
+const ShipyardWindow = lazy(() =>
+  import('@windows/ShipyardWindow').then((m) => ({
+    default: m.ShipyardWindow,
   })),
 );
 
@@ -19,13 +19,13 @@ const starMeta: Record<
   StarClass,
   { label: string; temperature: string }
 > = {
-  O: { label: 'Gigante blu (Classe O)', temperature: '30.000–50.000 K' },
-  B: { label: 'Blu-bianca (Classe B)', temperature: '10.000–30.000 K' },
-  A: { label: 'Bianca (Classe A)', temperature: '7.500–10.000 K' },
-  F: { label: 'Bianco-gialla (Classe F)', temperature: '6.000–7.500 K' },
-  G: { label: 'Gialla (Classe G)', temperature: '5.200–6.000 K' },
-  K: { label: 'Arancio (Classe K)', temperature: '3.700–5.200 K' },
-  M: { label: 'Rossa (Classe M)', temperature: '2.400–3.700 K' },
+  O: { label: 'Gigante blu (Classe O)', temperature: '30.000-50.000 K' },
+  B: { label: 'Blu-bianca (Classe B)', temperature: '10.000-30.000 K' },
+  A: { label: 'Bianca (Classe A)', temperature: '7.500-10.000 K' },
+  F: { label: 'Bianco-gialla (Classe F)', temperature: '6.000-7.500 K' },
+  G: { label: 'Gialla (Classe G)', temperature: '5.200-6.000 K' },
+  K: { label: 'Arancio (Classe K)', temperature: '3.700-5.200 K' },
+  M: { label: 'Rossa (Classe M)', temperature: '2.400-3.700 K' },
 };
 
 interface MapPanelsProps {
@@ -205,7 +205,7 @@ export const MapPanels = ({
           onClose={closeShipyard}
         >
           <Suspense fallback={<p className="text-muted">Caricamento...</p>}>
-            <ShipyardPanel system={shipyardSystem} />
+            <ShipyardWindow system={shipyardSystem} />
           </Suspense>
         </DraggablePanel>
       ) : null}

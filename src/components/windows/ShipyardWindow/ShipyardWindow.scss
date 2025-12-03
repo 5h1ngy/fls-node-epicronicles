@@ -1,0 +1,657 @@
+@use "../../../styles/_tokens";
+@use "../../../styles/_shared" as *;
+
+.shipyard-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.shipyard-modal__content {
+  width: min(540px, 90vw);
+  max-height: 80vh;
+  background: rgba(5, 9, 18, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow: auto;
+  position: relative;
+}
+
+.shipyard-modal__close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  background: transparent;
+  border: none;
+  color: #f6f7ff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.shipyard-panel__designs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.shipyard-panel--columns {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.8rem;
+}
+
+.shipyard-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+
+  h3 {
+    margin: 0.2rem 0 0.1rem;
+  }
+}
+
+.shipyard-panel__header-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.shipyard-panel__system {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.shipyard-panel__columns {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.shipyard-panel__col {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.shipyard-panel__col--designs {
+  display: flex;
+  flex-direction: column;
+  padding-left: 12px;
+}
+.shipyard-panel__col--queue-right {
+  padding-left: 12px;
+}
+
+.shipyard-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.shipyard-panel__summary-wide {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.shipyard-panel__summary-block {
+  @include panel-card(0.8rem, 12px);
+}
+
+.shipyard-panel__summary-meta {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+
+.shipyard-panel--modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.shipyard-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+
+  h3 {
+    margin: 0.2rem 0 0.1rem;
+  }
+}
+
+.shipyard-panel__header-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.shipyard-panel__system {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.shipyard-panel__message {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(100, 200, 255, 0.1);
+  border: 1px solid rgba(100, 200, 255, 0.25);
+  color: #dff3ff;
+}
+
+.shipyard-panel__content {
+  display: grid;
+  grid-template-columns: 2fr 340px;
+  gap: 1.2rem;
+}
+
+.shipyard-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.shipyard-panel__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.shipyard-panel__aside-card {
+  @include panel-card(0.85rem, 12px);
+
+  h4 {
+    margin: 0.2rem 0 0.4rem;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: rgba(255, 255, 255, 0.82);
+  }
+}
+
+.shipyard-queue__current {
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.shipyard-queue__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shipyard-queue__item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.shipyard-queue__item--current {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.shipyard-queue__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.shipyard-queue__label {
+  font-weight: 600;
+}
+
+.shipyard-queue__progress {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.shipyard-queue__progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7ba2ff, #4de2ff);
+}
+
+.shipyard-queue__meta {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.85rem;
+}
+
+.shipyard-queue__row-main {
+  display: flex;
+  justify-content: space-between;
+}
+
+.shipyard-panel__summary {
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.shipyard-panel__card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+.shipyard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.shipyard-card__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.shipyard-card__title {
+  font-size: 1rem;
+}
+
+.shipyard-card__badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 100px;
+  align-self: flex-start;
+
+  .pill--glass {
+    white-space: nowrap;
+  }
+}
+
+.shipyard-card__actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+
+  button {
+    flex: 1;
+  }
+}
+
+.shipyard-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.45rem 0;
+}
+
+.shipyard-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shipyard-card__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.shipyard-card__description {
+  margin: 0.15rem 0 0.1rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.pill--cost {
+  background: rgba(90, 150, 255, 0.12);
+  color: #dfe9ff;
+  border: 1px solid rgba(90, 150, 255, 0.28);
+}
+
+.pill--stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pill--stat-attack {
+  color: #ffb27a;
+  border-color: rgba(255, 178, 122, 0.35);
+}
+
+.pill--stat-defense {
+  color: #7bd0ff;
+  border-color: rgba(123, 208, 255, 0.35);
+}
+
+.pill--stat-hull {
+  color: #c9ff9b;
+  border-color: rgba(201, 255, 155, 0.35);
+}
+
+.shipyard-card__editor {
+  margin-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.shipyard-card__editor-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.shipyard-panel__queue ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.shipyard-panel__queue li {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.progress-bar {
+  margin-top: 0.4rem;
+  @include progress-bar(6px);
+}
+
+.progress-bar__fill {
+  @include progress-fill(linear-gradient(90deg, #7ba2ff, #4de2ff));
+  border-radius: inherit;
+}
+
+.fleet-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fleet-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.fleet-detail__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.fleet-detail__title {
+  margin: 0.1rem 0 0.2rem;
+}
+
+.fleet-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.fleet-detail__section {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fleet-detail__ships {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.fleet-detail__science {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fleet-detail__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.fleet-detail__row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.fleet-detail__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.fleet-detail__field select {
+  background: rgba(6, 9, 20, 0.9);
+  border: 1px solid rgba(90, 115, 150, 0.5);
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+  color: #e9efff;
+}
+
+.fleet-detail__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.science-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.science-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.science-detail__section {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.science-detail__row {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.science-detail__value {
+  margin: 0.1rem 0 0;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.planet-list {
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  &__system {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  &__yields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  &__yield {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+
+    .is-positive {
+      color: #7fe38f;
+    }
+
+    .is-negative {
+      color: #ff9b8a;
+    }
+  }
+}
+
+.planet-districts {
+  margin-top: 0.75rem;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.4rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  li {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 0.45rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}
+
+.planet-district__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.planet-list ul,
+.shipyard-panel__queue ul,
+.fleet-panel ul,
+.combat-log ul,
+.planet-list li,
+.shipyard-panel__queue li,
+.fleet-panel li,
+.combat-log li,
+.colonization-panel ul li {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.district-queue-panel ul {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.district-queue__item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.district-queue__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.district-queue__meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.district-queue__actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}

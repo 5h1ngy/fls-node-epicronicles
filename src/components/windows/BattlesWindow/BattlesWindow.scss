@@ -1,0 +1,6 @@
+@use "../../../styles/_tokens";
+@use "../../../styles/_shared" as *;
+
+.battles-panel {
+  @include column-stack(0.6rem);
+}

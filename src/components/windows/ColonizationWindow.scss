@@ -1,0 +1,79 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.colonization-panel {
+  @include column-stack(0.75rem);
+
+  ul {
+    @include panel-list(0.6rem, 0.75rem);
+
+    li {
+      @include panel-card(0.75rem);
+    }
+  }
+
+  &__table {
+    max-height: 160px;
+    overflow: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+
+      th,
+      td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.35rem 0.25rem;
+        text-align: left;
+      }
+    }
+  }
+}
+
+.colonization-mission__status {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 0.2rem;
+}
+
+.colonization-status {
+  @include tag(rgba(255, 255, 255, 0.08), transparent, 0.1rem 0.4rem, inherit);
+  font-size: 0.65rem;
+
+  &.is-preparing {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+  }
+  &.is-traveling {
+    border-color: rgba(255, 200, 87, 0.8);
+    color: #ffc857;
+  }
+  &.is-colonizing {
+    border-color: rgba(127, 227, 143, 0.8);
+    color: #7fe38f;
+  }
+}
+
+.colonization-mission__ticks {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.colonization-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.colonization-progress {
+  margin-top: 0.6rem;
+  @include progress-bar(6px);
+
+  &__bar {
+    @include progress-fill(linear-gradient(90deg, #7fe38f, #4dffdf));
+  }
+}
