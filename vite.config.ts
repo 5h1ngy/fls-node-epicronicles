@@ -9,7 +9,7 @@ export default defineConfig({
     alias: {
       '@store': path.resolve(__dirname, 'src/store'),
       '@domain': path.resolve(__dirname, 'src/engines'),
-      '@components': path.resolve(__dirname, 'src/ui/components'),
+      '@components': path.resolve(__dirname, 'src/ui/views'),
       '@windows': path.resolve(__dirname, 'src/ui/windows'),
       '@panels': path.resolve(__dirname, 'src/ui/panels'),
       '@hud': path.resolve(__dirname, 'src/ui/hud'),

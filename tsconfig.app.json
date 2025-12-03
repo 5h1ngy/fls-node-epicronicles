@@ -13,7 +13,7 @@
       "@store": ["src/store/index"],
       "@store/*": ["src/store/*"],
       "@domain/*": ["src/engines/*"],
-      "@components/*": ["src/ui/components/*"],
+      "@components/*": ["src/ui/views/*"],
       "@windows/*": ["src/ui/windows/*"],
       "@panels/*": ["src/ui/panels/*"],
       "@hud/*": ["src/ui/hud/*"],
