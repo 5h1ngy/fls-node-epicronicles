@@ -1,14 +1,16 @@
+import { getAssetUrl } from '@shared/utils/paths';
+
 export const MAIN_MENU_BACKGROUNDS = [
-  '/pages/main-menu/backgrounds/main-menu-background-1.png',
-  '/pages/main-menu/backgrounds/main-menu-background-2.png',
-  '/pages/main-menu/backgrounds/main-menu-background-3.png',
-  '/pages/main-menu/backgrounds/main-menu-background-4.png',
-  '/pages/main-menu/backgrounds/main-menu-background-5.png',
-  '/pages/main-menu/backgrounds/main-menu-background-6.png',
-  '/pages/main-menu/backgrounds/main-menu-background-7.png',
-  '/pages/main-menu/backgrounds/main-menu-background-8.png',
-  '/pages/main-menu/backgrounds/main-menu-background-9.png',
-  '/pages/main-menu/backgrounds/main-menu-background-10.png',
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-1.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-2.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-3.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-4.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-5.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-6.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-7.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-8.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-9.png'),
+  getAssetUrl('/pages/main-menu/backgrounds/main-menu-background-10.png'),
 ];
 
 export const pickBackground = (index: number) =>

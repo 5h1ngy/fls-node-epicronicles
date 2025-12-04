@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import './MainMenuLayout.scss';
+import { getAssetUrl } from '@shared/utils/paths';
 
 interface MainMenuLayoutProps {
   background: string;
@@ -24,7 +25,7 @@ export const MainMenuLayout = ({
     {showBrand ? (
       <header className="main-menu__brand">
         <img
-          src="/pages/main-menu/logo-full.png"
+          src={getAssetUrl('/pages/main-menu/logo-full.png')}
           alt="FLS Node Epicronicles logo"
           className="main-menu__logo"
         />
