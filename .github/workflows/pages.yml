@@ -6,8 +6,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -37,10 +35,11 @@ jobs:
       - name: Add SPA fallback (404.html)
         run: cp dist/index.html dist/404.html
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: ./dist
+          name: dist
+          path: dist/
 
   release:
     needs: build
@@ -82,18 +81,32 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ steps.prep.outputs.tag }}" \
-            --title "Alpha ${{ steps.prep.outputs.version }}" \
-            --notes "${{ steps.prep.outputs.changelog }}" \
-            --prerelease
+          CHANGELOG="${{ steps.prep.outputs.changelog }}"
+          gh api \
+            --method POST \
+            /repos/${{ github.repository }}/releases \
+            -f tag_name="${{ steps.prep.outputs.tag }}" \
+            -f target_commitish="${{ github.sha }}" \
+            -f name="Alpha ${{ steps.prep.outputs.version }}" \
+            -f body="${CHANGELOG}" \
+            -F prerelease=true \
+            -F draft=false
 
   deploy:
     needs: [build, release]
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy-pages.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deploy-pages
-        uses: actions/deploy-pages@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Deploy Frontend to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          destination_dir: ./
