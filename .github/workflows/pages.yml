@@ -61,11 +61,7 @@ jobs:
             RANGE=""
           fi
 
-          if [ -n "$RANGE" ]; then
-            COMMITS=$(git log "${RANGE}" --pretty=format:"- %s (%h)")
-          else
-            COMMITS=$(git log --pretty=format:"- %s (%h)")
-          fi
+          COMMITS=$(git log ${RANGE:+${RANGE}} --pretty=format:"- %s (%h)")
 
           if [ -z "$COMMITS" ]; then
             COMMITS="No commits found for changelog."
