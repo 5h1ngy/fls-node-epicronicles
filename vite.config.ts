@@ -4,9 +4,8 @@ import path from 'node:path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Use relative base by default so assets load correctly on GitHub Pages project sites.
-  // Override with BASE_PATH (e.g. "/fls-node-epicronicles/") if you need an absolute prefix.
-  base: process.env.BASE_PATH || './',
+  // Explicit base for GitHub Pages project site; override with BASE_PATH if needed.
+  base: process.env.BASE_PATH || '/fls-node-epicronicles/',
   plugins: [react()],
   resolve: {
     alias: {
