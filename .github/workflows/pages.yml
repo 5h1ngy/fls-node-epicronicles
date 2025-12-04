@@ -74,7 +74,7 @@ jobs:
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           {
-            echo "changelog<<'EOF'"
+            echo "changelog<<EOF"
             echo "${COMMITS}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
