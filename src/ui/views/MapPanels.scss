@@ -1,0 +1,71 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.floating-panels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.system-mini-panel {
+  position: fixed;
+  left: 74px; // lascia spazio al dock verticale
+  bottom: 64px;
+  width: 320px;
+  @include panel-card(0.75rem 0.85rem, 12px, rgba(6, 10, 20, 0.95));
+  pointer-events: auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  @include column-stack(0.5rem);
+  @include grid-overlay(22px, 0.02, false);
+}
+
+.planet-mini-panel {
+  position: fixed;
+  left: 74px; // lascia spazio al dock verticale
+  bottom: 64px;
+  width: 320px;
+  @include panel-card(0.75rem 0.85rem, 12px, rgba(6, 10, 20, 0.95));
+  pointer-events: auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  @include column-stack(0.5rem);
+  @include grid-overlay(22px, 0.02, false);
+}
+
+.system-mini-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.system-mini-panel__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+}
+
+.system-mini-panel__title {
+  margin: 0.05rem 0;
+}
+
+.system-mini-panel__close {
+  @include tag(rgba(255, 255, 255, 0.2), transparent, 0.1rem 0.35rem, #f4f4f4, false);
+  cursor: pointer;
+}
+
+.system-mini-panel__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.system-mini-panel__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}

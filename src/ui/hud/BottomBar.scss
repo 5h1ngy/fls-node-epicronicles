@@ -1,0 +1,142 @@
+@use '../../styles/_tokens';
+@use '../../styles/_shared' as *;
+
+.hud-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background:
+    radial-gradient(circle at 12% 60%, rgba(90, 200, 255, 0.08), transparent 32%),
+    radial-gradient(circle at 82% 70%, rgba(255, 184, 94, 0.06), transparent 30%),
+    linear-gradient(0deg, rgba(2, 8, 18, 0.96), rgba(2, 8, 18, 0.78));
+  border-top: 1px solid rgba(90, 200, 255, 0.2);
+  box-shadow:
+    0 -12px 26px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(90, 200, 255, 0.12);
+  z-index: 6;
+  font-size: 0.78rem;
+  @include grid-overlay(26px, 0.025, false);
+  position: fixed !important;
+  top: auto;
+  pointer-events: auto;
+}
+
+.hud-bottom-bar__stats {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  flex: 1 1 0;
+}
+
+.hud-stat {
+  @include pill(rgba(255, 255, 255, 0.12), rgba(10, 20, 40, 0.72), 0.4rem 0.7rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.hud-stat__value {
+  font-weight: 600;
+}
+
+.hud-bottom-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1 1 0;
+  justify-content: flex-end;
+}
+
+.hud-bottom-bar__era {
+  flex: 0 0 auto;
+  margin: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-era-pill {
+  @include pill(rgba(90, 200, 255, 0.2), linear-gradient(135deg, rgba(10, 22, 42, 0.96), rgba(16, 54, 96, 0.98)), 0.45rem 0.8rem, #e8ecff);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  position: relative;
+}
+
+.hud-era-pill__label {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.hud-icon-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(10, 22, 42, 0.96), rgba(16, 54, 96, 0.98));
+  color: #f6f7ff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(90, 200, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.hud-icon-btn.is-active {
+  border-color: rgba(120, 170, 255, 0.8);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  background: rgba(40, 80, 150, 0.5);
+}
+
+.hud-icon-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(120, 170, 255, 0.6);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.hud-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hud-stat::after,
+.hud-icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 120%;
+  transform: translateX(-50%);
+  padding: 0.35rem 0.55rem;
+  background: rgba(6, 10, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #f4f4f4;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.hud-stat:hover::after,
+.hud-icon-btn:hover::after {
+  opacity: 1;
+  transform: translate(-50%, -2px);
+}

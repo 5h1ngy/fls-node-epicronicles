@@ -1,0 +1,92 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.event-panel .panel__action {
+  text-align: left;
+}
+
+.log-panel__list {
+  margin-top: 0.5rem;
+
+  ul {
+    @include panel-list(0.4rem, 0);
+  }
+}
+
+.log-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  @include panel-card(0.4rem 0.5rem, 10px);
+}
+
+.log-badge {
+  @include tag();
+
+  &--notification {
+    @include tag(rgba(120, 170, 255, 0.7), rgba(120, 170, 255, 0.08), 0.15rem 0.55rem, #b9d3ff);
+  }
+
+  &--war {
+    @include tag(rgba(255, 158, 128, 0.8), rgba(255, 158, 128, 0.08), 0.15rem 0.55rem, #ffc6b0);
+  }
+}
+
+.log-tick {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  min-width: 50px;
+}
+
+.log-message {
+  color: #f6f7ff;
+  font-size: 0.9rem;
+}
+
+.event-card {
+  @include panel-card(0.9rem, 12px, rgba(255, 255, 255, 0.03));
+  @include column-stack(0.5rem);
+}
+
+.event-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.event-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.event-card__badge {
+  @include tag();
+}
+
+.event-card__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.event-card__option-title {
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+
+.event-log {
+  @include column-stack(0.4rem);
+}
+
+.event-log__row {
+  @include panel-card(0.45rem 0.5rem, 8px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.event-log__title {
+  font-weight: 600;
+}

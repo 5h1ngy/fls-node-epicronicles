@@ -1,0 +1,29 @@
+@use './_tokens';
+@use './_shared' as *;
+
+.panel-section {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.6rem;
+}
+
+.panel-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.panel-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
+.panel-section ul {
+  @include panel-list(0.5rem, 0.5rem);
+}
+
+.panel-section li {
+  @include panel-card(0.6rem);
+}

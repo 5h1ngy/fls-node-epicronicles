@@ -1,0 +1,1 @@
+export { MainMenuSetup } from './MainMenuSetup';

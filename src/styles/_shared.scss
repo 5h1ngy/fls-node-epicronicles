@@ -1,0 +1,181 @@
+@use './_tokens';
+
+@mixin column-stack($gap: 0.6rem) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin panel-list($gap: 0.6rem, $margin-top: 0.5rem) {
+  list-style: none;
+  margin: $margin-top 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin panel-card($padding: 0.75rem, $radius: 8px, $background: rgba(255, 255, 255, 0.02)) {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius;
+  padding: $padding;
+  background: $background;
+  }
+
+@mixin tag(
+  $border: rgba(255, 255, 255, 0.12),
+  $background: rgba(255, 255, 255, 0.02),
+  $padding: 0.15rem 0.55rem,
+  $color: rgba(255, 255, 255, 0.9),
+  $uppercase: true
+) {
+  padding: $padding;
+  border-radius: 999px;
+  border: 1px solid $border;
+  background: $background;
+  color: $color;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  @if $uppercase {
+    text-transform: uppercase;
+  }
+}
+
+@mixin holo-surface(
+  $padding: 1rem,
+  $radius: 12px,
+  $border: rgba(255, 255, 255, 0.12)
+) {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(90, 200, 255, 0.1), transparent 42%),
+    radial-gradient(circle at 82% 10%, rgba(255, 184, 94, 0.08), transparent 38%),
+    rgba(6, 12, 22, 0.92);
+  border: 1px solid $border;
+  border-radius: $radius;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(90, 200, 255, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  padding: $padding;
+  backdrop-filter: blur(2px);
+}
+
+@mixin grid-overlay($size: 28px, $opacity: 0.04, $set-position: true, $raise-children: true) {
+  @if $set-position {
+    position: relative;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, $opacity) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, $opacity) 1px, transparent 1px);
+    background-size: $size $size;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @if $raise-children {
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+  }
+}
+
+@mixin eyebrow-accent($color: rgba(90, 200, 255, 0.92)) {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color;
+  border-left: 3px solid $color;
+  padding-left: 0.6rem;
+  text-shadow: 0 0 12px rgba(90, 200, 255, 0.36);
+}
+
+@mixin pill($border: rgba(255, 255, 255, 0.12), $background: rgba(255, 255, 255, 0.02), $padding: 0.1rem 0.55rem, $color: inherit) {
+  padding: $padding;
+  border-radius: 999px;
+  border: 1px solid $border;
+  background: $background;
+  @if $color != inherit {
+    color: $color;
+  }
+}
+
+@mixin cta-button(
+  $border: rgba(90, 200, 255, 0.38),
+  $bg-start: rgba(10, 22, 42, 0.96),
+  $bg-end: rgba(16, 54, 96, 0.98)
+) {
+  padding: 0.95rem 1rem;
+  border-radius: 0;
+  border: 1px solid $border;
+  background: linear-gradient(135deg, $bg-start, $bg-end);
+  color: #e6f7ff;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(127, 227, 143, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::after,
+  &::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(90, 200, 255, 0.45);
+    opacity: 0.7;
+    transition: opacity 0.18s ease;
+  }
+
+  &::after {
+    top: 6px;
+    right: 6px;
+    border-left: 0;
+    border-bottom: 0;
+  }
+
+  &::before {
+    bottom: 6px;
+    left: 6px;
+    border-right: 0;
+    border-top: 0;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(90, 200, 255, 0.85);
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(90, 200, 255, 0.24),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+    &::after,
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+@mixin progress-bar($height: 8px) {
+  height: $height;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+@mixin progress-fill($gradient: linear-gradient(90deg, #9edcff, #7fe38f)) {
+  height: 100%;
+  background: $gradient;
+  transition: width 0.2s ease;
+}

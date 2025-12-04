@@ -1,0 +1,224 @@
+import { useMemo, useState } from "react";
+import { useAppSelector, useGameStore } from "@store/gameStore";
+import type { ColonizationStatus, ColonizationTask } from "@domain/types";
+import { formatCost } from './common/formatters';
+import {
+  selectColonizationTasks,
+  selectColonizedSystems,
+  selectResources,
+  selectSystems,
+} from "@store/selectors";
+import type { ColonyResultReason } from "@store/slice/gameSlice";
+import "./ColonizationWindow.scss";
+
+const colonizationErrors: Record<ColonyResultReason, string> = {
+  NO_SESSION: "Nessuna sessione.",
+  SYSTEM_NOT_FOUND: "Sistema non trovato.",
+  SYSTEM_UNKNOWN: "Devi prima rivelare il sistema.",
+  SYSTEM_NOT_SURVEYED: "Sonda prima il sistema.",
+  NO_HABITABLE_WORLD: "Nessun mondo abitabile.",
+  ALREADY_COLONIZED: "Sistema gia colonizzato.",
+  TASK_IN_PROGRESS: "Colonizzazione gia attiva.",
+  INSUFFICIENT_RESOURCES: "Risorse insufficienti.",
+  NO_COLONY_SHIP: "Serve una nave colonia disponibile.",
+};
+
+const statusLabels: Record<ColonizationStatus, string> = {
+  preparing: "Allestimento",
+  traveling: "In viaggio",
+  colonizing: "Insediamento",
+};
+const statusBadgeClass: Record<ColonizationStatus, string> = {
+  preparing: "is-preparing",
+  traveling: "is-traveling",
+  colonizing: "is-colonizing",
+};
+
+interface ColonizationWindowProps {
+  onFocusSystem?: (systemId: string) => void;
+}
+
+const missionProgressPercent = (task: ColonizationTask) => {
+  if (task.missionTotalTicks <= 0) {
+    return 0;
+  }
+  return Math.round(
+    Math.min(1, task.missionElapsedTicks / task.missionTotalTicks) * 100,
+  );
+};
+
+const stageProgressLabel = (task: ColonizationTask) => {
+  if (task.totalTicks <= 0) {
+    return "0/0 tick";
+  }
+  const completed = Math.max(0, task.totalTicks - task.ticksRemaining);
+  return `${completed}/${task.totalTicks} tick`;
+};
+
+export const ColonizationWindow = ({ onFocusSystem }: ColonizationWindowProps) => {
+  const systems = useAppSelector(selectSystems);
+  const colonizationTasks = useAppSelector(selectColonizationTasks);
+  const colonizedSystems = useAppSelector(selectColonizedSystems);
+  const resources = useAppSelector(selectResources);
+  const startColonization = useGameStore((state) => state.startColonization);
+  const colonizationConfig = useGameStore((state) => state.config.colonization);
+  const colonyShipDesignId = useGameStore(
+    (state) => state.config.military.colonyShipDesignId,
+  );
+  const session = useGameStore((state) => state.session);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const tasksBySystem = useMemo(() => {
+    const map = new Map<string, ColonizationTask>();
+    colonizationTasks.forEach((task) => {
+      map.set(task.systemId, task);
+    });
+    return map;
+  }, [colonizationTasks]);
+
+  const colonyShipsAvailable = useMemo(() => {
+    if (!session) {
+      return 0;
+    }
+    return session.fleets.reduce((total, fleet) => {
+      const ships = fleet.ships.filter(
+        (ship) => ship.designId === colonyShipDesignId,
+      ).length;
+      return total + ships;
+    }, 0);
+  }, [session, colonyShipDesignId]);
+
+  const canAffordColonization = () => {
+    if (!resources) {
+      return false;
+    }
+    return Object.entries(colonizationConfig.cost).every(([type, amount]) => {
+      if (!amount) {
+        return true;
+      }
+      const ledger = resources[type as keyof typeof resources];
+      return (ledger?.amount ?? 0) >= amount;
+    });
+  };
+
+  const handleColonize = (systemId: string) => {
+    const result = startColonization(systemId);
+    if (result.success) {
+      setMessage("Colonizzazione avviata.");
+    } else {
+      setMessage(colonizationErrors[result.reason]);
+    }
+  };
+
+  return (
+    <section className="colonization-panel">
+      <header className="panel-section__header">
+        <div>
+          <p className="economy-modal__eyebrow">Espansione</p>
+          <h2>Colonizzazione</h2>
+          <p className="text-muted">
+            Avvia e monitora le missioni di colonizzazione. Navi colonia disponibili: {colonyShipsAvailable}
+          </p>
+          <p className="text-muted">Costi: {formatCost(colonizationConfig.cost)}</p>
+        </div>
+        <div className="pill">Missioni attive: {colonizationTasks.length}</div>
+      </header>
+      {message ? <p className="panel-message">{message}</p> : null}
+      <div className="colonization-panel__table">
+        <table>
+          <thead>
+            <tr>
+              <th>Sistema</th>
+              <th>Stato</th>
+              <th>Missione</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {systems.map((system) => {
+              const habitable = system.habitableWorld;
+              const colonized = colonizedSystems.has(system.id);
+              const task = tasksBySystem.get(system.id);
+              const missionProgress = task ? missionProgressPercent(task) : 0;
+              const afford = canAffordColonization();
+              const disabledReason = !habitable
+                ? "Nessun mondo"
+                : system.visibility !== "surveyed"
+                  ? "Serve sondaggio"
+                  : colonized
+                    ? "Colonia attiva"
+                    : task
+                      ? `Missione in corso (${statusLabels[task.status]})`
+                      : !afford
+                        ? "Risorse insufficienti"
+                        : colonyShipsAvailable <= 0
+                          ? "Nessuna nave colonia disponibile"
+                          : null;
+              return (
+                <tr key={system.id}>
+                  <td>
+                    <div className="colony-table__system">
+                      <span>{system.name}</span>
+                      {onFocusSystem ? (
+                        <button
+                          type="button"
+                          className="colony-table__link"
+                          onClick={() => onFocusSystem(system.id)}
+                        >
+                          Vai
+                        </button>
+                      ) : null}
+                    </div>
+                  </td>
+                  <td>
+                    {colonized
+                      ? "Colonia attiva"
+                      : task
+                        ? (
+                          <span
+                            className={`colonization-status ${statusBadgeClass[task.status]}`}
+                          >
+                            {statusLabels[task.status]}
+                          </span>
+                        )
+                        : "-"}
+                  </td>
+                  <td>
+                    {task ? (
+                      <>
+                        <div className="colonization-mission__status">
+                          {stageProgressLabel(task)}
+                          <span className="colonization-mission__ticks">
+                            {missionProgress}% missione
+                          </span>
+                        </div>
+                        <div className="colonization-progress">
+                          <div
+                            className="colonization-progress__bar"
+                            style={{ width: `${missionProgress}%` }}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <span className="text-muted">Nessuna missione</span>
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      className="panel__action panel__action--compact"
+                      disabled={Boolean(disabledReason)}
+                      title={disabledReason ?? "Avvia colonizzazione"}
+                      onClick={() => handleColonize(system.id)}
+                    >
+                      Colonizza
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+};

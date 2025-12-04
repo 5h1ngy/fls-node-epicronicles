@@ -1,0 +1,79 @@
+@use "../../../styles/_tokens";
+
+.main-menu {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  color: var(--color-text);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.main-menu__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2, 12, 26, 0.82), rgba(0, 0, 0, 0.48));
+  backdrop-filter: blur(8px);
+}
+
+.main-menu__brand {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.main-menu__logo {
+  width: min(680px, 95vw);
+  height: auto;
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.6));
+}
+
+.main-menu__content {
+  position: relative;
+  min-height: 100vh;
+  box-sizing: border-box;
+  width: 100%;
+  z-index: 2;
+  padding: 1.5rem;
+  display: flex;
+}
+
+.main-menu__toast {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  transform: translateY(-4rem);
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(127, 227, 143, 0.45);
+  background: rgba(10, 20, 35, 0.8);
+  color: #7fe38f;
+  font-weight: 600;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .main-menu__content {
+    padding: 1rem;
+  }
+}

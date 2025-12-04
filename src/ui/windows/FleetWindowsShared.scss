@@ -1,0 +1,271 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.fleet-detail {
+  @include column-stack(0.85rem);
+  width: 100%;
+  max-width: 1080px;
+}
+
+.fleet-detail--split {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.fleet-detail__left {
+  flex: 1 1 0;
+  min-width: 420px;
+  @include column-stack(0.85rem);
+}
+
+.fleet-detail__aside {
+  flex: 0 0 340px;
+  @include column-stack(0.6rem);
+}
+
+.fleet-detail__aside .fleet-detail__section {
+  height: 100%;
+}
+
+.fleet-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.fleet-detail__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.fleet-detail__title {
+  margin: 0.1rem 0 0.2rem;
+}
+
+.fleet-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.87rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.fleet-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fleet-detail__section {
+  @include panel-card(0.8rem 0.9rem, 10px);
+  @include column-stack(0.5rem);
+}
+
+.fleet-detail__ships {
+  margin: 0.05rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.fleet-detail__science {
+  @include column-stack(0.35rem);
+}
+
+.fleet-detail__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.fleet-detail__row {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.fleet-detail__field {
+  @include column-stack(0.35rem);
+  flex: 1;
+  min-width: 200px;
+}
+
+.fleet-detail__field select {
+  background: rgba(6, 9, 20, 0.9);
+  border: 1px solid rgba(90, 115, 150, 0.5);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  color: #e9efff;
+}
+
+.fleet-detail__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.fleet-construction-card {
+  @include panel-card(0.6rem 0.7rem, 10px);
+  @include column-stack(0.5rem);
+  align-items: flex-start;
+}
+
+.fleet-construction__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.fleet-construction-card .panel__action {
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .fleet-detail--split {
+    flex-direction: column;
+  }
+
+  .fleet-detail__left,
+  .fleet-detail__aside {
+    flex: 1 1 auto;
+    min-width: 100%;
+  }
+}
+
+.fleet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.fleet-panel__order {
+  @include column-stack(0.3rem);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.fleet-panel__order select {
+  background: rgba(6, 9, 20, 0.9);
+  border: 1px solid rgba(90, 115, 150, 0.5);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  color: #e9efff;
+}
+
+.fleet-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fleet-ships {
+  margin: 0.4rem 0;
+  font-size: 0.85rem;
+}
+
+.fleet-science {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.fleet-chip {
+  @include pill(rgba(120, 140, 200, 0.35), rgba(120, 140, 200, 0.2), 0.15rem 0.4rem);
+  font-size: 0.75rem;
+}
+
+.fleet-chip small {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.04em;
+}
+
+.science-detail {
+  @include column-stack(0.75rem);
+}
+
+.science-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.science-detail__titleblock {
+  @include column-stack(0.25rem);
+}
+
+.science-detail__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.science-detail__section {
+  @include panel-card(0.8rem 0.9rem, 10px);
+  @include column-stack(0.5rem);
+}
+
+.science-detail__row {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.science-detail__row--split {
+  gap: 0.7rem;
+}
+
+.science-detail__card {
+  flex: 1 1 180px;
+  @include panel-card(0.65rem 0.75rem, 10px);
+}
+
+.science-detail__value {
+  margin: 0.15rem 0 0;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.science-detail__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.science-detail__controls {
+  @include column-stack(0.6rem);
+}
+
+.science-detail__field {
+  @include column-stack(0.35rem);
+}
+
+.science-detail__field select {
+  background: rgba(6, 9, 20, 0.9);
+  border: 1px solid rgba(90, 115, 150, 0.5);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  color: #e9efff;
+}
+
+.science-detail__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.science-detail__hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}

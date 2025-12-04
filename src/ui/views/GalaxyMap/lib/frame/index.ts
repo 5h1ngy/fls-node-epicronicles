@@ -1,0 +1,1 @@
+export { updateFrame } from './updateFrame';

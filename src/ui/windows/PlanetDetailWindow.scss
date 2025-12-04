@@ -1,0 +1,514 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.planet-list {
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  &__system {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  &__yields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  &__yield {
+    @include column-stack(0.2rem);
+    @include panel-card(0.4rem 0.6rem, 6px, rgba(255, 255, 255, 0.03));
+    border-color: rgba(255, 255, 255, 0.06);
+
+    .is-positive {
+      color: #7fe38f;
+    }
+
+    .is-negative {
+      color: #ff9b8a;
+    }
+  }
+}
+
+.planet-districts {
+  margin-top: 0.75rem;
+
+  ul {
+    @include panel-list(0.5rem, 0.4rem);
+  }
+
+  li {
+    @include panel-card(0.45rem 0.5rem, 6px);
+    @include column-stack(0.3rem);
+  }
+}
+
+.planet-districts .district-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.6rem;
+}
+
+.district-card {
+  @include panel-card(0.7rem 0.75rem, 8px);
+  @include column-stack(0.5rem);
+}
+
+.district-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.district-card__title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.district-card__title strong {
+  font-size: 1rem;
+}
+
+.district-card__title .text-muted {
+  line-height: 1.3;
+}
+
+.district-card__count {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.district-bar {
+  width: 100%;
+  @include progress-bar(8px);
+}
+
+.district-bar__fill {
+  @include progress-fill(linear-gradient(90deg, #7fe38f, #4de2ff));
+  border-radius: 999px;
+}
+
+.district-card__progress {
+  margin-top: 0.1rem;
+}
+
+.district-card__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.district-card__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.district-card__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.panel__action--danger {
+  background: rgba(255, 155, 138, 0.08);
+  border: 1px solid rgba(255, 155, 138, 0.4);
+  color: #ff9b8a;
+}
+
+.district-card__chip {
+  @include tag(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04), 0.2rem 0.45rem, inherit, false);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.district-card__pill {
+  @include pill(rgba(127, 227, 143, 0.35), rgba(127, 227, 143, 0.1), 0.2rem 0.5rem, #7fe38f);
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.planet-district__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.planet-population {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  ul {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  li {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+  }
+}
+
+.population-job__meta {
+  display: none;
+}
+
+.population-job__actions {
+  display: none;
+}
+
+.planet-production {
+  margin-top: 0.75rem;
+  @include column-stack(0.4rem);
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.5rem;
+  }
+
+  &__card {
+    @include panel-card(0.4rem 0.45rem, 8px);
+    @include column-stack(0.25rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__card--positive {
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+  }
+
+  &__card--negative {
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  &__pill {
+    @include pill(rgba(255, 255, 255, 0.08), transparent, 0.1rem 0.45rem);
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  &__pill.is-positive {
+    color: #7fe38f;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: transparent;
+  }
+
+  &__pill.is-negative {
+    color: #ff9b8a;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: transparent;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  &__stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.3rem;
+    @include panel-card(0.25rem 0.35rem, 6px, rgba(255, 255, 255, 0.02));
+    border-color: rgba(255, 255, 255, 0.06);
+    font-size: 0.8rem;
+
+    .is-positive {
+      color: #7fe38f;
+    }
+
+    .is-negative {
+      color: #ff9b8a;
+    }
+  }
+}
+
+.planet-detail {
+  display: grid;
+  grid-template-columns: 260px 1fr 260px;
+  gap: 1rem;
+  height: 100%;
+  overflow: hidden;
+}
+
+.planet-detail__production {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  position: relative;
+  top: 0;
+  padding-right: 0.75rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.planet-detail__roles {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  position: relative;
+  top: 0;
+  padding-left: 0.75rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.planet-detail__roles .planet-population {
+  height: auto;
+}
+
+.planet-detail__roles .planet-population ul {
+  max-height: none;
+  overflow: visible;
+}
+
+.planet-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.planet-detail__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.planet-detail__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.planet-detail__title {
+  margin: 0.05rem 0 0.2rem;
+}
+
+.planet-detail__system {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.planet-detail__pill {
+  @include pill(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04), 0.25rem 0.55rem);
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.planet-body__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.planet-body__meta {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.planet-production--vertical {
+  h4 {
+    margin: 0.4rem 0;
+  }
+}
+
+.planet-production__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.planet-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.planet-population ul {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.population-role-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.population-role {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02), 0 8px 18px rgba(0, 0, 0, 0.16);
+}
+
+.population-role__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.population-role__headline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.population-role__description {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.population-role__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(127, 227, 143, 0.15);
+  border: 1px solid rgba(127, 227, 143, 0.4);
+  color: #6edb7e;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.population-role__stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.population-role__stat-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.population-role__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.82rem;
+  font-weight: 600;
+  width: auto;
+  max-width: 100%;
+}
+
+.population-role__chip--accent {
+  border-color: rgba(127, 227, 143, 0.35);
+  color: #7fe38f;
+}
+
+.population-role__chip--muted {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.population-role__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.population-role__label {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.82rem;
+}
+
+.planet-districts ul {
+  max-height: none;
+  overflow: visible;
+}
+
+@media (max-width: 1024px) {
+  .planet-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .planet-detail__production {
+    position: relative;
+    height: auto;
+    top: 0;
+  }
+
+  .planet-detail__roles {
+    position: relative;
+    height: auto;
+    top: 0;
+    border-left: none;
+    padding-left: 0;
+  }
+}

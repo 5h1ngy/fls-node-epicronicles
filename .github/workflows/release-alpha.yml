@@ -1,0 +1,60 @@
+name: Release alpha
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare tag and changelog
+        id: prep
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          TAG="v${VERSION}-alpha"
+
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            RANGE="${LAST_TAG}..HEAD"
+          else
+            RANGE=""
+          fi
+
+          if [ -n "$RANGE" ]; then
+            COMMITS=$(git log "${RANGE}" --pretty=format:"- %s (%h)")
+          else
+            COMMITS=$(git log --pretty=format:"- %s (%h)")
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            COMMITS="No commits found for changelog."
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          {
+            echo "changelog<<'EOF'"
+            echo "${COMMITS}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release (alpha)
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.prep.outputs.tag }}
+          release_name: Alpha ${{ steps.prep.outputs.version }}
+          draft: false
+          prerelease: true
+          body: ${{ steps.prep.outputs.changelog }}

@@ -1,0 +1,22 @@
+@use '../../styles/_tokens';
+
+.game-layout {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--color-text);
+}
+
+.game-map-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.floating-panels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12000;
+}

@@ -1,0 +1,1 @@
+export { createBlackHole } from './blackHole';

@@ -1,0 +1,146 @@
+@use "../../styles/_shared" as *;
+
+.constructor-window {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.75rem 0.9rem 1rem;
+  min-height: 480px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.constructor-window__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.5rem;
+}
+
+.constructor-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.constructor-detail__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.constructor-window__body {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.constructor-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.constructor-card {
+  @include panel-card(0.9rem, 12px, rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(120, 180, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.constructor-card--wide {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.composition-card {
+  max-width: 440px;
+}
+
+.constructor-card--projects {
+  height: 100%;
+}
+
+.constructor-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.constructor-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+
+  select {
+    background: rgba(10, 20, 36, 0.8);
+    border: 1px solid rgba(120, 180, 255, 0.2);
+    color: #e8f0ff;
+    padding: 0.45rem 0.5rem;
+    border-radius: 8px;
+  }
+}
+
+.build-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.build-progress__bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #7ec8ff, #4de2ff);
+    border-radius: 999px;
+  }
+}
+
+.build-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.build-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.build-project {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 180, 255, 0.08);
+  background: rgba(10, 16, 26, 0.7);
+
+  &.is-disabled {
+    opacity: 0.6;
+
+    button {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.build-project__title {
+  margin: 0 0 0.15rem;
+  font-weight: 700;
+}

@@ -1,0 +1,54 @@
+@use "../../styles/_tokens";
+@use "../../styles/_shared" as *;
+
+.economy-card {
+  @include panel-card(0.85rem, 12px, radial-gradient(circle at 18% 18%, rgba(90, 200, 255, 0.08), rgba(255, 255, 255, 0.02)));
+  @include column-stack(0.6rem);
+}
+
+.economy-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.economy-card__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.economy-pill {
+  @include pill(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02), 0.2rem 0.55rem);
+
+  &.is-positive {
+    @include pill(rgba(127, 227, 143, 0.7), rgba(127, 227, 143, 0.08), 0.2rem 0.55rem, #a6f0b3);
+  }
+
+  &.is-negative {
+    @include pill(rgba(255, 158, 128, 0.8), rgba(255, 158, 128, 0.1), 0.2rem 0.55rem, #ffc6b0);
+  }
+}
+
+.economy-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.economy-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.economy-progress {
+  @include progress-bar();
+
+  &__fill {
+    @include progress-fill(linear-gradient(90deg, #7fe38f, #54d4ff));
+  }
+}
