@@ -42,6 +42,18 @@ pkg.version = nextVersion;
 try {
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   console.log(`✅ package.json version set to ${nextVersion}`);
+
+  // Commit the change with a conventional commit message.
+  try {
+    const { execSync } = await import('node:child_process');
+    execSync('git add package.json', { stdio: 'inherit' });
+    execSync(`git commit -m "chore: bump version to ${nextVersion}"`, {
+      stdio: 'inherit',
+    });
+    console.log('✅ Committed version bump');
+  } catch (commitErr) {
+    console.warn(`⚠️ Unable to commit automatically: ${commitErr.message}`);
+  }
 } catch (err) {
   console.error(`❌ Unable to write package.json: ${err.message}`);
   process.exit(1);
