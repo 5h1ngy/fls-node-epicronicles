@@ -1,18 +1,42 @@
 {
-  "name": "fls-node-epicrnoicles",
+  "name": "fls-node-epicronicles",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.135.290",
+  "description": "A management-focused space sim with a 3D galaxy map (Vite + React + Three.js + Redux Toolkit).",
+  "license": "MIT",
+  "author": "5h1ngy",
+  "homepage": ".",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/5h1ngy/fls-node-epicronicles.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "vite",
+    "react",
+    "threejs",
+    "three.js",
+    "redux-toolkit",
+    "typescript",
+    "galaxy",
+    "space-sim",
+    "4x",
+    "strategy",
+    "game"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "qa:progress": "tsx scripts/qa/progression-smoke.ts",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version:set": "node scripts/set-version.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.3.0",
