@@ -1,5 +1,13 @@
-const cleanBase = (base: string) => base.replace(/\/+$/, '') || '/';
-const cleanPath = (p: string) => p.replace(/^\/+/, '');
+const normalizeSlashes = (value: string) => value.replace(/\/+/g, '/');
+const trimTrailing = (value: string) => value.replace(/\/+$/, '');
+const trimLeading = (value: string) => value.replace(/^\/+/, '');
+
+const cleanBase = (base: string) => {
+  const normalized = normalizeSlashes(base || '/');
+  return normalized === '/' ? '/' : trimTrailing(normalized);
+};
+
+const cleanPath = (p: string) => trimLeading(normalizeSlashes(p));
 
 export const getBasePath = () => cleanBase(import.meta.env.VITE_BASE_PATH || '/');
 
