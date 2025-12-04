@@ -5,13 +5,10 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
 import { store } from '@store/gameStore';
 
-const rawBase = import.meta.env.VITE_BASE_PATH || '/';
-const routerBase = rawBase.replace(/\/+$/, '') || '/';
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter basename={routerBase}>
+      <BrowserRouter>
         <App />
       </BrowserRouter>
     </Provider>

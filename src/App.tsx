@@ -5,8 +5,9 @@ import { MainMenu } from '@pages/MainMenu';
 import { useGameStore } from '@store/gameStore';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 
-const HOME_PATH = '/';
-const GAME_PATH = '/game';
+const basePath = (import.meta.env.VITE_BASE_PATH || '/').replace(/\/+$/, '') || '';
+const HOME_PATH = `${basePath}/`;
+const GAME_PATH = `${basePath}/game`;
 
 export const App = () => {
   const view = useGameStore((state) => state.view);
