@@ -13,5 +13,7 @@ export const getBasePath = () => cleanBase(import.meta.env.VITE_BASE_PATH || '/'
 
 export const getAssetUrl = (path: string) => {
   const baseUrl = cleanBase(import.meta.env.BASE_URL || '/');
-  return `${baseUrl}/${cleanPath(path)}`;
+  const cleaned = cleanPath(path);
+  const merged = `${baseUrl}/${cleaned}`;
+  return normalizeSlashes(merged);
 };
