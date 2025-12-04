@@ -1,7 +1,7 @@
 {
   "name": "fls-node-epicronicles",
   "private": true,
-  "version": "0.135.294",
+  "version": "0.135.295",
   "description": "A management-focused space sim with a 3D galaxy map (Vite + React + Three.js + Redux Toolkit).",
   "license": "MIT",
   "author": "5h1ngy",
