@@ -1,7 +1,3 @@
-Ti propongo un’analisi funzionale ad alto livello per un **gioco single player simile a Stellaris**, pensato come 4X/Grand Strategy spaziale.
-
----
-
 ## 1. Visione generale
 
 **Genere:** 4X spaziale / grand strategy in tempo reale con pausa.
