@@ -1,17 +1,17 @@
 import * as THREE from 'three';
-import { updateStarVisuals } from './starVisuals';
+import { updateStarEntity } from './starUpdate';
 
-export interface SystemNodesParams {
+export interface SystemUpdateParams {
   systemGroup: THREE.Group;
   zoomFactor: number;
   camera: THREE.PerspectiveCamera;
 }
 
-export const updateSystemNodes = ({
+export const updateSystemEntities = ({
   systemGroup,
   zoomFactor,
   camera,
-}: SystemNodesParams) => {
+}: SystemUpdateParams) => {
   const showLabels = camera.position.y < 240 && zoomFactor < 0.9;
   const baseLabelScale = showLabels
     ? THREE.MathUtils.clamp(120 / Math.max(1, camera.position.y), 0.45, 1.4)
@@ -48,6 +48,7 @@ export const updateSystemNodes = ({
       }
     });
 
-    updateStarVisuals(node);
+    updateStarEntity(node);
   });
 };
+

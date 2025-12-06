@@ -78,7 +78,7 @@ export const fallbackStarVisuals: Record<StarClass, StarVisual> = {
   },
 };
 
-export const createStarVisual = (
+export const createStarEntity = (
   starClass: StarSystem['starClass'],
   visibility: StarSystem['visibility'],
   pulseSeed: number,

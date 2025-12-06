@@ -16,7 +16,7 @@ import {
   battleIconMaterial,
   ownerMaterials,
 } from '@three/materials';
-import { createStarVisual, fallbackStarVisuals, type StarVisual } from './starVisual';
+import { createStarEntity, fallbackStarVisuals, type StarVisual } from './star';
 
 const createLabelSprite = (text: string) => {
   const canvas = document.createElement('canvas');
@@ -165,7 +165,7 @@ const addShipyardMarker = ({
   node.add(square);
 };
 
-const createSystemNode = (
+export const createSystemEntity = (
   system: StarSystem,
   recentCombatSystems: Set<string>,
   activeBattles: Set<string>,
@@ -184,7 +184,7 @@ const createSystemNode = (
   const visuals = (starVisuals ?? fallbackStarVisuals) as Record<StarClass, StarVisual>;
   const baseRadius = visuals[system.starClass]?.coreRadius ?? 2.1;
 
-  const starVisual = createStarVisual(
+  const starVisual = createStarEntity(
     system.starClass,
     system.visibility,
     system.id.charCodeAt(0),
@@ -219,6 +219,4 @@ const createSystemNode = (
 
   return node;
 };
-
-export { createSystemNode };
 

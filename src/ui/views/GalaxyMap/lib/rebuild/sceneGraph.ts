@@ -10,7 +10,7 @@ import { buildSystems } from './systems';
 import { buildScienceAnchors } from './scienceAnchors';
 import { buildFleetAnchors } from './fleetAnchors';
 import type { AnchorEntry } from '../anchors';
-import type { StarVisual } from '../scene/starVisual';
+import type { StarVisual } from '../entities/star';
 
 export interface RebuildSceneParams {
   group: THREE.Group;

@@ -3,7 +3,7 @@ import type { MutableRefObject } from 'react';
 import type { GalaxySceneContext } from '../../hooks/useGalaxyScene';
 import type { AnchorEntry } from '../anchors';
 import { updateCameraAndTilt } from './camera';
-import { updateSystemNodes } from './systemNodes';
+import { updateSystemEntities } from '../entities/systemUpdate';
 
 export interface FrameUpdateParams {
   ctx: GalaxySceneContext;
@@ -42,7 +42,7 @@ export const updateFrame = (params: FrameUpdateParams) => {
     });
 
   const sceneEffectsStep = (zoomFactor: number) => {
-    updateSystemNodes({
+    updateSystemEntities({
       systemGroup: params.ctx.systemGroup,
       zoomFactor,
       camera: params.ctx.camera,

@@ -36,7 +36,7 @@ npm run preview   # preview the build
 - `src/store` — Redux store, slices, selectors, and thunks.
 
 ## 🧭 Galaxy Map (Three.js)
-- Custom shaders for star cores (`starCoreMaterial.ts`) and visual layers (`starVisual.ts`).
+- Minimal star rendering via simple entities (`lib/entities/star.ts`).
 - Scene rebuild pipeline (`lib/rebuild`) for systems, fleets, and science anchors.
 - Per-frame updates (`lib/frame`) for camera, effects, and star animations.
 
@@ -48,3 +48,4 @@ npm run preview   # preview the build
 
 ## 📜 License
 Distributed under the [MIT](LICENSE) license.
+

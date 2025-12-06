@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { StarClass, StarSystem } from '@domain/types';
-import { createSystemNode } from '../scene/systemNodes';
-import type { StarVisual } from '../scene/starVisual';
+import { createSystemEntity } from '../entities/system';
+import type { StarVisual } from '../entities/star';
 
 interface SystemBuildParams {
   group: THREE.Group;
@@ -27,7 +27,7 @@ export const buildSystems = ({
   systems.forEach((system) => {
     const colonizedPlanet = colonizedLookup.get(system.id);
     const visuals = starVisuals;
-    const node = createSystemNode(
+    const node = createSystemEntity(
       system,
       recentCombatSystems,
       activeBattles,
