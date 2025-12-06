@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import type { StarSystem, ScienceShip, Fleet } from '@domain/types';
-import { rebuildSceneGraph } from '../lib/rebuild';
-import { createAnchorResolver } from '../lib/anchors';
+import { rebuildScene } from '../entities/Scene';
+import { AnchorsResolver } from '../entities/Anchors';
 import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 
 export interface UseSceneRebuildParams {
@@ -106,9 +106,9 @@ export const useSceneRebuild = ({
 
     const resolverForBuild =
       anchorResolverRef.current ??
-      createAnchorResolver(systemPositionRef.current);
+      new AnchorsResolver(systemPositionRef.current);
 
-    const { positions, updateAnchorInstances } = rebuildSceneGraph({
+    const { positions, updateAnchorInstances } = rebuildScene({
       group,
       systems,
       colonizedLookup,
@@ -123,18 +123,16 @@ export const useSceneRebuild = ({
       fleetMaterials,
       scienceAnchorsRef: scienceAnchorsRef.current,
       fleetAnchorsRef: fleetAnchorsRef.current,
-      getVector: resolverForBuild.getVector,
-      releaseVector: resolverForBuild.releaseVector,
-      getMatrix: resolverForBuild.getMatrix,
-      releaseMatrix: resolverForBuild.releaseMatrix,
+      getVector: resolverForBuild.getVector.bind(resolverForBuild),
+      releaseVector: resolverForBuild.releaseVector.bind(resolverForBuild),
+      getMatrix: resolverForBuild.getMatrix.bind(resolverForBuild),
+      releaseMatrix: resolverForBuild.releaseMatrix.bind(resolverForBuild),
       shipDesignLookup,
       starRotations,
     });
 
     systemPositionRef.current = positions;
-    anchorResolverRef.current = createAnchorResolver(
-      systemPositionRef.current,
-    );
+    anchorResolverRef.current = new AnchorsResolver(systemPositionRef.current);
 
     updateAnchorInstances();
   }, [

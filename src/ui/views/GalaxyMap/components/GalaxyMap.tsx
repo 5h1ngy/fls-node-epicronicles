@@ -3,11 +3,10 @@ import { useGalaxyMapData } from '../hooks/useGalaxyMapData';
 import { GalaxyMapProvider } from '../providers/GalaxyMapContext';
 import { useGalaxyMapRefs } from '../hooks/useGalaxyMapRefs';
 import { useGalaxyScene, type GalaxySceneContext } from '../hooks/useGalaxyScene';
-import { updateFrame } from '../lib/frame';
-import { createAnchorResolver } from '../lib/anchors';
+import { updateScene } from '../entities/Scene';
+import { AnchorsResolver } from '../entities/Anchors';
 import { GalaxyMapScene } from './GalaxyMapScene';
 import { useGalaxyMapContextValue } from '../hooks/useGalaxyMapContextValue';
-import { BASE_TILT, MAX_TILT_DOWN } from '../lib/config';
 import './GalaxyMap.scss';
 
 interface GalaxyMapProps {
@@ -59,21 +58,19 @@ export const GalaxyMap = ({
   const handleFrame = useCallback(
     (ctx: GalaxySceneContext, delta: number, elapsed: number) => {
       if (!anchorResolverRef.current) {
-        anchorResolverRef.current = createAnchorResolver(
+        anchorResolverRef.current = new AnchorsResolver(
           systemPositionRef.current,
         );
       }
       if (!anchorResolverRef.current || !systemGroupRef.current) {
         return;
       }
-      updateFrame({
+      updateScene({
         ctx,
         delta,
         elapsed,
         minZoom: data.minZoom,
         maxZoom: data.maxZoom,
-        baseTilt: BASE_TILT,
-        maxTiltDown: MAX_TILT_DOWN,
         offsetTargetRef,
         zoomTargetRef,
         tiltStateRef,
@@ -81,7 +78,7 @@ export const GalaxyMap = ({
         tempOffsetRef,
         scienceAnchors: scienceAnchorsRef.current,
         fleetAnchors: fleetAnchorsRef.current,
-        updateAnchors: anchorResolverRef.current.updateAnchors,
+        updateAnchors: anchorResolverRef.current.updateAnchors.bind(anchorResolverRef.current),
         zoomTargetDirtyRef,
       });
     },

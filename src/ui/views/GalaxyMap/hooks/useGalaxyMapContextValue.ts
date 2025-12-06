@@ -3,7 +3,7 @@ import type { GalaxySceneContext } from './useGalaxyScene';
 import type { useGalaxyMapData } from './useGalaxyMapData';
 import type { GalaxyMapContextValue } from '../providers/GalaxyMapContext';
 import type { GalaxyMapRefs } from './useGalaxyMapRefs';
-import { BASE_TILT, MAX_TILT_DOWN } from '../lib/config';
+import { BASE_TILT, MAX_TILT_DOWN } from '../entities/Config';
 
 type UseGalaxyMapContextValueParams = {
   data: ReturnType<typeof useGalaxyMapData>;

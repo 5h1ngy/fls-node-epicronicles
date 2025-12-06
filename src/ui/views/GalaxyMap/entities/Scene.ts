@@ -1,4 +1,9 @@
 import * as THREE from 'three';
+import type { MutableRefObject } from 'react';
+import type { GalaxySceneContext } from '../hooks/useGalaxyScene';
+import type { AnchorEntry } from './Anchors';
+import { CameraEntity } from './Camera';
+import { updateSystemEntities, buildSystems } from './System';
 import type {
   StarSystem,
   ScienceShip,
@@ -6,13 +11,32 @@ import type {
   ShipDesign,
   StarClass,
 } from '@domain/types';
-import { buildSystems } from './systems';
-import { buildScienceAnchors } from './scienceAnchors';
-import { buildFleetAnchors } from './fleetAnchors';
-import type { AnchorEntry } from '../anchors';
-import type { StarVisual } from '../entities/star';
+import { buildScienceAnchors } from './SpaceshipsScience';
+import { buildMilitaryAnchors } from './SpaceshipsMilitary';
+import { buildConstructionAnchors } from './SpaceshipsConstruction';
+import type { StarVisual } from './Star';
+import { BASE_TILT, MAX_TILT_DOWN } from './Config';
 
-export interface RebuildSceneParams {
+export interface SceneUpdateParams {
+  ctx: GalaxySceneContext;
+  delta: number;
+  elapsed: number;
+  minZoom: number;
+  maxZoom: number;
+  baseTilt?: number;
+  maxTiltDown?: number;
+  offsetTargetRef: MutableRefObject<THREE.Vector3>;
+  zoomTargetRef: MutableRefObject<number>;
+  zoomTargetDirtyRef: MutableRefObject<boolean>;
+  tiltStateRef: MutableRefObject<{ current: number; target: number }>;
+  tempSphericalRef: MutableRefObject<THREE.Spherical>;
+  tempOffsetRef: MutableRefObject<THREE.Vector3>;
+  scienceAnchors: AnchorEntry[];
+  fleetAnchors: AnchorEntry[];
+  updateAnchors: (group: THREE.Group, entries: AnchorEntry[]) => void;
+}
+
+export interface SceneRebuildParams {
   group: THREE.Group;
   systems: StarSystem[];
   colonizedLookup: Map<string, { id: string; name: string }>;
@@ -35,7 +59,45 @@ export interface RebuildSceneParams {
   starRotations?: Map<string, number>;
 }
 
-export const rebuildSceneGraph = (params: RebuildSceneParams) => {
+export const updateScene = (params: SceneUpdateParams) => {
+  const cameraEntity = new CameraEntity();
+  const baseTilt = params.baseTilt ?? BASE_TILT;
+  const maxTiltDown = params.maxTiltDown ?? MAX_TILT_DOWN;
+  const cameraStep = () =>
+    cameraEntity.update({
+      ctx: params.ctx,
+      delta: params.delta,
+      minZoom: params.minZoom,
+      maxZoom: params.maxZoom,
+      minTilt: baseTilt,
+      maxTilt: maxTiltDown,
+      offsetTargetRef: params.offsetTargetRef,
+      zoomTargetRef: params.zoomTargetRef,
+      zoomTargetDirtyRef: params.zoomTargetDirtyRef,
+      tiltStateRef: params.tiltStateRef,
+      tempSphericalRef: params.tempSphericalRef,
+      tempOffsetRef: params.tempOffsetRef,
+    });
+
+  const sceneEffectsStep = (zoomFactor: number) => {
+    updateSystemEntities({
+      systemGroup: params.ctx.systemGroup,
+      zoomFactor,
+      camera: params.ctx.camera,
+    });
+  };
+
+  const anchorsStep = () => {
+    params.updateAnchors(params.ctx.systemGroup, params.scienceAnchors);
+    params.updateAnchors(params.ctx.systemGroup, params.fleetAnchors);
+  };
+
+  const { zoomFactor } = cameraStep();
+  sceneEffectsStep(zoomFactor);
+  anchorsStep();
+};
+
+export const rebuildScene = (params: SceneRebuildParams) => {
   const {
     group,
     systems,
@@ -80,7 +142,18 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
     releaseVector,
   });
 
-  const fleetTargetGroup = buildFleetAnchors({
+  const fleetTargetGroup = buildMilitaryAnchors({
+    group,
+    fleets,
+    positions,
+    empireWar,
+    fleetAnchorsRef,
+    fleetMaterials,
+    getVector,
+    releaseVector,
+    shipDesignLookup,
+  });
+  const constructorTargetGroup = buildConstructionAnchors({
     group,
     fleets,
     positions,
@@ -127,6 +200,7 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
     positions,
     scienceTargetGroup,
     fleetTargetGroup,
+    constructorTargetGroup,
     updateAnchorInstances,
   };
 };

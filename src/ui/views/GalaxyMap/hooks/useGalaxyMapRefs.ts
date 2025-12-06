@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
-import { createAnchorResolver, type AnchorEntry } from '../lib/anchors';
-import { BASE_TILT } from '../lib/config';
+import { AnchorsResolver, type AnchorEntry } from '../entities/Anchors';
+import { BASE_TILT } from '../entities/Config';
 import type { GalaxySceneContext } from './useGalaxyScene';
 
 export type GalaxyMapRefs = ReturnType<typeof useGalaxyMapRefs>;
@@ -23,7 +23,7 @@ export const useGalaxyMapRefs = () => {
   const scienceAnchorsRef = useRef<AnchorEntry[]>([]);
   const fleetAnchorsRef = useRef<AnchorEntry[]>([]);
   const systemsSignatureRef = useRef<string>('');
-  const anchorResolverRef = useRef<ReturnType<typeof createAnchorResolver> | null>(null);
+  const anchorResolverRef = useRef<AnchorsResolver | null>(null);
 
   const syncSceneContext = (sceneContext: GalaxySceneContext | null) => {
     if (!sceneContext) {

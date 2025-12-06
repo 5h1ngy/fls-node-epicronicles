@@ -1,6 +1,7 @@
 import { Group, Mesh, SphereGeometry, MeshBasicMaterial, Color } from 'three';
 import type { StarClass, StarSystem } from '@domain/types';
 import { materialCache } from '@three/materials';
+import { SceneEntityBase } from './SpaceshipsBase';
 
 export type StarVisual = {
   coreColor: string;
@@ -78,33 +79,52 @@ export const fallbackStarVisuals: Record<StarClass, StarVisual> = {
   },
 };
 
-export const createStarEntity = (
-  starClass: StarSystem['starClass'],
-  visibility: StarSystem['visibility'],
-  pulseSeed: number,
-  visuals: Record<StarClass, StarVisual>,
-) => {
-  const preset =
-    visuals[starClass] ?? fallbackStarVisuals[starClass] ?? fallbackStarVisuals.G;
-  const group = new Group();
-  group.name = 'starVisual';
-  group.userData = { ...group.userData, pulseSeed };
+export class StarEntity extends SceneEntityBase {
+  private visuals: Record<StarClass, StarVisual> = fallbackStarVisuals;
 
-  const coreMaterial =
-    visibility === 'unknown'
-      ? materialCache.fogged
-      : new MeshBasicMaterial({
-          color: new Color(preset.coreColor),
-        });
+  constructor() {
+    super();
+  }
 
-  const core = new Mesh(
-    new SphereGeometry(preset.coreRadius, 32, 32),
-    coreMaterial,
-  );
-  core.userData.systemId = null;
-  core.name = 'starCore';
-  group.add(core);
+  setup(params: { starVisuals?: Record<StarClass, StarVisual> }) {
+    this.visuals = params.starVisuals ?? fallbackStarVisuals;
+  }
 
-  return group;
-};
+  rebuild({
+    starClass,
+    visibility,
+    pulseSeed,
+  }: {
+    starClass: StarSystem['starClass'];
+    visibility: StarSystem['visibility'];
+    pulseSeed: number;
+  }) {
+    const preset =
+      this.visuals[starClass] ?? fallbackStarVisuals[starClass] ?? fallbackStarVisuals.G;
+    const group = new Group();
+    group.name = 'starVisual';
+    group.userData = { ...group.userData, pulseSeed };
 
+    const coreMaterial =
+      visibility === 'unknown'
+        ? materialCache.fogged
+        : new MeshBasicMaterial({
+            color: new Color(preset.coreColor),
+          });
+
+    const core = new Mesh(
+      new SphereGeometry(preset.coreRadius, 32, 32),
+      coreMaterial,
+    );
+    core.userData.systemId = null;
+    core.name = 'starCore';
+    group.add(core);
+
+    return group;
+  }
+
+  update(_node: Group) {
+    // Stelle statiche: nessun aggiornamento per frame.
+    void _node;
+  }
+}
