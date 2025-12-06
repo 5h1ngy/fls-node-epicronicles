@@ -5,13 +5,11 @@ export type AnchorEntry = {
   object?: THREE.Object3D;
   index?: number;
   systemId: string;
-  planetId: string | null;
   height: number;
 };
 
 export const createAnchorResolver = (
   systemPositions: Map<string, THREE.Vector3>,
-  planetLookup: Map<string, THREE.Object3D>,
 ) => {
   const vectorPool: THREE.Vector3[] = [];
   const matrixPool: THREE.Matrix4[] = [];
@@ -29,31 +27,20 @@ export const createAnchorResolver = (
   };
 
   const resolveAnchorPositionLocal = (
-    entry: { systemId: string; planetId: string | null; height: number },
-    group: THREE.Group,
+    entry: { systemId: string; height: number },
   ): THREE.Vector3 | null => {
     const systemPos = systemPositions.get(entry.systemId);
     if (!systemPos) {
       return null;
-    }
-    if (entry.planetId) {
-      const planetObj = planetLookup.get(entry.planetId);
-      if (planetObj) {
-        const world = getVector();
-        planetObj.getWorldPosition(world);
-        group.worldToLocal(world);
-        world.y += entry.height;
-        return world;
-      }
     }
     const pos = getVector().copy(systemPos);
     pos.y += entry.height;
     return pos;
   };
 
-  const updateAnchors = (group: THREE.Group, entries: AnchorEntry[]) => {
+  const updateAnchors = (_group: THREE.Group, entries: AnchorEntry[]) => {
     entries.forEach((entry) => {
-      const pos = resolveAnchorPositionLocal(entry, group);
+      const pos = resolveAnchorPositionLocal(entry);
       if (!pos) {
         return;
       }

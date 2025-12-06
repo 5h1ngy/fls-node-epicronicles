@@ -10,11 +10,6 @@ interface UseMapInteractionsParams {
     ((systemId: string, anchor: { x: number; y: number }) => void) | undefined
   >;
   onClearRef: MutableRefObject<(() => void) | undefined>;
-  onPlanetSelect?: (
-    planetId: string,
-    systemId: string,
-    anchor: { x: number; y: number },
-  ) => void;
   onShipyardSelect?: (
     systemId: string,
     anchor: { x: number; y: number },
@@ -24,7 +19,6 @@ interface UseMapInteractionsParams {
 export const useMapInteractions = ({
   onSelectRef,
   onClearRef,
-  onPlanetSelect,
   onShipyardSelect,
 }: UseMapInteractionsParams) => {
   const { focusOnPosition, toggleTilt, clampZoom, setZoomTarget } = useCameraController();
@@ -83,7 +77,7 @@ export const useMapInteractions = ({
         onClearRef.current?.();
         return;
       }
-      const { systemId, planetId, kind, worldPos } = hit;
+      const { systemId, kind, worldPos } = hit;
       focusOnPosition(worldPos, { zoom: 60 });
       const anchor = computeAnchor(worldPos, camera, {
         width: renderer.domElement.clientWidth,
@@ -91,8 +85,6 @@ export const useMapInteractions = ({
       });
       if (kind === 'shipyard' && onShipyardSelect) {
         onShipyardSelect(systemId, anchor);
-      } else if (planetId && onPlanetSelect) {
-        onPlanetSelect(planetId, systemId, anchor);
       } else {
         onSelectRef.current?.(systemId, anchor);
       }
@@ -114,7 +106,6 @@ export const useMapInteractions = ({
     systemGroupRef,
     onSelectRef,
     onClearRef,
-    onPlanetSelect,
     onShipyardSelect,
     focusOnPosition,
     toggleTilt,

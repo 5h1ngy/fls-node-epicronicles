@@ -19,7 +19,13 @@ export interface GalaxyGenerationParams {
   starClasses?: Array<{ id: StarClass; weight: number }>;
 }
 
-export type GalaxyShape = 'circle' | 'spiral';
+export type GalaxyShape =
+  | 'circle'
+  | 'spiral'
+  | 'ring'
+  | 'bar'
+  | 'ellipse'
+  | 'cluster';
 
 const planetKinds: PlanetKind[] = ['terrestrial', 'desert', 'tundra'];
 
@@ -89,19 +95,51 @@ const generatePoissonPositions = (
     points.push([Math.cos(theta) * r, Math.sin(theta) * r]);
   }
 
+  const clusterCenters =
+    shape === 'cluster'
+      ? Array.from({ length: 3 }, () => {
+          const angle = random() * Math.PI * 2;
+          const radius = 0.3 + random() * 0.4;
+          return {
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius,
+          };
+        })
+      : [];
+
   return points.slice(0, count).map(([x, y], idx) => {
-    const rNorm = Math.max(0.02, Math.sqrt(x * x + y * y));
-    const baseAngle = Math.atan2(y, x);
-    const arms = 2;
+    let px = x;
+    let py = y;
+
+    if (shape === 'ring') {
+      const target = 0.7 + random() * 0.2;
+      const r = Math.sqrt(px * px + py * py);
+      const scale = r === 0 ? target : target / Math.max(r, 0.001);
+      px *= scale;
+      py *= scale;
+    } else if (shape === 'bar') {
+      py *= 0.25;
+      px *= 1.2;
+    } else if (shape === 'ellipse') {
+      px *= 1.35;
+      py *= 0.7;
+    } else if (shape === 'cluster' && clusterCenters.length > 0) {
+      const target = clusterCenters[idx % clusterCenters.length];
+      px = target.x + (px - target.x) * 0.35 + (random() - 0.5) * 0.12;
+      py = target.y + (py - target.y) * 0.35 + (random() - 0.5) * 0.12;
+    }
+
+    const rNorm = Math.max(0.02, Math.sqrt(px * px + py * py));
+    let baseAngle = Math.atan2(py, px);
+
     if (shape === 'spiral') {
+      const arms = 3;
       const arm = idx % arms;
       const armOffset = (arm / arms) * Math.PI * 2;
-      const twist = rNorm * Math.PI * 3;
-      return {
-        radius: rNorm * maxRadius,
-        angle: baseAngle + twist + armOffset,
-      };
+      const twist = rNorm * Math.PI * 3.6;
+      baseAngle = baseAngle + twist + armOffset;
     }
+
     return { radius: rNorm * maxRadius, angle: baseAngle };
   });
 };
@@ -235,4 +273,3 @@ export const createTestGalaxy = ({
     systems,
   };
 };
-

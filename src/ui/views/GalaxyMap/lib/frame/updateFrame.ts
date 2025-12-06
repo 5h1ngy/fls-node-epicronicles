@@ -3,9 +3,7 @@ import type { MutableRefObject } from 'react';
 import type { GalaxySceneContext } from '../../hooks/useGalaxyScene';
 import type { AnchorEntry } from '../anchors';
 import { updateCameraAndTilt } from './camera';
-import { updateNebulaOpacity } from './nebula';
 import { updateSystemNodes } from './systemNodes';
-import { updateBlackHoleFrame } from './blackHole';
 
 export interface FrameUpdateParams {
   ctx: GalaxySceneContext;
@@ -21,9 +19,6 @@ export interface FrameUpdateParams {
   tiltStateRef: MutableRefObject<{ current: number; target: number }>;
   tempSphericalRef: MutableRefObject<THREE.Spherical>;
   tempOffsetRef: MutableRefObject<THREE.Vector3>;
-  planetAngleRef: MutableRefObject<Map<string, number>>;
-  nebulaRef: MutableRefObject<THREE.Group | null>;
-  blackHoleRef: MutableRefObject<THREE.Group | null>;
   scienceAnchors: AnchorEntry[];
   fleetAnchors: AnchorEntry[];
   updateAnchors: (group: THREE.Group, entries: AnchorEntry[]) => void;
@@ -46,18 +41,12 @@ export const updateFrame = (params: FrameUpdateParams) => {
       tempOffsetRef: params.tempOffsetRef,
     });
 
-  const sceneEffectsStep = (zoomFactor: number, deltaFactor: number) => {
-    updateNebulaOpacity(params.nebulaRef.current, zoomFactor);
+  const sceneEffectsStep = (zoomFactor: number) => {
     updateSystemNodes({
       systemGroup: params.ctx.systemGroup,
-      delta: params.delta,
-      elapsed: params.elapsed,
       zoomFactor,
-      planetAngleRef: params.planetAngleRef,
       camera: params.ctx.camera,
-      deltaFactor,
     });
-    updateBlackHoleFrame(params.blackHoleRef, params.elapsed, params.ctx.camera);
   };
 
   const anchorsStep = () => {
@@ -65,7 +54,7 @@ export const updateFrame = (params: FrameUpdateParams) => {
     params.updateAnchors(params.ctx.systemGroup, params.fleetAnchors);
   };
 
-  const { zoomFactor, deltaFactor } = cameraStep();
-  sceneEffectsStep(zoomFactor, deltaFactor);
+  const { zoomFactor } = cameraStep();
+  sceneEffectsStep(zoomFactor);
   anchorsStep();
 };

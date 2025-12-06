@@ -1,18 +1,20 @@
 import * as THREE from 'three';
-import type { StarSystem, ScienceShip, Fleet, ShipDesign } from '@domain/types';
-import { buildNebula } from './nebula';
+import type {
+  StarSystem,
+  ScienceShip,
+  Fleet,
+  ShipDesign,
+  StarClass,
+} from '@domain/types';
 import { buildSystems } from './systems';
 import { buildScienceAnchors } from './scienceAnchors';
 import { buildFleetAnchors } from './fleetAnchors';
 import type { AnchorEntry } from '../anchors';
+import type { StarVisual } from '../scene/starVisual';
 
 export interface RebuildSceneParams {
   group: THREE.Group;
   systems: StarSystem[];
-  galaxyShape: 'circle' | 'spiral';
-  galaxySeed: string;
-  maxSystemRadius: number;
-  orbitBaseSpeed: number;
   colonizedLookup: Map<string, { id: string; name: string }>;
   recentCombatSystems: Set<string>;
   activeBattles: Set<string>;
@@ -20,8 +22,6 @@ export interface RebuildSceneParams {
   scienceShips: ScienceShip[];
   fleets: Fleet[];
   empireWar: boolean;
-  planetAngleRef: Map<string, number>;
-  planetLookupRef: Map<string, THREE.Object3D>;
   scienceMaterials: Record<string, THREE.Material>;
   scienceLineMaterials: Record<string, THREE.Material>;
   fleetMaterials: Record<string, THREE.Material>;
@@ -39,10 +39,6 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
   const {
     group,
     systems,
-    galaxyShape,
-    galaxySeed,
-    maxSystemRadius,
-    orbitBaseSpeed,
     colonizedLookup,
     recentCombatSystems,
     activeBattles,
@@ -50,8 +46,6 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
     scienceShips,
     fleets,
     empireWar,
-    planetAngleRef,
-    planetLookupRef,
     scienceMaterials,
     scienceLineMaterials,
     fleetMaterials,
@@ -65,24 +59,13 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
     starRotations,
   } = params;
 
-  const nebula = buildNebula({
-    group,
-    systems,
-    galaxyShape,
-    galaxySeed,
-    maxSystemRadius,
-  });
-
   const positions = buildSystems({
     group,
     systems,
-    orbitBaseSpeed,
     colonizedLookup,
-    planetAngleRef,
-    planetLookupRef,
     recentCombatSystems,
     activeBattles,
-    starVisuals,
+    starVisuals: starVisuals as Record<StarClass, StarVisual>,
     starRotations,
   });
 
@@ -115,24 +98,9 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
       if (!pos) {
         return;
       }
-      const planetId = entry.planetId;
-      let target: THREE.Vector3 | null = null;
-      if (!planetId) {
-        const base = getVector().copy(pos);
-        base.y += entry.height;
-        target = base;
-      }
-      if (planetId) {
-        const obj = planetLookupRef.get(planetId);
-        if (obj) {
-          const world = getVector();
-          obj.getWorldPosition(world);
-          group.worldToLocal(world);
-          world.y += entry.height;
-          target = world;
-        }
-      }
-      const resolvedTarget = target ?? pos;
+      const base = getVector().copy(pos);
+      base.y += entry.height;
+      const resolvedTarget = base;
       if (entry.mesh && typeof entry.index === 'number') {
         const matrix = getMatrix().setPosition(
           resolvedTarget.x,
@@ -149,16 +117,13 @@ export const rebuildSceneGraph = (params: RebuildSceneParams) => {
           resolvedTarget.z,
         );
       }
-      if (resolvedTarget !== pos) {
-        releaseVector(resolvedTarget);
-      }
+      releaseVector(resolvedTarget);
     };
     scienceAnchorsRef.forEach(updateEntry);
     fleetAnchorsRef.forEach(updateEntry);
   };
 
   return {
-    nebula,
     positions,
     scienceTargetGroup,
     fleetTargetGroup,

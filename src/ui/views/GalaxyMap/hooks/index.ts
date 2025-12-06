@@ -6,7 +6,6 @@ export * from './useGalaxySceneSetup';
 export * from './useMapInteractions';
 export * from './useMapFocus';
 export * from './useSceneRebuild';
-export * from './useBlackHole';
 export * from './useCameraController';
 export * from './mapDataUtils';
 export * from './signatures';

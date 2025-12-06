@@ -15,7 +15,7 @@ export const buildSystemsSignature = ({
   fleetSignature,
 }: {
   systems: StarSystem[];
-  galaxyShape: 'circle' | 'spiral';
+  galaxyShape: import('@domain/galaxy/galaxy').GalaxyShape;
   galaxySeed: string;
   fleetSignature: string;
 }) =>

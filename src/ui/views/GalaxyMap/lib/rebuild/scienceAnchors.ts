@@ -46,10 +46,6 @@ export const buildScienceAnchors = ({
         mesh,
         index: idx,
         systemId: ship.currentSystemId,
-        planetId:
-          ship.targetSystemId && ship.targetSystemId !== ship.currentSystemId
-            ? null
-            : ship.anchorPlanetId ?? null,
         height: 6,
       });
       if (ship.targetSystemId && ship.targetSystemId !== ship.currentSystemId) {

@@ -1,27 +1,22 @@
 import * as THREE from 'three';
-import type { StarSystem } from '@domain/types';
-import { createSystemNode } from '../map/systemNodes';
+import type { StarClass, StarSystem } from '@domain/types';
+import { createSystemNode } from '../scene/systemNodes';
+import type { StarVisual } from '../scene/starVisual';
 
 interface SystemBuildParams {
   group: THREE.Group;
   systems: StarSystem[];
-  orbitBaseSpeed: number;
   colonizedLookup: Map<string, { id: string; name: string }>;
-  planetAngleRef: Map<string, number>;
-  planetLookupRef: Map<string, THREE.Object3D>;
   recentCombatSystems: Set<string>;
   activeBattles: Set<string>;
-  starVisuals: Record<string, unknown>;
+  starVisuals: Record<StarClass, StarVisual>;
   starRotations?: Map<string, number>;
 }
 
 export const buildSystems = ({
   group,
   systems,
-  orbitBaseSpeed,
   colonizedLookup,
-  planetAngleRef,
-  planetLookupRef,
   recentCombatSystems,
   activeBattles,
   starVisuals,
@@ -31,12 +26,9 @@ export const buildSystems = ({
 
   systems.forEach((system) => {
     const colonizedPlanet = colonizedLookup.get(system.id);
-    const visuals = starVisuals as Parameters<typeof createSystemNode>[7];
+    const visuals = starVisuals;
     const node = createSystemNode(
       system,
-      orbitBaseSpeed,
-      planetAngleRef,
-      planetLookupRef,
       recentCombatSystems,
       activeBattles,
       colonizedPlanet,

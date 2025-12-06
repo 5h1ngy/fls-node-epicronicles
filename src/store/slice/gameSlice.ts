@@ -6,7 +6,9 @@ export interface StartSessionArgs {
   seed?: string;
   label?: string;
   presetId?: string;
-  galaxyShape?: 'circle' | 'spiral';
+  galaxyShape?: import('@domain/galaxy/galaxy').GalaxyShape;
+  systemCount?: number;
+  galaxyRadius?: number;
 }
 
 const initialState: { view: 'mainMenu' | 'simulation'; config: GameConfig; session: GameSession | null } =
@@ -220,4 +222,3 @@ export type PopulationJobId =
 
 // Config-driven ship ids; keep open to allow new classes from config
 export type ShipClassId = string;
-

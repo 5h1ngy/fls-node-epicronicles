@@ -2,7 +2,6 @@ import { useGalaxyMapData } from '../hooks/useGalaxyMapData';
 import { useGalaxyMapContext } from '../providers/GalaxyMapContext';
 import { useMapInteractions } from '../hooks/useMapInteractions';
 import { useSceneRebuild } from '../hooks/useSceneRebuild';
-import { useBlackHole } from '../hooks/useBlackHole';
 import { useMapFocus } from '../hooks/useMapFocus';
 import {
   scienceMaterials,
@@ -13,13 +12,7 @@ import {
 type GalaxyMapSceneProps = {
   data: ReturnType<typeof useGalaxyMapData>;
   focusSystemId: string | null;
-  focusPlanetId: string | null;
   focusTrigger: number;
-  onPlanetSelect?: (
-    planetId: string,
-    systemId: string,
-    anchor: { x: number; y: number },
-  ) => void;
   onShipyardSelect?: (
     systemId: string,
     anchor: { x: number; y: number },
@@ -34,9 +27,7 @@ type GalaxyMapSceneProps = {
 export const GalaxyMapScene = ({
   data,
   focusSystemId,
-  focusPlanetId,
   focusTrigger,
-  onPlanetSelect,
   onShipyardSelect,
   onClearFocus,
   onSelectRef,
@@ -45,21 +36,14 @@ export const GalaxyMapScene = ({
   const { refs } = useGalaxyMapContext();
   const { containerRef } = refs;
 
-  useBlackHole();
-
   useMapInteractions({
     onSelectRef,
     onClearRef,
-    onPlanetSelect,
     onShipyardSelect,
   });
 
   useSceneRebuild({
     systems: data.systems,
-    galaxyShape: data.galaxyShape,
-    galaxySeed: data.galaxySeed,
-    maxSystemRadius: data.maxSystemRadius,
-    orbitBaseSpeed: data.orbitBaseSpeed,
     colonizedLookup: data.colonizedLookup,
     recentCombatSystems: data.recentCombatSystems,
     activeBattles: data.activeBattles,
@@ -76,7 +60,6 @@ export const GalaxyMapScene = ({
 
   useMapFocus({
     focusSystemId,
-    focusPlanetId,
     focusTrigger,
     systems: data.systems,
     onClearFocus,

@@ -12,14 +12,8 @@ import './GalaxyMap.scss';
 
 interface GalaxyMapProps {
   focusSystemId?: string | null;
-  focusPlanetId?: string | null;
   focusTrigger?: number;
   onSystemSelect?: (
-    systemId: string,
-    anchor: { x: number; y: number },
-  ) => void;
-  onPlanetSelect?: (
-    planetId: string,
     systemId: string,
     anchor: { x: number; y: number },
   ) => void;
@@ -32,10 +26,8 @@ interface GalaxyMapProps {
 
 export const GalaxyMap = ({
   focusSystemId,
-  focusPlanetId,
   focusTrigger = 0,
   onSystemSelect,
-  onPlanetSelect,
   onShipyardSelect,
   onClearFocus,
 }: GalaxyMapProps) => {
@@ -60,10 +52,6 @@ export const GalaxyMap = ({
     systemPositionRef,
     scienceAnchorsRef,
     fleetAnchorsRef,
-    planetAngleRef,
-    planetLookupRef,
-    blackHoleRef,
-    nebulaRef,
     anchorResolverRef,
     syncSceneContext,
   } = refs;
@@ -73,7 +61,6 @@ export const GalaxyMap = ({
       if (!anchorResolverRef.current) {
         anchorResolverRef.current = createAnchorResolver(
           systemPositionRef.current,
-          planetLookupRef.current,
         );
       }
       if (!anchorResolverRef.current || !systemGroupRef.current) {
@@ -92,9 +79,6 @@ export const GalaxyMap = ({
         tiltStateRef,
         tempSphericalRef,
         tempOffsetRef,
-        planetAngleRef,
-        nebulaRef,
-        blackHoleRef,
         scienceAnchors: scienceAnchorsRef.current,
         fleetAnchors: fleetAnchorsRef.current,
         updateAnchors: anchorResolverRef.current.updateAnchors,
@@ -106,16 +90,12 @@ export const GalaxyMap = ({
       data.minZoom,
       anchorResolverRef,
       systemPositionRef,
-      planetLookupRef,
       offsetTargetRef,
       zoomTargetRef,
       zoomTargetDirtyRef,
       tiltStateRef,
       tempSphericalRef,
       tempOffsetRef,
-      planetAngleRef,
-      nebulaRef,
-      blackHoleRef,
       scienceAnchorsRef,
       fleetAnchorsRef,
       systemGroupRef,
@@ -147,9 +127,7 @@ export const GalaxyMap = ({
       <GalaxyMapScene
         data={data}
         focusSystemId={focusSystemId ?? null}
-        focusPlanetId={focusPlanetId ?? null}
         focusTrigger={focusTrigger}
-        onPlanetSelect={onPlanetSelect}
         onShipyardSelect={onShipyardSelect}
         onClearFocus={onClearFocus}
         onSelectRef={onSelectRef}

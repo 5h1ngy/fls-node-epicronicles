@@ -68,7 +68,6 @@ export const GameScreen = () => {
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [planetDetailId, setPlanetDetailWindowId] = useState<string | null>(null);
-  const [focusPlanetId, setFocusPlanetId] = useState<string | null>(null);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
   const [missionsOpen, setMissionsOpen] = useState(false);
   const [eventsOpen, setEventsOpen] = useState(false);
@@ -125,14 +124,12 @@ export const GameScreen = () => {
     setSelectedSystemId(null);
     setSelectedPlanetId(null);
     setPlanetDetailWindowId(null);
-    setFocusPlanetId(null);
     setMapMessage(null);
   };
 
   const closeShipyardPanel = () => {
     setShipyardSystemId(null);
     setFocusSystemId(null);
-    setFocusPlanetId(null);
   };
 
   useEffect(() => {
@@ -166,13 +163,12 @@ export const GameScreen = () => {
       null;
     if (homeSystemId) {
       setFocusSystemId(homeSystemId);
-      setFocusPlanetId(null);
       setSelectedSystemId(null);
       setSelectedPlanetId(null);
       setMapMessage(null);
     }
     focusedSessionRef.current = session.id;
-  }, [session, setFocusPlanetId, setFocusSystemId]);
+  }, [session, setFocusSystemId]);
 
   const viewportWidth =
     typeof window !== 'undefined' ? window.innerWidth : 1200;
@@ -256,10 +252,10 @@ export const GameScreen = () => {
       <div className="side-entity-stack">
         <EntityDock
           variant="colonies"
-          onCenter={(systemId, planetId) => {
+          onCenter={(systemId, _planetId) => {
+            void _planetId;
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
-            setFocusPlanetId(planetId ?? null);
             setSelectedSystemId(null);
             setSelectedPlanetId(null);
             setDockSelection(null);
@@ -277,14 +273,12 @@ export const GameScreen = () => {
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
-            setFocusPlanetId(null);
             setSelectedSystemId(null);
             setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
             setDockSelection(selection);
-            setFocusPlanetId(null);
           }}
         />
         <EntityDock
@@ -292,14 +286,12 @@ export const GameScreen = () => {
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
-            setFocusPlanetId(null);
             setSelectedSystemId(null);
             setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
             setDockSelection(selection);
-            setFocusPlanetId(null);
           }}
         />
         <EntityDock
@@ -307,14 +299,12 @@ export const GameScreen = () => {
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
-            setFocusPlanetId(null);
             setSelectedSystemId(null);
             setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
             setDockSelection(selection);
-            setFocusPlanetId(null);
           }}
         />
         <EntityDock
@@ -322,20 +312,17 @@ export const GameScreen = () => {
           onCenter={(systemId) => {
             setFocusSystemId(systemId);
             setFocusTrigger((value) => value + 1);
-            setFocusPlanetId(null);
             setSelectedSystemId(null);
             setSelectedPlanetId(null);
             setDockSelection(null);
           }}
           onSelect={(selection) => {
             setDockSelection(selection);
-            setFocusPlanetId(null);
           }}
         />
       </div>
       <MapLayer
         focusSystemId={focusSystemId}
-        focusPlanetId={focusPlanetId}
         focusTrigger={focusTrigger}
         mapMessage={mapMessage}
         onSelectSystem={(systemId) => {
@@ -351,7 +338,6 @@ export const GameScreen = () => {
           setSelectedPlanetId(null);
           setSelectedSystemId(isAccessible ? systemId : null);
           setFocusSystemId(systemId);
-          setFocusPlanetId(null);
           setMapMessage(
             isAccessible
               ? null
@@ -371,21 +357,6 @@ export const GameScreen = () => {
           setSelectedSystemId(null);
           setSelectedPlanetId(null);
           setFocusSystemId(systemId);
-          setFocusPlanetId(null);
-        }}
-        onSelectPlanet={(planetId, systemId) => {
-          setFocusSystemId(systemId);
-          setFocusPlanetId(planetId);
-          const isColonized =
-            session?.economy.planets.some((planet) => planet.id === planetId) ?? false;
-          if (isColonized) {
-            setPlanetDetailWindowId(planetId);
-            setSelectedPlanetId(null);
-          } else {
-            setSelectedPlanetId(planetId);
-            setPlanetDetailWindowId(null);
-          }
-          setFocusTrigger((value) => value + 1);
         }}
       />
       <BottomBar
@@ -411,7 +382,7 @@ export const GameScreen = () => {
           onClearFocusTargets={clearFocusTargets}
           shipyardSystem={shipyardSystem}
           closeShipyard={closeShipyardPanel}
-      />
+        />
         {missionsOpen ? (
           <DraggablePanel
             title="Missioni in corso"
@@ -485,7 +456,6 @@ export const GameScreen = () => {
               onFocusSystem={(systemId) => {
                 setGalaxyOpen(false);
                 setFocusSystemId(systemId);
-                setFocusPlanetId(null);
                 setSelectedSystemId(null);
                 setSelectedPlanetId(null);
               }}
@@ -505,7 +475,6 @@ export const GameScreen = () => {
               onFocusSystem={(systemId) => {
                 setColonizationOpen(false);
                 setFocusSystemId(systemId);
-                setFocusPlanetId(null);
                 setSelectedSystemId(null);
                 setSelectedPlanetId(null);
               }}
@@ -609,7 +578,6 @@ export const GameScreen = () => {
                   }
                   onCenter={(systemId) => {
                     setFocusSystemId(systemId);
-                    setFocusPlanetId(null);
                     setSelectedSystemId(null);
                     setSelectedPlanetId(null);
                     setFocusTrigger((value) => value + 1);
@@ -638,7 +606,6 @@ export const GameScreen = () => {
                   }
                   onCenter={(systemId) => {
                     setFocusSystemId(systemId);
-                    setFocusPlanetId(null);
                     setSelectedSystemId(null);
                     setSelectedPlanetId(null);
                     setFocusTrigger((value) => value + 1);
@@ -674,7 +641,6 @@ export const GameScreen = () => {
                 onStop={() => stopScienceShip(selectedScienceShip.id)}
                 onCenter={(systemId) => {
                   setFocusSystemId(systemId);
-                  setFocusPlanetId(null);
                   setSelectedSystemId(null);
                   setSelectedPlanetId(null);
                   setFocusTrigger((value) => value + 1);

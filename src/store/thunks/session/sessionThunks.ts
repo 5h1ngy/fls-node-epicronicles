@@ -92,14 +92,20 @@ export const startNewSession =
       cfg.galaxyPresets.find((entry) => entry.id === (args?.presetId ?? '')) ??
       cfg.galaxyPresets.find((entry) => entry.id === 'standard');
     const seed = args?.seed ?? preset?.seed ?? cfg.defaultGalaxy.seed;
+    const systemCount =
+      args?.systemCount ?? preset?.systemCount ?? cfg.defaultGalaxy.systemCount;
+    const galaxyRadius =
+      args?.galaxyRadius ?? preset?.galaxyRadius ?? cfg.defaultGalaxy.galaxyRadius;
+    const galaxyShape =
+      args?.galaxyShape ?? preset?.galaxyShape ?? cfg.defaultGalaxy.galaxyShape;
     const session = createSession({
       seed,
       starClasses: cfg.starClasses,
       label: args?.label,
       galaxyOverrides: {
-        systemCount: preset?.systemCount ?? cfg.defaultGalaxy.systemCount,
-        galaxyRadius: preset?.galaxyRadius ?? cfg.defaultGalaxy.galaxyRadius,
-        galaxyShape: args?.galaxyShape ?? preset?.galaxyShape ?? cfg.defaultGalaxy.galaxyShape,
+        systemCount,
+        galaxyRadius,
+        galaxyShape,
       },
       economyConfig: cfg.economy,
       researchConfig: cfg.research,
@@ -185,4 +191,3 @@ export const advanceClockBy =
       }),
     );
   };
-

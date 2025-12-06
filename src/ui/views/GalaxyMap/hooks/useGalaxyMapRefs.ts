@@ -22,11 +22,7 @@ export const useGalaxyMapRefs = () => {
   const systemPositionRef = useRef(new Map<string, THREE.Vector3>());
   const scienceAnchorsRef = useRef<AnchorEntry[]>([]);
   const fleetAnchorsRef = useRef<AnchorEntry[]>([]);
-  const planetAngleRef = useRef(new Map<string, number>());
-  const planetLookupRef = useRef(new Map<string, THREE.Object3D>());
   const systemsSignatureRef = useRef<string>('');
-  const blackHoleRef = useRef<THREE.Group | null>(null);
-  const nebulaRef = useRef<THREE.Group | null>(null);
   const anchorResolverRef = useRef<ReturnType<typeof createAnchorResolver> | null>(null);
 
   const syncSceneContext = (sceneContext: GalaxySceneContext | null) => {
@@ -52,11 +48,7 @@ export const useGalaxyMapRefs = () => {
     systemPositionRef,
     scienceAnchorsRef,
     fleetAnchorsRef,
-    planetAngleRef,
-    planetLookupRef,
     systemsSignatureRef,
-    blackHoleRef,
-    nebulaRef,
     anchorResolverRef,
   };
 
@@ -73,11 +65,7 @@ export const useGalaxyMapRefs = () => {
     systemPositionRef,
     scienceAnchorsRef,
     fleetAnchorsRef,
-    planetAngleRef,
-    planetLookupRef,
     systemsSignatureRef,
-    blackHoleRef,
-    nebulaRef,
     anchorResolverRef,
     cameraState,
     anchorState,

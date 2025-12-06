@@ -9,13 +9,12 @@ export interface GalaxyMapData {
   scienceShips: ScienceShip[];
   fleets: Fleet[];
   shipDesignLookup: Map<string, ShipDesign>;
-  galaxyShape: 'circle' | 'spiral';
+  galaxyShape: import('@domain/galaxy/galaxy').GalaxyShape;
   galaxySeed: string;
   starVisuals: Record<string, unknown>;
   empireWar: boolean;
   recentCombatSystems: Set<string>;
   activeBattles: Set<string>;
-  orbitBaseSpeed: number;
   colonizedLookup: Map<string, { id: string; name: string }>;
   maxSystemRadius: number;
   minZoom: number;
@@ -46,7 +45,6 @@ export const useGalaxyMapData = (): GalaxyMapData => {
         (empire) => empire.kind === 'ai' && empire.warStatus === 'war',
       ) ?? false,
   );
-  const orbitBaseSpeed = useGameStore((state) => state.config.map.orbitSpeed);
 
   const combatReports = useGameStore(
     (state) => state.session?.combatReports ?? [],
@@ -134,7 +132,6 @@ export const useGalaxyMapData = (): GalaxyMapData => {
     empireWar,
     recentCombatSystems,
     activeBattles,
-    orbitBaseSpeed,
     colonizedLookup,
     maxSystemRadius,
     minZoom,

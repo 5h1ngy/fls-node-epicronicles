@@ -1,4 +1,4 @@
-import type { GalaxyGenerationParams } from '@domain/galaxy';
+import type { GalaxyGenerationParams, GalaxyShape } from '@domain/galaxy';
 import type { EconomyConfig } from '@domain/economy';
 import type {
   GameEvent,
@@ -118,6 +118,9 @@ export interface GameConfig {
   ticksPerSecond: number;
   defaultGalaxy: GalaxyGenerationParams;
   galaxyPresets: Array<GalaxyGenerationParams & { id: string; label: string }>;
+  galaxyShapes?: GalaxyShape[];
+  galaxyRadii?: number[];
+  galaxySystemCounts?: number[];
   debug: {
     autoStart: boolean;
   };

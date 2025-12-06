@@ -12,8 +12,38 @@ export const MainMenu = () => {
   const hasSavedSession = useGameStore((state) => state.hasSavedSession);
   const config = useGameStore((state) => state.config);
   const [seed, setSeed] = useState(config.defaultGalaxy.seed);
+  const availableShapes =
+    config.galaxyShapes && config.galaxyShapes.length > 0
+      ? config.galaxyShapes
+      : Array.from(
+          new Set(
+            config.galaxyPresets.map((preset) => preset.galaxyShape ?? 'circle'),
+          ),
+        );
   const [galaxyShape, setGalaxyShape] = useState(
-    config.defaultGalaxy.galaxyShape ?? 'circle',
+    config.defaultGalaxy.galaxyShape ?? availableShapes[0] ?? 'circle',
+  );
+  const availableSystemCounts =
+    config.galaxySystemCounts && config.galaxySystemCounts.length > 0
+      ? config.galaxySystemCounts
+      : Array.from(
+          new Set(
+            config.galaxyPresets.map((preset) => preset.systemCount ?? config.defaultGalaxy.systemCount),
+          ),
+        ).filter((val): val is number => typeof val === 'number');
+  const availableRadii =
+    config.galaxyRadii && config.galaxyRadii.length > 0
+      ? config.galaxyRadii
+      : Array.from(
+          new Set(
+            config.galaxyPresets.map((preset) => preset.galaxyRadius ?? config.defaultGalaxy.galaxyRadius),
+          ),
+        ).filter((val): val is number => typeof val === 'number');
+  const [systemCount, setSystemCount] = useState(
+    config.defaultGalaxy.systemCount ?? availableSystemCounts[0] ?? 18,
+  );
+  const [galaxyRadius, setGalaxyRadius] = useState(
+    config.defaultGalaxy.galaxyRadius ?? availableRadii[0] ?? 256,
   );
   const defaultPresetId =
     config.galaxyPresets.find((preset) => preset.id === 'standard')?.id ??
@@ -39,9 +69,15 @@ export const MainMenu = () => {
   }, [loadSession]);
 
   const handleStart = useCallback(() => {
-    startNewSession({ seed, presetId, galaxyShape });
+    startNewSession({
+      seed,
+      presetId,
+      galaxyShape,
+      systemCount,
+      galaxyRadius,
+    });
     setMessage(null);
-  }, [startNewSession, seed, presetId, galaxyShape]);
+  }, [startNewSession, seed, presetId, galaxyShape, systemCount, galaxyRadius]);
 
   return stage === 'landing' ? (
     <MainMenuLanding
@@ -61,9 +97,16 @@ export const MainMenu = () => {
       presetId={presetId}
       presets={config.galaxyPresets}
       galaxyShape={galaxyShape}
+      galaxyShapes={availableShapes}
+      systemCount={systemCount}
+      systemCountOptions={availableSystemCounts}
+      galaxyRadius={galaxyRadius}
+      galaxyRadii={availableRadii}
       onSeedChange={setSeed}
       onPresetChange={setPresetId}
       onShapeChange={setGalaxyShape}
+      onSystemCountChange={setSystemCount}
+      onRadiusChange={setGalaxyRadius}
       onConfirm={handleStart}
       onBack={() => setStage('landing')}
     />

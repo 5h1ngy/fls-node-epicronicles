@@ -14,7 +14,6 @@ interface FleetAnchorParams {
     object?: THREE.Object3D;
     index?: number;
     systemId: string;
-    planetId: string | null;
     height: number;
   }>;
   fleetMaterials: Record<string, THREE.Material>;
@@ -159,10 +158,6 @@ export const buildFleetAnchors = ({
           mesh,
           index: idx,
           systemId: fleet.systemId,
-          planetId:
-            fleet.targetSystemId && fleet.targetSystemId !== fleet.systemId
-              ? null
-              : fleet.anchorPlanetId ?? null,
           height: 5,
         });
         if (fleet.targetSystemId && fleet.targetSystemId !== fleet.systemId) {
@@ -204,10 +199,6 @@ export const buildFleetAnchors = ({
             const entry: AnchorEntry = {
               object: placeholder,
               systemId: fleet.systemId,
-              planetId:
-                fleet.targetSystemId && fleet.targetSystemId !== fleet.systemId
-                  ? null
-                  : fleet.anchorPlanetId ?? null,
               height: 3,
             };
             fleetAnchorsRef.push(entry);

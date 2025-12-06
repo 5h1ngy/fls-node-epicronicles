@@ -70,7 +70,7 @@ export const hostileIndicatorMaterial = new THREE.MeshBasicMaterial({
 });
 
 export const combatIndicatorMaterial = new THREE.MeshBasicMaterial({
-  color: 0xffc857,
+  color: 0xffffff,
   transparent: true,
   opacity: 0.7,
 });

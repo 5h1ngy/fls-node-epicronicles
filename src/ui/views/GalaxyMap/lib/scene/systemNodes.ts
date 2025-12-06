@@ -5,8 +5,10 @@ import {
   MeshBasicMaterial,
   DoubleSide,
   PlaneGeometry,
+  CanvasTexture,
+  SpriteMaterial,
+  Sprite,
 } from 'three';
-import type { Object3D } from 'three';
 import type { StarSystem, StarClass } from '@domain/types';
 import {
   hostileIndicatorMaterial,
@@ -14,22 +16,60 @@ import {
   battleIconMaterial,
   ownerMaterials,
 } from '@three/materials';
-import { createOrbitingPlanets, createLabelSprite } from './orbits';
-import { createStarVisual } from './starVisual';
-import { fallbackStarVisuals, type StarVisual } from './starCoreMaterial';
+import { createStarVisual, fallbackStarVisuals, type StarVisual } from './starVisual';
+
+const createLabelSprite = (text: string) => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return null;
+  }
+
+  const fontSize = 48;
+  ctx.font = `600 ${fontSize}px Inter`;
+  const textWidth = ctx.measureText(text).width + 40;
+  canvas.width = textWidth;
+  canvas.height = fontSize * 1.8;
+
+  ctx.font = `600 ${fontSize}px Inter`;
+  ctx.fillStyle = '#e5ecff';
+  ctx.fillText(text, 20, fontSize);
+
+  const texture = new CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  const material = new SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+  });
+
+  const sprite = new Sprite(material);
+  sprite.userData.baseWidth = canvas.width / 30;
+  sprite.userData.baseHeight = canvas.height / 30;
+  sprite.scale.set(sprite.userData.baseWidth, sprite.userData.baseHeight, 1);
+  sprite.position.set(0, 8, 0);
+  sprite.renderOrder = 20;
+  sprite.raycast = () => null;
+  sprite.name = 'label';
+  return sprite;
+};
 
 const addOwnerRings = ({
   node,
   systemId,
   baseRadius,
-  maxOrbitRadius,
-  orbitVisible,
   ownerKey,
-}: { node: Group; systemId: string; baseRadius: number; maxOrbitRadius: number; orbitVisible: boolean; ownerKey: keyof typeof ownerMaterials }) => {
+  hasColonized,
+}: {
+  node: Group;
+  systemId: string;
+  baseRadius: number;
+  ownerKey: keyof typeof ownerMaterials;
+  hasColonized: boolean;
+}) => {
   const baseInner = baseRadius + 3.6;
   const baseOuter = baseInner + 2.5;
-  const orbitInner = orbitVisible ? maxOrbitRadius + 1 : baseInner;
-  const orbitOuter = orbitVisible ? maxOrbitRadius + 1.6 : baseOuter;
 
   const baseRing = new Mesh(new RingGeometry(baseInner, baseOuter, 32), ownerMaterials[ownerKey] ?? ownerMaterials.player);
   baseRing.material.side = DoubleSide;
@@ -38,16 +78,28 @@ const addOwnerRings = ({
   baseRing.raycast = () => null;
   baseRing.rotation.x = -Math.PI / 2;
   node.add(baseRing);
-  const orbitRing = new Mesh(new RingGeometry(orbitInner, orbitOuter, 32), ownerMaterials[ownerKey] ?? ownerMaterials.player);
-  orbitRing.material.side = DoubleSide;
-  orbitRing.userData.systemId = systemId;
-  orbitRing.userData.kind = 'ownerOrbit';
-  orbitRing.userData.orbitVisible = orbitVisible;
-  orbitRing.visible = false;
-  orbitRing.raycast = () => null;
-  orbitRing.rotation.x = -Math.PI / 2;
-  node.add(orbitRing);
+
+  if (hasColonized && ownerKey === 'player') {
+    const colonizedInner = baseRadius + 2.1;
+    const colonizedOuter = colonizedInner + 1.2;
+    const colonizedRing = new Mesh(
+      new RingGeometry(colonizedInner, colonizedOuter, 32),
+      new MeshBasicMaterial({
+        color: '#6fe6a5',
+        transparent: true,
+        opacity: 0.16,
+        depthWrite: false,
+      }),
+    );
+    colonizedRing.material.side = DoubleSide;
+    colonizedRing.userData.systemId = systemId;
+    colonizedRing.userData.kind = 'colonizedSystem';
+    colonizedRing.raycast = () => null;
+    colonizedRing.rotation.x = -Math.PI / 2;
+    node.add(colonizedRing);
+  }
 };
+
 const addHostileIndicator = (node: Group, system: StarSystem, baseRadius: number) => {
   if (!system.hostilePower || system.hostilePower <= 0) return;
   const ring = new Mesh(new RingGeometry(baseRadius + 1.2, baseRadius + 2.1, 24), hostileIndicatorMaterial);
@@ -58,6 +110,7 @@ const addHostileIndicator = (node: Group, system: StarSystem, baseRadius: number
   ring.rotation.x = -Math.PI / 2;
   node.add(ring);
 };
+
 const addCombatIndicator = (
   node: Group,
   systemId: string,
@@ -73,6 +126,7 @@ const addCombatIndicator = (
   ring.rotation.x = -Math.PI / 2;
   node.add(ring);
 };
+
 const addBattleIndicator = (
   node: Group,
   systemId: string,
@@ -90,12 +144,12 @@ const addBattleIndicator = (
   cross.rotation.x = -Math.PI / 2;
   node.add(cross);
 };
+
 const addShipyardMarker = ({
   node,
   system,
   baseRadius,
-  planetLookup,
-}: { node: Group; system: StarSystem; baseRadius: number; planetLookup: Map<string, Object3D> }) => {
+}: { node: Group; system: StarSystem; baseRadius: number }) => {
   if (!system.hasShipyard) return;
   const square = new Mesh(new PlaneGeometry(baseRadius * 1.6, baseRadius * 1.6), new MeshBasicMaterial({
     color: '#7fc1ff',
@@ -107,28 +161,12 @@ const addShipyardMarker = ({
   square.userData.kind = 'shipyard';
   square.rotation.z = Math.PI / 4;
   square.rotation.x = -Math.PI / 2;
-  const anchorPlanet =
-    system.shipyardAnchorPlanetId && planetLookup
-      ? planetLookup.get(system.shipyardAnchorPlanetId)
-      : null;
-    if (anchorPlanet) {
-      const planetMesh = anchorPlanet as Mesh;
-      if (planetMesh.geometry && !planetMesh.geometry.boundingSphere) {
-        planetMesh.geometry.computeBoundingSphere();
-      }
-      const radius = planetMesh.geometry?.boundingSphere?.radius ?? 2.5;
-      square.position.set(0, radius + 1.5, 0);
-      anchorPlanet.add(square);
-      return;
-    }
   square.position.set(0, baseRadius + 2.5, 0);
   node.add(square);
 };
+
 const createSystemNode = (
   system: StarSystem,
-  orbitBaseSpeed: number,
-  angleStore: Map<string, number>,
-  planetLookup: Map<string, Object3D>,
   recentCombatSystems: Set<string>,
   activeBattles: Set<string>,
   colonizedPlanet?: { id: string; name: string } | null,
@@ -143,7 +181,6 @@ const createSystemNode = (
   node.position.set(pos.x, 0, depth);
 
   const isRevealed = system.visibility !== 'unknown';
-  const isSurveyed = system.visibility === 'surveyed';
   const visuals = (starVisuals ?? fallbackStarVisuals) as Record<StarClass, StarVisual>;
   const baseRadius = visuals[system.starClass]?.coreRadius ?? 2.1;
 
@@ -162,13 +199,7 @@ const createSystemNode = (
     node.add(label);
   }
 
-  const maxOrbitRadius = isSurveyed
-    ? system.orbitingPlanets.reduce(
-        (max, p) => Math.max(max, p.orbitRadius + (p.size ?? 0)),
-        0,
-      )
-    : 0;
-  const orbitVisible = isSurveyed && maxOrbitRadius > 0;
+  const hasColonized = Boolean(colonizedPlanet);
 
   if (system.ownerId) {
     const ownerKey = system.ownerId === 'player' ? 'player' : 'ai';
@@ -176,31 +207,18 @@ const createSystemNode = (
       node,
       systemId: system.id,
       baseRadius,
-      maxOrbitRadius,
-      orbitVisible,
       ownerKey,
+      hasColonized,
     });
   }
 
   addHostileIndicator(node, system, baseRadius);
   addCombatIndicator(node, system.id, baseRadius, recentCombatSystems);
   addBattleIndicator(node, system.id, baseRadius, activeBattles);
-  addShipyardMarker({ node, system, baseRadius, planetLookup });
-
-  if (isSurveyed && system.orbitingPlanets.length > 0) {
-    const orbitGroup = createOrbitingPlanets(
-      system.orbitingPlanets,
-      system.id.charCodeAt(0),
-      orbitBaseSpeed,
-      system.id,
-      angleStore,
-      planetLookup,
-      colonizedPlanet ?? null,
-    );
-    node.add(orbitGroup);
-  }
+  addShipyardMarker({ node, system, baseRadius });
 
   return node;
 };
 
 export { createSystemNode };
+

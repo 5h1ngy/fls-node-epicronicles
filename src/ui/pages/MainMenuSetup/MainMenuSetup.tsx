@@ -8,10 +8,17 @@ interface MainMenuSetupProps {
   seed: string;
   presetId: string;
   presets: GameConfig['galaxyPresets'];
-  galaxyShape: 'circle' | 'spiral';
+  galaxyShape: import('@domain/galaxy/galaxy').GalaxyShape;
+  galaxyShapes: import('@domain/galaxy/galaxy').GalaxyShape[];
+  systemCount: number;
+  systemCountOptions: number[];
+  galaxyRadius: number;
+  galaxyRadii: number[];
   onSeedChange: (value: string) => void;
   onPresetChange: (value: string) => void;
-  onShapeChange: (value: 'circle' | 'spiral') => void;
+  onShapeChange: (value: import('@domain/galaxy/galaxy').GalaxyShape) => void;
+  onSystemCountChange: (value: number) => void;
+  onRadiusChange: (value: number) => void;
   onConfirm: () => void;
   onBack: () => void;
 }
@@ -22,9 +29,16 @@ export const MainMenuSetup = ({
   presetId,
   presets,
   galaxyShape,
+  galaxyShapes,
+  systemCount,
+  systemCountOptions,
+  galaxyRadius,
+  galaxyRadii,
   onSeedChange,
   onPresetChange,
   onShapeChange,
+  onSystemCountChange,
+  onRadiusChange,
   onConfirm,
   onBack,
 }: MainMenuSetupProps) => (
@@ -78,11 +92,46 @@ export const MainMenuSetup = ({
             <span>Forma galassia</span>
             <select
               value={galaxyShape}
-              onChange={(event) => onShapeChange(event.target.value as 'circle' | 'spiral')}
+              onChange={(event) =>
+                onShapeChange(event.target.value as import('@domain/galaxy/galaxy').GalaxyShape)
+              }
               aria-label="Forma galassia"
             >
-              <option value="circle">Tonda</option>
-              <option value="spiral">Spirale</option>
+              {galaxyShapes.map((shape) => (
+                <option key={shape} value={shape}>
+                  {shape}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="setup-card__field">
+            <span>Numero sistemi</span>
+            <select
+              value={systemCount}
+              onChange={(event) => onSystemCountChange(Number(event.target.value))}
+              aria-label="Numero sistemi"
+            >
+              {systemCountOptions.map((count) => (
+                <option key={count} value={count}>
+                  {count}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="setup-card__field">
+            <span>Raggio galassia</span>
+            <select
+              value={galaxyRadius}
+              onChange={(event) => onRadiusChange(Number(event.target.value))}
+              aria-label="Raggio galassia"
+            >
+              {galaxyRadii.map((radius) => (
+                <option key={radius} value={radius}>
+                  {radius}
+                </option>
+              ))}
             </select>
           </label>
         </div>

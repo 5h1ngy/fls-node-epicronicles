@@ -393,7 +393,7 @@ export type FleetSplitResult =
 
 export interface GalaxyState {
   seed: string;
-  galaxyShape?: 'circle' | 'spiral';
+  galaxyShape?: import('@domain/galaxy/galaxy').GalaxyShape;
   systems: StarSystem[];
 }
 
